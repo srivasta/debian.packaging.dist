@@ -42,7 +42,7 @@
 .in -5
 .fi
 ..
-.TH DIST 1 ram
+.TH DIST 7 ram
 .SH NAME
 dist \- introduction to dist
 .SH DESCRIPTION

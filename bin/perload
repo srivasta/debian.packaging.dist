@@ -1,4 +1,4 @@
-: # feed this into perl
+#! /usr/bin/perl
 '/bin/true' && eval 'exec perl -S $0 "$@"'
 	if $running_under_some_shell;
 'di';

@@ -260,7 +260,7 @@ AllTarget(manpages)			@!\
 							@!\
 install.man::				@@\
 	@if test "$(MANSRC)"; then \		@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		for file in manpages; do \		@@\
 			(set -x; $(INSTALL) -c -m 444 $$file $(MANSRC)); \	@@\
 		done; \				@@\
@@ -268,7 +268,7 @@ install.man::				@@\
 							@!\
 deinstall.man::				@@\
 	@if test "$(MANSRC)"; then \		@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		for file in manpages; do \		@@\
 			(set -x; $(RM) $(MANSRC)/$$file); \	@@\
 		done; \				@@\
@@ -461,13 +461,13 @@ InstallScriptWithFlags(script,dest,^^)
 |once _InstallScripts_		@!\
 install:: $(SCRIPTS) $(LSCRIPTS) @@\
 	@for file in $(SCRIPTS) $(LSCRIPTS); do \	@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		(set -x; $(INSTALL) -c -m 555 $$file $(SCRIPTDIR)); \	@@\
 	done					@!\
 							@!\
 deinstall::					@@\
 	@for file in $(SCRIPTS) $(LSCRIPTS); do \	@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		(set -x; $(RM) $(SCRIPTDIR)/$$file); \	@@\
 	done					@!\
 -once
@@ -486,7 +486,7 @@ deinstall::					@@\
 ?NOMAN:|skip				@!\
 install.man::				@@\
 	@if test "$(MANSRC)"; then \	@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		for file in $(SCRIPTS); do \	@@\
 			if test -f $$file.man; then \	@@\
 				(set -x; \		@@\
@@ -497,7 +497,7 @@ install.man::				@@\
 							@!\
 deinstall.man::				@@\
 	@if test "$(MANSRC)"; then \	@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		for file in $(SCRIPTS); do \	@@\
 			(set -x; $(RM) $(MANSRC)/$$file.$(L)); \	@@\
 		done; \					@@\
@@ -515,7 +515,7 @@ deinstall.man::				@@\
 #define LinkFileList(step,list,dir,sub)	@!\
 >LN @!\
 step:: list							@@\
-	@case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 	echo "	cd" dir; cd dir; for i in list; do (set -x; $(LN) sub/$$i .); done
 
 
@@ -529,13 +529,13 @@ step:: list							@@\
 >INSTALL @!\
 >RM @!\
 step:: list							@@\
-	@case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 	for i in list; do \				@@\
 		(set -x; $(INSTALL) -c flags $$i dest); \	@@\
 	done							@!\
 									@!\
 de^^step::						@@\
-	@case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 	for i in list; do \				@@\
 		(set -x; $(RM) dest/$$i); \	@@\
 	done
@@ -1237,11 +1237,11 @@ local_realclean:: 								@@\
 #define CommonSubdirsRule(dirs) @!\
 >MAKE	@!\
 subdirs: 						@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \			@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \		@@\
 	for i in dirs ;\					@@\
 	do \								@@\
 		(cd $$i ; echo $(VERB) "in $(DIR)$$i..."; \		@@\
-			$(MAKE) $(MFLAGS) $(FLAGS) $(TARGET)); \		@@\
+			$(MAKE) $(MFLAGS) $(FLAGS) $(TARGET)) || false; \	@@\
 	done
 	
 
@@ -1252,11 +1252,11 @@ subdirs: 						@@\
 #define NamedTargetSubdirsRule(dirs,name,verb,flags)	@!\
 >MAKE @!\
 name::									@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \		@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \		@@\
 	for i in dirs ;\					@@\
 	do \								@@\
 		(cd $$i ; echo verb "in $(DIR)$$i..."; \	@@\
-			$(MAKE) $(MFLAGS) flags name); \			@@\
+			$(MAKE) $(MFLAGS) flags name) || false; \		@@\
 	done
 	
 	
@@ -1389,7 +1389,7 @@ LintDirs($(SUBDIRS))
 #define MakeDirs(dirs) \
 >INSTALLDIR @@\
 	@for dir in dirs; do \		@@\
-		case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+		case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 		(set -x; test -d $$dir || $(INSTALLDIR) $$dir); \	@@\
 	done
 
@@ -1434,13 +1434,13 @@ MakeLintSubdirs(dirs,lintlib)
 #define MakeMakeSubdirs(target)	@!\
 >MAKE	@!\
 target::								@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \	@@\
 	for i in $(SUBDIRS);\				@@\
 	do \								@@\
 		echo "Making "target" in $(DIR)$$i..."; \	@@\
 		(cd $$i || exit 1; \			@@\
 		if test ! -f Makefile; then /bin/sh Makefile.SH; fi; \ @@\
-		$(MAKE) $(MFLAGS) target) \	@@\
+		$(MAKE) $(MFLAGS) target) || false\	@@\
 	done
 
 
@@ -1454,7 +1454,7 @@ target::								@@\
 #define MakeMakefilesSH()		@!\
 >MAKE	@!\
 Makefiles.SH:: Makefile.SH				@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \	@@\
 	for i in $(SUBDIRS);\					@@\
 	do \								@@\
 		case "$(DIR)$$i/" in \								@@\
