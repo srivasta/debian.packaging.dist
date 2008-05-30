@@ -1,12 +1,12 @@
-?RCS: $Id: spitshell.U,v 3.0.1.4 1997/02/28 16:22:12 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: spitshell.U,v $
 ?RCS: Revision 3.0.1.4  1997/02/28  16:22:12  ram
@@ -26,7 +26,7 @@
 ?RCS: Revision 3.0  1993/08/18  12:09:49  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:spitshell shsharp sharpbang: eunicefix sh
+?MAKE:spitshell shsharp sharpbang: eunicefix sh Head
 ?MAKE:	-pick add $@ %<
 ?S:spitshell:
 ?S:	This variable contains the command necessary to spit out a runnable
@@ -40,7 +40,10 @@
 ?S:	This variable contains the string #! if this system supports that
 ?S:	construct.
 ?S:.
-?T:xcat
+?F:!sharp
+?T:xcat p
+?X: "paths" comes from Head
+?LINT:extern paths _exe
 : see if sh knows # comments
 ?X: This is loaded up early, so avoid being chatty.
 ?X: echo " "
@@ -52,19 +55,31 @@ if `$sh -c '#' >/dev/null 2>&1`; then
 ?X:	echo " "
 ?X:	echo "Okay, let's see if #! works on this system..."
 	xcat=/bin/cat
-	test -f $xcat || xcat=/usr/bin/cat
-	echo "#!$xcat" >try
-	$eunicefix try
-	chmod +x try
-	./try > today
+	test -f $xcat$_exe || xcat=/usr/bin/cat
+	if test ! -f $xcat$_exe; then
+		for p in `echo $PATH | sed -e "s/$p_/ /g"` $paths; do
+			if test -f $p/cat$_exe; then
+				xcat=$p/cat
+				break
+			fi
+		done
+		if test ! -f $xcat$_exe; then
+			echo "Can't find cat anywhere!"
+			exit 1
+		fi
+	fi
+	echo "#!$xcat" >sharp
+	$eunicefix sharp
+	chmod +x sharp
+	./sharp > today 2>/dev/null
 	if test -s today; then
 ?X:		echo "It does."
 		sharpbang='#!'
 	else
-		echo "#! $xcat" > try
-		$eunicefix try
-		chmod +x try
-		./try > today
+		echo "#! $xcat" > sharp
+		$eunicefix sharp
+		chmod +x sharp
+		./sharp > today 2>/dev/null
 		if test -s today; then
 ?X:			echo "It does."
 			sharpbang='#! '
@@ -88,5 +103,5 @@ else
 	echo "I presume that if # doesn't work, #! won't work either!"
 	sharpbang=': use '
 fi
-rm -f try today
+rm -f sharp today
 

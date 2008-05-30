@@ -1,12 +1,12 @@
-?RCS: $Id: registers.U,v 3.0.1.2 1997/02/28 16:19:41 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: registers.U,v $
 ?RCS: Revision 3.0.1.2  1997/02/28  16:19:41  ram
@@ -38,7 +38,7 @@
 ?C:	can freely declare register variables in sub-blocks of code and as
 ?C:	function parameters.  Do not use register<n> more than once per routine.
 ?C:.
-?LINT:describe reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg11
+?LINT:describe reg2 reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg11
 ?LINT:describe reg12 reg13 reg14 reg15 reg16
 ?LINT:known register2 register3 register4 register5 register6 register7
 ?LINT:known register8 register9 register10 register11 register12 register13
@@ -61,7 +61,6 @@
 ?H:#define register16 $reg16	/**/
 ?H:.
 ?F:!.foo
-?T:i d
 : see how many register declarations we want to use
 case "$registers" in
 '')
@@ -81,7 +80,7 @@ case "$registers" in
 	fi;;
 *) dflt=$registers ;;
 esac
-?LINT:set reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg11
+?LINT:set reg2 reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg11
 ?LINT:set reg12 reg13 reg14 reg15 reg16
 cat <<EOM
  

@@ -1,12 +1,12 @@
-?RCS: $Id: models.U,v 3.0.1.2 1997/02/28 16:13:17 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: models.U,v $
 ?RCS: Revision 3.0.1.2  1997/02/28  16:13:17  ram
@@ -19,7 +19,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?MAKE:models split small medium large huge: test cat Myread sysman Oldconfig \
-	Loc contains
+	Loc Warn contains rm
 ?MAKE:	-pick add $@ %<
 ?S:models:
 ?S:	This variable contains the list of memory models supported by this
@@ -54,16 +54,17 @@
 ?S:	huge model is not supported, contains the flag to produce large
 ?S:	model programs.  It is up to the Makefile to use this.
 ?S:.
-?T:unsplit tans
+?T:unsplit tans modelcc
 ?F:!pdp11
 ?D:large=''
+?LINT:extern cc
 : see what memory models we can support
 case "$models" in
 '')
 ?X: We may not use Cppsym or we get a circular dependency through cc.
 ?X: But this should work regardless of which cc we eventually use.
 	$cat >pdp11.c <<'EOP'
-main() {
+int main() {
 #ifdef pdp11
 	exit(0);
 #else
@@ -71,8 +72,14 @@ main() {
 #endif
 }
 EOP
-	cc -o pdp11 pdp11.c >/dev/null 2>&1
-	if ./pdp11 2>/dev/null; then
+?X: Run cc in a subshell in case they don't have a 'cc' command.
+?X: Presumably they do have gcc or something.
+	case "$cc" in
+	'') modelcc="$cc" ;;
+	*) modelcc="cc" ;;
+	esac
+	( $modelcc -o pdp11 pdp11.c ) >/dev/null 2>&1
+	if $test -f pdp11 && ./pdp11 2>/dev/null; then
 		dflt='unsplit split'
 	else
 		tans=`./loc . X /lib/small /lib/large /usr/lib/small /usr/lib/large /lib/medium /usr/lib/medium /lib/huge`
@@ -105,6 +112,8 @@ If you wish to force everything to one memory model, say "none" here and
 put the appropriate flags later when it asks you for other cc and ld flags.
 Venix systems may wish to put "none" and let the compiler figure things out.
 (In the following question multiple model names should be space separated.)
+
+The default for most systems is "none".
 
 EOM
 rp="Which memory models are supported?"
@@ -198,7 +207,8 @@ none)
 	esac
 	;;
 *)
-	echo "Unrecognized memory models--you may have to edit Makefile.SH" >&4
+	./warn "Unrecognized memory models--you may have to edit Makefile.SH"
 	;;
 esac
+$rm -f pdp11.* pdp11
 

@@ -20,15 +20,15 @@ $startperl
 	eval 'exec perl -S \$0 "\$@"'
 		if \$running_under_some_shell;
 
-# $Id: manilist.SH,v 3.0.1.3 1994/10/29 15:42:42 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # $Log: manilist.SH,v $
 # Revision 3.0.1.3  1994/10/29  15:42:42  ram
@@ -472,8 +472,7 @@ EOF
 # Remove ':' quotations in front of the lines
 sub q {
 	local($_) = @_;
-	local($*) = 1;
-	s/^://g;
+	s/^://gm;
 	$_;
 }
 

@@ -17,15 +17,15 @@ esac
 echo "Extracting makedir (with variable substitutions)"
 $spitshell >makedir <<!GROK!THIS!
 $startsh
-# $Id: makedir.sh,v 3.0.1.1 1994/01/24 14:00:08 ram Exp $
+# $Id: makedir.sh,v 3.0.1.1 1994/01/24 14:00:08 ram Exp ram $
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # Original Author: Larry Wall <lwall@netlabs.com>
 # 

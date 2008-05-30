@@ -20,17 +20,30 @@ $startperl
 	eval 'exec perl -S \$0 "\$@"'
 		if \$runnning_under_some_shell;
 
-# $Id: jmake.SH,v 3.0.1.6 1995/09/25 09:08:01 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # $Log: jmake.SH,v $
+# Revision 3.0.1.9  2004/08/22 09:01:42  ram
+# patch71: renamed |test as |case as the construct has its syntax
+# patch71: added |subst section to allow variable substitutions
+#
+# Revision 3.0.1.8  2004/08/21 23:19:46  ram
+# patch71: added '|shell' section to emit verbatim code in Makefile.SH
+# patch71: new '|test' to conditionally generate Makefile sections
+#
+# Revision 3.0.1.7  2004/08/21 20:59:57  ram
+# patch71: replaced old "do foo()" with modern "&foo()" syntax
+# patch71: take care of junk emitted by GNU make when running commands
+# patch71: new ^^^ escape sequence, removing extra spaces afterwards
+#
 # Revision 3.0.1.6  1995/09/25  09:08:01  ram
 # patch59: will now force macro definitions to the left
 #
@@ -58,6 +71,7 @@ $startperl
 \$cpp = '$cpp';
 \$version = '$VERSION';
 \$patchlevel = '$PATCHLEVEL';
+\$revision = '$REVISION';
 !GROK!THIS!
 $spitshell >>jmake <<'!NO!SUBS!'
 
@@ -72,6 +86,18 @@ while ($ARGV[0] =~ /^-/) {
 	$cpp_opt .= "$_ ";
 }
 $cpp_opt .= "-I$dir";
+
+# Pass 0 is looking at the template for "?CP:CP =" lines that are to be
+# emitted if the CP variable is needed.  Later on, when we see $(CP) being
+# used, we'll be able to set the $symbol{CP} entry to 1 to have the CP
+# variable initialized by the template.
+
+open(TMPL, $file) || die "$me: can't open $file: $!\n";
+while (<TMPL>) {
+	next unless /^\?([\w_]+):\1\s+=/;
+	$wanted{$1}++;
+}
+close TMPL;
 
 # Thank you HP-UX for having a cpp that blindly strips trailing backslashes
 # in the text. Run through cpp by using the fixcpp script...
@@ -104,9 +130,12 @@ while (<CPP>) {
 	# Restore possibly escaped C comments
 	s|/#\*|/*|g;
 	s|\*#/|*/|g;
+	# Remove all ^^^ (null space character) up to next non-space character
+	s|\^\^\^\s*||g;
 	# Remove all ^^ (null space character)
 	s|\^\^||g;
-	# Restore escaped ^^ sequence
+	# Restore escaped ^^ and ^^^ sequences
+	s|\^\\\^\\\^|^^^|g;
 	s|\^\\\^|^^|g;
 	next if /^#\s+\d+/;		# Skip cpp commments
 
@@ -115,13 +144,11 @@ while (<CPP>) {
 	s/@!\s?/\n/g;
 	s/@@\s?/\n\t/g;
 
-	$* = 1;
 	# A '\r' is added to all lines, in order to let 'split' keep them
 	# As lines ending with '\' won't fit in the next regular
 	# expression (why ?), we have to treat that special case separately
-	s/\n$/\r\n/g;
-	s/\\\s*$/\\\r/g;	# Remove spaces after final '\' and add '\r'
-	$* = 0;
+	s/\n$/\r\n/gm;
+	s/\\\s*$/\\\r/gm;	# Remove spaces after final '\' and add '\r'
 	@macro = split(/\n/);
 	for ($i = 0; $i <= $#macro; $i++) {
 		chop($_ = $macro[$i]);				# Remove final '\r'
@@ -129,7 +156,10 @@ while (<CPP>) {
 		if (/^TOP\s*=\s*(\S+)/) {			# Get the top from generated file
 			$top = $1;
 		}
+		find_wanted($_);					# Look for known $(VAR) usage
 		if (s/^\s*>//) {					# '>' means "symbol wanted"
+			warn "$me: the '>$_' construct is deprecated for known symbols\n"
+				if $wanted{$_} && !$warned_wanted_symbol_deprecated++;
 			$symbol{$_} = 1;
 		} elsif (s/^\s*\+//) {				# '+' means "initialization section"
 			if (s/^\+(\w+)//) {				# '++' means add to variable list
@@ -148,7 +178,7 @@ while (<CPP>) {
 				push(@makefile, "|$_");		# Skip handled in pass 2
 			} elsif (/^expand/) {
 				push(@makefile, "|$_");		# Expand handled in pass 2
-			} elsif (/^once\s+(\S+)/) {		# Once handled in pass 1
+			} elsif (/^once\s+(.*)/) {		# Once handled in pass 1
 				if ($Once{$1}++) {			# Symbol already seen -- skip
 					for (; $i <= $#macro; $i++) {
 						last if $macro[$i] =~/^-once/;
@@ -156,6 +186,12 @@ while (<CPP>) {
 					warn("$me: -once not found for $1")
 						unless $macro[$i] =~/^-once/;
 				}
+			} elsif (/^shell/) {			# Escaping to shell
+				push(@makefile, "|$_");		# will be handled in pass 2
+			} elsif (/^case/) {				# Conditional generation
+				push(@makefile, "|$_");		# will be handled in pass 2
+			} elsif (/^subst/) {			# Section with var substitution
+				push(@makefile, "|$_");		# will be handled in pass 2
 			} else {
 				print "$me: Warning: unknown command $_\n";
 			}
@@ -173,19 +209,104 @@ $symbol{'INIT'} = 1 if ($#init >= 0 || $#key >=0);		# Initializations
 $symbol{'SUFFIX'} = 1 if ($#suffix >= 0 || $#rule >=0);	# Rules or suffixes
 $symbol{'TOP'} = 1 if $top eq '.';		# If imake invoked for the top
 
+$shellmode = 0;			# Set to true within "shell" section
+$casemode = 0;			# Counts nesting levels within "case" section
+$substmode = 0;			# True when within section with variable substitution
+
+$SPIT_START = "\$spitshell >>Makefile <<'!NO!SUBS!'\n";
+$SPIT_END = "!NO!SUBS!\n";
+$GROK_START = "\$spitshell >>Makefile <<!GROK!THIS!\n";
+$GROK_END = "!GROK!THIS!\n";
+
 open(MAKEFILE, ">Makefile.SH");
 # We have to use for instead of foreach to handle 'skip' easily
 line: for ($i = 0; $i <= $#makefile; $i++) {
 	$_ = $makefile[$i];
 	next if /^-skip|-expand/;		# They might have made a mistake
 
-	s/<TAG>/[jmake $version PL$patchlevel]/;
+	# Strip consecutive blank lines in generated file
+
 	if (/^\s*$/) {
 		next if ($last_was_blank);
 		$last_was_blank = 1;
 	} else {
 		$last_was_blank = 0;
 	}
+
+	# In shell mode, we're transparent, untill we reach a "-shell"
+	# We don't call print_makefile() as we don't want to record
+	# those non-makefile lines in the @Generated array.
+
+	if ($shellmode) {
+		if (/^-shell/) {			# Ending shell mode, back to Makefile
+			print MAKEFILE $substmode ? $GROK_START : $SPIT_START;
+			$shellmode = 0;
+		} elsif (/^\|shell/) {
+			die "$me: can't nest 'shell' sections.\n";
+		} else {
+			print MAKEFILE "$_\n";
+		}
+		next;
+	} elsif (/^\|shell/) {
+		print MAKEFILE $substmode ? $GROK_END : $SPIT_END;
+		$shellmode = 1;				# Next lines emitted verbatim as shell
+		next;
+	}
+
+	# In subst mode, the section until "-subst" is emitted regularily,
+	# excepted that it will be in a grok section, so its $var will be
+	# substituted by the shell.
+
+	if ($substmode) {
+		if (/^-subst/) {			# Ending subst mode, back to regular
+			print MAKEFILE $GROK_END;
+			print MAKEFILE $SPIT_START;
+			$substmode = 0;
+			next;
+		} elsif (/^\|subst/) {
+			die "$me: can't nest 'subst' sections.\n";
+		} 
+		# Continue with line
+	} elsif (/^\|subst/) {
+		print MAKEFILE $SPIT_END;	# End spit section in Makefile.SH
+		print MAKEFILE $GROK_START;
+		$substmode = 1;				# Next lines subject to $ interpretation
+		next;
+	}
+
+	# In a "case" section, the Makefile will be conditionally generated
+	# based on the value of the supplied variable, as evaluated by the shell.
+	# We can nest "case" sections without problems.
+
+	if (/^-case/) {					# Ending current case section
+		if ($casemode == 0) {
+			warn "$me: ignoring spurious '-case'\n";
+			next;
+		}
+		print MAKEFILE $substmode ? $GROK_END : $SPIT_END;
+		my $indent = "\t" x ($casemode - 1);
+		print MAKEFILE "${indent}\t;;\n";
+		print MAKEFILE "${indent}esac\n";
+		print MAKEFILE "${indent}", $substmode ? $GROK_START : $SPIT_START;
+		$casemode--;
+		next;
+	}
+
+	if (/^\|case/) {
+		my ($var, $value) = /^\|case\s+(\w+)\s+in\s+(.*)/;
+		die "$me: unparseable directive '$_'\n" if $var eq '';
+		$casemode++;
+		print MAKEFILE $substmode ? $GROK_END : $SPIT_END;
+		my $indent = "\t" x ($casemode - 1);
+		print MAKEFILE "${indent}case \"\$$var\" in\n";
+		print MAKEFILE "${indent}$value)\n";
+		print MAKEFILE "${indent}\t", $substmode ? $GROK_START : $SPIT_START;
+		next;
+	}
+
+	# Process regular line to be generated in Makefile.SH
+
+	s/<TAG>/[jmake $version-$revision]/;
 
 	# Lines starting with ?SYMBOL: (resp. %SYMBOL:) are to be processed
 	# only if SYMBOL is defined (resp. undefined).
@@ -212,13 +333,13 @@ line: for ($i = 0; $i <= $#makefile; $i++) {
 	s/^\s+(\w+\s+=)/$1/;				# Left justify variable definition
 	s/^;#/#/;							# Comments in Jmakefile
 
-	if (s/^\|//) {							# Command for us
-		if (/^skip/) {						# Skip until -skip
+	if (s/^\|//) {						# Command for us
+		if (/^skip/) {					# Skip until -skip
 			for (; $i <= $#makefile; $i++) {
 				last if $makefile[$i] =~ /^-skip/;
 			}
 		} elsif (s/^expand//) {
-			do init_expand($_);			# Initializes data structures
+			&init_expand($_);			# Initializes data structures
 			$i++;						# Skip expand line
 			undef @Expand;				# Storage for expanded lines
 			$pattern = '';				# Assume no pattern
@@ -233,9 +354,9 @@ line: for ($i = 0; $i <= $#makefile; $i++) {
 				s/^\s/\t/;				# Make sure leading tab is there
 				push(@Expand, $_);		# Line to be expanded
 			}
-			do expand($pattern);		# Expand all lines in buffer
+			&expand($pattern);			# Expand all lines in buffer
 		} else {
-			print "$me: Warning: unknown command $_\n";
+			die "$me: unknown command $_\n";
 		}
 	} elsif (/^INIT/) {						# Initialization section
 		# All the initializations are put in the variable substitution
@@ -243,16 +364,16 @@ line: for ($i = 0; $i <= $#makefile; $i++) {
 		# the '$' signs that are not followed by an alphanumeric character.
 		foreach (@init) {
 			# Dumps core sometimes with perl 4.0 PL10
-			# do protect_dollars(*_);
-			$_ = do protect_dollars($_);
-			do print_makefile($_);
+			# &protect_dollars(*_);
+			$_ = &protect_dollars($_);
+			&print_makefile($_);
 		}
 		foreach (@key) {	# @key set earlier to keys(%added)
 			$_ .= " = " . $added{$_};
 			# Dumps core sometimes with perl 4.0 PL10
-			# do protect_dollars(*_);
-			$_ = do protect_dollars($_);
-			do print_makefile($_);
+			# &protect_dollars(*_);
+			$_ = &protect_dollars($_);
+			&print_makefile($_);
 		}
 	} elsif (/^SUFFIX/) {					# Suffixes/Rules section
 		# Rules and suffixes are put in the variable substitution
@@ -262,20 +383,20 @@ line: for ($i = 0; $i <= $#makefile; $i++) {
 			print MAKEFILE ".SUFFIXES:";
 			foreach (@suffix) {
 				# Dumps core sometimes with perl 4.0 PL10
-				# do protect_dollars(*_);
-				$_ = do protect_dollars($_);
+				# &protect_dollars(*_);
+				$_ = &protect_dollars($_);
 				print MAKEFILE " $_";
 			}
 			print MAKEFILE "\n\n";
 		}
 		foreach (@rule) {
 			# Dumps core sometimes with perl 4.0 PL10
-			# do protect_dollars(*_);
-			$_ = do protect_dollars($_);
+			# &protect_dollars(*_);
+			$_ = &protect_dollars($_);
 			print MAKEFILE "$_\n";
 		}
 	} else {
-		do print_makefile($_);
+		&print_makefile($_);
 	}
 }
 close MAKEFILE;
@@ -299,15 +420,19 @@ sub init_expand {
 	if (/\$\(\w+\)/) {	# If at least one macro
 		local($make) = "/tmp/mkjm$$";
 		open(MAKE, ">$make") || die "$me: can't create $make: $!\n";
-		do gen_variables();			# Generates already computed variables
+		&gen_variables();			# Generates already computed variables
 		foreach $var (@Order) {		# Print each in order we found them
 			print MAKE "$var = $Makesym{$var}\n" if !$Gvars{$var};
 		}
-		print MAKE "all:\n\t\@echo '$_'\n";
+		# We prepend OUTPUT: in front of the line that interests us, because
+		# some makes can print extra information, especially GNU make with
+		# its entering/leaving blurb when invoked from another makefile.
+		print MAKE "all:\n\t\@echo 'OUTPUT: $_'\n";
 		close MAKE;
-		chop($_ = `make -f $make all`);
+		chop($_ = `make -f $make all | grep ^OUTPUT:`);
 		unlink($make);
 	}
+	s/^OUTPUT: //;
 	while (s/^\s*(\w+)!([^!]*)!//) {
 		$Vars{$1} = $2;
 		# Record only length for _first_ expanded symbol
@@ -345,7 +470,7 @@ sub expand {
 			}
 			# Protect substitution in an 'eval' in case of error
 			eval "s/${pattern}\$//" if $pattern && $i == ($Vars_len - 1);
-			do print_makefile($_);
+			&print_makefile($_);
 		}
 	}
 }
@@ -382,6 +507,16 @@ sub gen_variables {
 		}
 	}
 	print MAKE "void::\n";		# Cut incomplete escape sequence
+}
+
+# Parse line to extract all $(VAR) usage and trigger the symbol if VAR
+# is among the wanted set, as if they had manually said ">VAR" like in
+# the old days.
+sub find_wanted {
+	my ($l) = @_;
+	while ($l =~ s/\$\(([\w_]+)\)//) {
+		$symbol{$1}++ if $wanted{$1};
+	}
 }
 
 !NO!SUBS!

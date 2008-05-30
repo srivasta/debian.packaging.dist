@@ -1,12 +1,12 @@
-?RCS: $Id: mansrc.U,v 3.0.1.9 1997/02/28 16:12:03 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: mansrc.U,v $
 ?RCS: Revision 3.0.1.9  1997/02/28  16:12:03  ram
@@ -83,9 +83,10 @@ esac
 echo "If you don't want the manual sources installed, answer 'none'."
 case "$mansrc" in
 '')
-	lookpath="$prefixexp/man/man1 $prefixexp/man/u_man/man1"
-	lookpath="$lookpath $prefixexp/man/l_man/man1"
+	lookpath="$prefixexp/share/man/man1 $prefixexp/man/man1"
+	lookpath="$lookpath $prefixexp/man/u_man/man1 $prefixexp/man/l_man/man1"
 	lookpath="$lookpath /usr/local/man/man1 /opt/man/man1 /usr/man/manl"
+	lookpath="$lookpath /usr/share/man/man1 /usr/local/share/man/man1"
 	lookpath="$lookpath /usr/man/local/man1 /usr/man/l_man/man1"
 	lookpath="$lookpath /usr/local/man/u_man/man1 /usr/local/man/l_man/man1"
 	lookpath="$lookpath /usr/man/man.L"

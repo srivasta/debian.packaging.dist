@@ -20,15 +20,15 @@ $startperl
 	eval 'exec perl -S \$0 "\$@"'
 		if \$runnning_under_some_shell;
 
-# $Id: fixcpp.SH,v 3.0.1.1 1995/03/21 08:35:37 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # $Log: fixcpp.SH,v $
 # Revision 3.0.1.1  1995/03/21  08:35:37  ram
@@ -43,7 +43,7 @@ $startperl
 # This program is meant to be called from jmake. All it does is pre-process
 # the file it is given as argument, focusing on #include directives and
 # resolving them as cpp would (but without the #line stuff since we don't
-# really care about it), escaping all the trailing \ into '\ ^M'. The resulting
+# really care about it), escaping all the trailing \ into '\ ^A'. The resulting
 # temporary file is then handed off to the real cpp for macro processing, and
 # the output is printed on stdout, after restoration of any original trailing \.
 # Again, thanks HP-UX for making this so challenging and exciting... :-)
@@ -52,9 +52,10 @@ $startperl
 # in macros and must go away some way or the other. Also trailing backslashes
 # on #define lines are really continuations and are left un-escaped.
 
-\$cpp = '$cpp';
+\$cpp = '$cpp_trad';
 \$version = '$VERSION';
 \$patchlevel = '$PATCHLEVEL';
+\$revision = '$REVISION';
 !GROK!THIS!
 $spitshell >>fixcpp <<'!NO!SUBS!'
 
@@ -135,7 +136,7 @@ sub escape {
 	# Don't escape trailing backslashes in macro definition or cpp
 	# won't see them as macro continuation any longer, and also within
 	# macro definitions, all those @@ or @! continuations...
-	s/\\$/\\ \015/ unless /\@[!@]\\$/ || /^#define/;
+	s/\\$/\\ \001/ unless /\@[!@]\\$/ || /^#define/;
 }
 
 # Append file to given (opened) file descriptor
@@ -172,7 +173,7 @@ sub cpp {
 	local($file) = @_;
 	open(CPP, "$cpp $cpp_opt $file |") || die "Can't fork: $!\n";
 	while (<CPP>) {
-		s/\\ \015$/\\/;				# Un-escape trailing \
+		s/\\ \001$/\\/;				# Un-escape trailing \
 		print STDOUT;
 	}
 	close CPP;

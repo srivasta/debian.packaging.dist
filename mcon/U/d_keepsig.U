@@ -1,12 +1,12 @@
-?RCS: $Id: d_keepsig.U,v 3.0.1.4 1995/07/25 13:57:56 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_keepsig.U,v $
 ?RCS: Revision 3.0.1.4  1995/07/25  13:57:56  ram
@@ -24,7 +24,7 @@
 ?RCS: Revision 3.0  1993/08/18  12:06:26  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:d_keepsig: cat +cc +ccflags rm Guess contains echo n c Setvar
+?MAKE:d_keepsig: cat Compile rm Guess contains echo n c Setvar run
 ?MAKE:	-pick add $@ %<
 ?S:d_keepsig:
 ?S:	This variable contains the eventual value of the SIGNALS_KEPT symbol,
@@ -37,6 +37,7 @@
 ?C:.
 ?H:#$d_keepsig SIGNALS_KEPT	/**/
 ?H:.
+?F:!try !try.out
 ?LINT:set d_keepsig
 : see if signals are kept
 val="$undef";
@@ -45,7 +46,7 @@ echo "Checking to see if signal handlers stick around..." >&4
 $cat >try.c <<'EOCP'
 foo() {}
 
-main()
+int main()
 {
 	signal(2, foo);
 	kill(getpid(), 2);
@@ -53,11 +54,12 @@ main()
 	printf("abc\n");
 }
 EOCP
-if $cc -o try $ccflags try.c >/dev/null 2>&1; then
+set try
+if eval $compile; then
 ?X: On AIX a single ./try will not work (with ksh)
 ?X: Backquotes required on Linux and SGI (prevents "ambiguous output redirect")
 ?X: (reported by Xavier LeVourch <xavierl@eiffel.com>)
-	`sh -c ./try >try.out 2>/dev/null`
+	echo `sh -c $run ./try >try.out 2>/dev/null` >/dev/null
 	if $contains abc try.out >/dev/null 2>&1; then
 		echo "Yes, they do."
 		val="$define";

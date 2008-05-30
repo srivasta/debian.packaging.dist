@@ -18,6 +18,7 @@ bin/manilist.man           Manual page for manilist
 bin/packinit.SH            Creates a .package file describing your package
 bin/packinit.man           Manual page for packinit
 bin/perload                Build dynamically loaded perl scripts
+bin/svn-revision           Updates the top "revision.h" file if needed
 dist.man                   Introduction to dist
 install.SH                 Installation script with a BSD-like syntax
 jmake/                     Where makefile generator is stored
@@ -76,12 +77,15 @@ mcon/README                Instructions on using metaconfig
 mcon/U/                    Holds Units for metaconfig
 mcon/U/AAAAA.U             Does magic before Head.U
 mcon/U/Begin.U             "Beginning of configuration questions"
+mcon/U/Checkcc.U           A unit for checking the C compiler for sanity
 mcon/U/Chk_MANI.U          MANIFEST checks
 mcon/U/Chk_whoami.U        A unit which checks for conflicts
+mcon/U/Compile.U           Unit for performing compile and link tests
 mcon/U/Config_h.U          Makes config.h.SH--bizarrity here
 mcon/U/Config_sh.U         Makes config.sh
 mcon/U/Configdir.U         Creates .config directory to store persistent info
 mcon/U/Cppsym.U            Makes program to test for cpp symbols
+mcon/U/Cross.U             Unit for cross-compiling support
 mcon/U/Csym.U              Determines whether C symbol is defined
 mcon/U/End.U               "End of configuration questions"
 mcon/U/Extract.U           .SH file extraction
@@ -101,6 +105,8 @@ mcon/U/Loc_sed.U           Full path of sed interpreter, even when portable
 mcon/U/Magic_h.U           Makes confmagic.h--bizarrity here
 mcon/U/MailAuthor.U        Offers user to register himself
 mcon/U/MailList.U          Offers user to subscribe to users list
+mcon/U/Mkdirp.U            Unit producing shell script to "mkdir -p"
+mcon/U/Mksymlinks.U        Unit to generate symlink to source tree
 mcon/U/Myinit.U            For copying to private U directories
 mcon/U/Myread.U            Makes program to do read with shell escape
 mcon/U/Nothing.U           For empty dependencies
@@ -118,6 +124,7 @@ mcon/U/Signal.U            Utilities for sig_name.U
 mcon/U/Tr.U                Builds a tr script to handle lower and upper classes
 mcon/U/Typedef.U           Defines a typedef lookup function
 mcon/U/Unix.U              Common UNIX settings and assumptions
+mcon/U/Warn.U              Summarizes warnings emitted during Configure run
 mcon/U/Warn_v7EXT.U        V7 has some ideosyncracies
 mcon/U/Warn_v7ND.U         V7 has no O_NDELAY read
 mcon/U/Whoa.U              Warning function
@@ -141,6 +148,7 @@ mcon/U/charorder.U         Character order within a byte
 mcon/U/charsize.U          What is the size of "char"?
 mcon/U/contains.U          Makes status-returning grep
 mcon/U/cpp_stuff.U         Some cpp stuff
+mcon/U/cpp_trad.U          Checks how to get traditional cpp behaviour
 mcon/U/cppfilecom.U        Running cpp while preserving C comments
 mcon/U/cppstdin.U          Check how to invoke the C pre-processor
 mcon/U/d_NOFILE.U          Maximum # of file descriptors
@@ -171,6 +179,7 @@ mcon/U/d_csh.U             csh path
 mcon/U/d_ctermid.U         Do we have ctermid()?
 mcon/U/d_cuserid.U         Do we have cuserid()?
 mcon/U/d_dbl_dig.U         Is DBL_DIG defined in <limits.h> or <float.h>?
+mcon/U/d_debugging.U       Conditionally defines -DDEBUGGING
 mcon/U/d_difftime.U        Do we have difftime()?
 mcon/U/d_dlerror.U         Do we have dlerror()?
 mcon/U/d_dlopen.U          Do we have dlopen()?
@@ -228,6 +237,7 @@ mcon/U/d_lstat.U           Do we have lstat()?
 mcon/U/d_mblen.U           Do we have mblen()?
 mcon/U/d_mbstowcs.U        Do we have mbstowcs()?
 mcon/U/d_mbtowc.U          Do we have mbtowc()?
+mcon/U/d_memalign.U        Do we have memalign()?
 mcon/U/d_memccpy.U         Do we have memccpy()?
 mcon/U/d_memchr.U          Do we have memchr()?
 mcon/U/d_memcmp.U          Do we have memcmp()?
@@ -238,6 +248,7 @@ mcon/U/d_mkdir.U           Do we have mkdir()?
 mcon/U/d_mkfifo.U          Do we have mkfifo()?
 mcon/U/d_mktime.U          Do we have mktime()?
 mcon/U/d_mmap.U            Do we have mmap()?
+mcon/U/d_msem_lck.U        Do we have msem_lock()?
 mcon/U/d_msg.U             Do we have full msg(2) support?
 mcon/U/d_msgctl.U          Do we have msgctl()?
 mcon/U/d_msgget.U          Do we have msgget()?
@@ -259,7 +270,11 @@ mcon/U/d_pipe.U            Do we have pipe()?
 mcon/U/d_poll.U            Do we have poll()?
 mcon/U/d_popen.U           Do we have popen()?
 mcon/U/d_portable.U        How portable do we want to be?
+mcon/U/d_pread.U           Do we have pread()?
+mcon/U/d_preadv.U          Do we have preadv()?
 mcon/U/d_psignal.U         Do we have psignal()?
+mcon/U/d_pwrite.U          Do we have pwrite()?
+mcon/U/d_pwritev.U         Do we have pwritev()?
 mcon/U/d_raster.U          Is this a Raster Tech machine?
 mcon/U/d_rdchk.U           Is rdchk() there to check for input?
 mcon/U/d_readdir.U         Do we have readdir()?
@@ -282,6 +297,7 @@ mcon/U/d_semget.U          Do we have semget()?
 mcon/U/d_semop.U           Do we have semop()?
 mcon/U/d_setegid.U         Do we have setegid()?
 mcon/U/d_seteuid.U         Do we have seteuid()?
+mcon/U/d_setgrps.U         Do we have setgroups()?
 mcon/U/d_setlnbuf.U        Do we have setlinebuf()?
 mcon/U/d_setlocale.U       Do we have setlocale()?
 mcon/U/d_setpgid.U         Do we have setpgid()?
@@ -359,12 +375,14 @@ mcon/U/d_wifstat.U         Can we safely use WIFEXITED() and friends?
 mcon/U/d_xdrs.U            Do we have XDR serialization routines?
 mcon/U/defeditor.U         Find default editor
 mcon/U/doublesize.U        What is the size of "double"?
+mcon/U/ebcdic.U            Check for an EBCDIC system
 mcon/U/errnolist.U         See if we need our own .c to get sys_errnolist[]
 mcon/U/etc.U               Where administrative executable should go
 mcon/U/filexp.U            Finds location of filexp made by Filexp.U
 mcon/U/floatsize.U         What is the size of "float"?
 mcon/U/fpostype.U          What is the type for file positions?
 mcon/U/fpu.U               What kind of Sun fpu is in use?
+mcon/U/gccvers.U           Computes the version of the GCC compiler
 mcon/U/gidtype.U           What is the type of gids?
 mcon/U/groupstype.U        What is the type for groups in getgroups()?
 mcon/U/h_fcntl.U           Do we need to include fcntl.h?
@@ -379,6 +397,7 @@ mcon/U/i_fcntl.U           Shall we include <fcntl.h>?
 mcon/U/i_float.U           Shall we include <float.h>?
 mcon/U/i_gdbm.U            Shall we include <gdbm.h>?
 mcon/U/i_grp.U             Shall we include <grp.h>?
+mcon/U/i_inttypes.U        Shall we include <inttypes.h>?
 mcon/U/i_limits.U          Shall we include <limits.h>?
 mcon/U/i_locale.U          Shall we include <locale.h>?
 mcon/U/i_malloc.U          Shall we include <malloc.h>?
@@ -387,6 +406,7 @@ mcon/U/i_memory.U          Shall we include <memory.h>?
 mcon/U/i_ndbm.U            Shall we include <ndbm.h>?
 mcon/U/i_neterrno.U        Shall we include <net/errno.h>?
 mcon/U/i_niin.U            Shall we include <netinet/in.h>?
+mcon/U/i_poll.U            Shall we include <poll.h>?
 mcon/U/i_pwd.U             Shall we include <pwd.h>?
 mcon/U/i_regex.U           Shall we include <regex.h>?
 mcon/U/i_sfio.U            Shall we include <sfio.h>?
@@ -399,6 +419,7 @@ mcon/U/i_sysioctl.U        Include <sys/ioctl.h> or <sgtty.h>?
 mcon/U/i_sysmman.U         Do we have to include <sys/mman.h>?
 mcon/U/i_sysndir.U         Shall we include <sys/ndir.h>?
 mcon/U/i_sysparam.U        Shall we include <sys/param.h>?
+mcon/U/i_syspoll.U         Shall we include <sys/poll.h>?
 mcon/U/i_sysresrc.U        Shall we include <sys/resource.h>?
 mcon/U/i_sysselct.U        Shall we include <sys/select.h>?
 mcon/U/i_syssock.U         Shall we include <sys/socket.h>?
@@ -422,6 +443,7 @@ mcon/U/inc.U               Where to put public include files?
 mcon/U/install.U           Look for a BSD-compatible install
 mcon/U/intsize.U           What is the size of "int"?
 mcon/U/ipc.U               Choose IPC mechanism
+mcon/U/issymlink.U         How to test for symlink status from the shell
 mcon/U/kernel.U            Compute the kernel pathname
 mcon/U/lex.U               Use lex or flex?
 mcon/U/lib.U               Where to put public library files ?
@@ -468,6 +490,7 @@ mcon/U/pager.U             What's the pager, more or less?
 mcon/U/patchlevel.U        Grab current patchlevel out of patchlevel.h
 mcon/U/perlpath.U          The full path of perl
 mcon/U/pidtype.U           What is the type of a PID?
+mcon/U/pkgsrc.U            Computes the absolute package source directory
 mcon/U/prefix.U            Installation prefix setting (none, /usr/local)
 mcon/U/prefshell.U         Preferred user shell
 mcon/U/privlib.U           Where is the private library?
@@ -498,8 +521,10 @@ mcon/U/startsh.U           How to guarantee sh startup
 mcon/U/stdchar.U           Are chars unsigned in stdio?
 mcon/U/sunscanf.U          Is this Sun's version of scanf()?
 mcon/U/sysman.U            Where is the man(1) located?
+mcon/U/trnl.U              Finds appropriate value for a newline in tr
 mcon/U/uidtype.U           What is the type of uids?
 mcon/U/usenm.U             Shall we use the costly nm extraction?
+mcon/U/usesocks.U          Defines USE_SOCKS when SOCKS is to be used
 mcon/U/usrinc.U            Where are include files located?
 mcon/U/vaproto.U           How do we prototype varargs, with ...?
 mcon/U/voidflags.U         How supported is void?
@@ -588,3 +613,4 @@ pl/rcsargs.pl              Perl library to expand rcs filename lists
 pl/snapshot.pl             Perl library to parse RCS snapshot file
 pl/tilde.pl                Perl library to perform ~name expansion
 pl/users.pl                Perl library to parse users file
+revision.h                 The current SVN revision number for dist

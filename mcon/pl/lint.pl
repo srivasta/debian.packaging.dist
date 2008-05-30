@@ -1,12 +1,12 @@
-;# $Id: lint.pl,v 3.0.1.10 1997/02/28 16:31:53 ram Exp $
+;# $Id$
 ;#
-;#  Copyright (c) 1991-1993, Raphael Manfredi
+;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
 ;#  You may redistribute only under the terms of the Artistic Licence,
 ;#  as specified in the README file that comes with the distribution.
 ;#  You may reuse parts of this distribution only within the terms of
 ;#  that same Artistic Licence; a copy of which may be found at the root
-;#  of the source tree for dist 3.0.
+;#  of the source tree for dist 4.0.
 ;#
 ;# $Log: lint.pl,v $
 ;# Revision 3.0.1.10  1997/02/28  16:31:53  ram
@@ -55,7 +55,14 @@ sub init_extraction {
 	$c_symbol = '';				# Current symbol seen in ?C: lines
 	$s_symbol = '';				# Current symbol seen in ?S: lines
 	$m_symbol = '';				# Current symbol seen in ?M: lines
+	$h_section = 0;				# 0 = no ?H: yet, 1 = in ?H:, 2 = ?H:. seen
+	$h_section_warned = 0;		# Whether we warned about terminated ?H: section
+	$heredoc = '';				# Last "here" document symbol seen
+	$heredoc_nosubst = 0;		# True for <<'EOM' here docs
+	$heredoc_line = 0;			# Line were last "here" document started
 	$last_interpreted = 0;		# True when last line was an '@' one
+	$past_first_line = 0;		# True when first body line was already seen
+	$wiped_unit = 0;			# True if unit will be "wiped" for macro subst
 	%csym = ();					# C symbols described
 	%ssym = ();					# Shell symbols described
 	%hcsym = ();				# C symbols used by ?H: lines
@@ -73,11 +80,24 @@ sub init_extraction {
 	%filecreated = ();			# Records files created in this unit
 	%prodfile = ();				# Unit where a given file is said to be created
 	%defseen = ();				# Symbol defintions claimed
+	%lintset = ();				# Symbols declared set by a ?LINT: line
+	%lintsdesc = ();			# Symbols declared described by a ?LINT: line
+	%lintcdesc = ();			# Symbols declared described by a ?LINT: line
 	%lintseen = ();				# Symbols declared known by a ?LINT: line
 	%lintchange = ();			# Symbols declared changed by a ?LINT: line
 	%lintuse = ();				# Symbols declared used by unit
 	%lintextern = ();			# Symbols known to be externally defined
 	%lintcreated = ();			# Files declared as created by a ?LINT: line
+	%linthere = ();				# Unclosed here document from ?LINT: line
+	%lintnothere = ();			# False here document names, from ?LINT: line
+	%lintfused = ();			# Records files markedas used in ?LINT: line
+	%lintchange_used = ();		# Tracks symbols for which %lintchange was used
+	%lintuse_used = ();			# Tracks symbols for which %lintuse was used
+	%lintseen_used = ();		# Tracks symbols for which %lintseen was used
+	%lintcdesc_used = ();		# Tracks symbols for which %lintcdesc was used
+	%lintsdesc_used = ();		# Tracks symbols for which %lintsdesc was used
+	%lintset_used = ();			# Tracks symbols for which %lintset was used
+	%lintnocomment = ();		# Signals it's OK for unit to lack a : comment
 	%condsym = ();				# Records all the conditional symbols
 	%condseen = ();				# Records conditional dependencies
 	%depseen = ();				# Records full dependencies
@@ -90,6 +110,15 @@ sub init_extraction {
 	@make = ();					# Records make dependency lines
 	$body = 'p_body';			# Procedure to handle body
 	$ending = 'p_end';			# Called at the end of each unit
+	@wiping = qw( 				# The keywords we recognize for "wiped" units
+		PACKAGENAME
+		MAINTLOC
+		VERSION
+		PATCHLEVEL
+		REVISION
+		DATE
+		BASEREV
+	);
 }
 
 # End the extraction process
@@ -102,12 +131,21 @@ sub p_make {
 	local(@ary);					# Locally defined symbols
 	local(@dep);					# Dependencies
 	local($where) = "\"$file\", line $. (?MAKE:)";
-	return unless /^[\w+ ]*:/;		# We only want the main dependency rule
+	unless (/^[\w+ ]*:/) {
+		$wiped_unit++ if /^\t+-pick\s+wipe\b/;
+		return;						# We only want the main dependency rule
+	}
 	warn "$where: ignoring duplicate dependency listing line.\n"
 		if $makeseen{$unit}++;
 	return if $makeseen{$unit} > 1;
-	undef %condseen;				# Reset those once for every unit
-	undef %depseen;					# (assuming there is only one depend line)
+
+	# Reset those once for every unit
+	# (assuming there is only one depend line)
+	$h_section = 0;				# 0 = no ?H: yet, 1 = in ?H:, 2 = ?H:. seen
+	$h_section_warned = 0;		# Whether we warned about terminated ?H: section
+	$wiped_unit = 0;			# Whether macros like "<MAINTLOC> will be wiped
+	undef %condseen;
+	undef %depseen;
 	undef %defseen;
 	undef %tempseen;
 	undef %symset;
@@ -116,13 +154,27 @@ sub p_make {
 	undef %ssym;
 	undef %hcsym;
 	undef %hssym;
+	undef %lintuse;
+	undef %lintuse_used;
 	undef %lintseen;
 	undef %lintchange;
+	undef %lintchange_used;
 	undef %lintextern;
 	undef %lintcreated;
 	undef %fileseen;
+	undef %lintseen_used;
 	undef %filetmp;
 	undef %filecreated;
+	undef %linthere;
+	undef %lintnothere;
+	undef %lintfused;
+	undef %lintsdesc;
+	undef %lintsdesc_used;
+	undef %lintcdesc;
+	undef %lintcdesc_used;
+	undef %lintset;
+	undef %lintset_used;
+
 	s|^\s*||;						# Remove leading spaces
 	chop;
 	s/:(.*)//;
@@ -201,6 +253,8 @@ sub p_obsolete {
 sub p_shell {
 	local($_) = @_;
 	local($where) = "\"$file\", line $. (?S:)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	if (/^(\w+)\s*(\(.*\))*\s*:/) {
 		&check_last_declaration;
 		$s_symbol = $1;
@@ -209,8 +263,11 @@ sub p_shell {
 		# listed in the ?MAKE: line.
 		warn "$where: duplicate description for variable '\$$s_symbol'.\n"
 			if $ssym{$s_symbol}++;
-		warn "$where: variable '\$$s_symbol' is not listed on ?MAKE: line.\n"
-			unless $defseen{$s_symbol} || $lintseen{$s_symbol};
+		unless ($defseen{$s_symbol}) {
+			warn "$where: variable '\$$s_symbol' is not listed " .
+				"on ?MAKE: line.\n" unless $lintseen{$s_symbol};
+			$lintseen_used{$s_symbol}++ if $lintseen{$s_symbol};
+		}
 		# Deal with obsolete symbol list (enclosed between parenthesis)
 		&record_obsolete("\$$_") if /\(/;
 	} else {
@@ -227,6 +284,13 @@ sub p_shell {
 sub p_c {
 	local($_) = @_;
 	local($where) = "\"$file\", line $. (?C:)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
+	# The previous ?H: section, if present, must have been closed
+	if ($h_section && $h_section != 2) {
+		 warn "$where: unclosed ?H: section.\n";
+	}
+	$h_section = 0;
 	if (s/^(\w+)\s*~\s*(\S+)\s*(.*):/$1 $3:/) {
 		&check_last_declaration;
 		$c_symbol = $2;					# Alias for definition in config.h
@@ -259,15 +323,29 @@ sub p_c {
 	s|^(\w+)|?$c_symbol:/* $1| ||							# Start of comment
 	(s|^\.\s*$|?$c_symbol: */\n| && ($c_symbol = '', 1)) ||	# End of comment
 	s|^(.*)|?$c_symbol: *$1|;								# Middle of comment
-	&p_config("$_");					# Add comments to config.h.SH
 }
 
 # Process the ?H: lines
 sub p_config {
 	local($_) = @_;
 	local($where) = "\"$file\", line $. (?H)" unless $where;
-	s/^\?(\w+)://;						# Remove leading '?var:'
-	return unless /^#/;					# Look only for cpp lines
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
+	unless ($h_section){				# Entering ?H: section
+		$h_section = 1;
+		$h_section_warned = 0;
+	}
+	if ($h_section == 2) {
+		warn "$where: section was already terminated by '?H:.'.\n"
+			unless $h_section_warned++;
+		return;
+	}
+	if ($_ eq ".\n") {
+		$h_section = 2;					# Marks terminated ?H: section
+		return;
+	}
+	(my $constraint) = m/^\?(\w+):/;
+	s/^\?\w+://;						# Remove leading '?var:' constraint
 	if (m|^#\$(\w+)\s+(\w+).*\$(\w+)|) {
 		# Case: #$d_var VAR "$var"
 		warn "$where: symbol '$2' was already defined.\n" if $hcsym{$2}++;
@@ -291,6 +369,19 @@ sub p_config {
 	} elsif (m|^#define\s+(\w+)|) {
 		# Case: #define VAR
 		$hcsym{$1}++;			# Multiple occurrences may be legitimate
+	} else {
+		if (/^#/) {
+			warn "$where: uncommon cpp line should be protected with '?%<:'.\n"
+				if $constraint eq '';
+		} elsif (!/^\@(if|elsif|else|end)\b/) {
+			warn "$where: line should not be listed here but in '?C:'.\n";
+		}
+	}
+
+	# Ensure the constraint is either %< (unit base name) or a known symbol.
+	if ($constraint ne '' && $constraint ne $unit) {
+		warn "$where: constraint '$constraint' is an unknown symbol.\n"
+				unless $csym{$constraint} || $ssym{$constraint};
 	}
 }
 
@@ -298,6 +389,8 @@ sub p_config {
 sub p_magic {
 	local($_) = @_;
 	local($where) = "\"$file\", line $. (?M)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	if (/^(\w+):\s*([\w\s]*)\n$/) {
 		&check_last_declaration;
 		$m_symbol = $1;
@@ -315,27 +408,42 @@ sub p_magic {
 
 # Process the ?INIT: lines
 sub p_init {
+	local($_) = @_;
 	local($where) = "\"$file\", line $. (?INIT)";
-	&p_body;		# Pass it along as a body line (leading ?INIT: removed)
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
+	&p_body($_, 1);		# Pass it along as a body line (leading ?INIT: removed)
 }
 
 # Process the ?D: lines
 sub p_default {
 	local($_) = @_;
 	local($where) = "\"$file\", line $. (?D)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	local($sym) = /^(\w+)=/;
 	$hasdefault{$sym}++;
-	&p_body;		# Pass it along as a body line (leading ?D: removed)
+	unless ($defseen{$sym}) {
+		warn "$where: variable '\$$sym' is not listed " .
+			"on ?MAKE: line.\n" unless $lintseen{$sym};
+		$lintseen_used{$sym}++ if $lintseen{$sym};
+	}
+	s/^\w+=//;		# So that p_body does not consider variable as being set
+	&p_body($_, 1);	# Pass it along as a body line (leading ?D: + var removed)
 }
 
 # Process the ?V: lines
 sub p_visible {
+	local($where) = "\"$file\", line $. (?V)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
+
 	# A visible symbol can freely be manipulated by any unit which includes the
 	# current unit in its dependencies. Symbols before ':' may be only used for
 	# reading while symbols after ':' may be used for both reading and writing.
 	# The array %shvisible records symbols as keys. Read-only symbols have a
 	# leading '$' while read-write symbols are recorded as-is.
-	local($where) = "\"$file\", line $. (?V)";
+
 	unless (substr($unit, 0, 1) =~ /^[A-Z]/) {
 		warn "$where: visible declaration in non-special unit ignored.\n";
 		return;
@@ -369,12 +477,14 @@ sub p_visible {
 
 # Process the ?W: lines
 sub p_wanted {
+	local($where) = "\"$file\", line $. (?W)" unless $where;
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	# Somehow, we should check that none of the symbols to activate are stale
 	# ones, i.e. they all finally resolve to some known target -- FIXME
 	local($active) = $_[0] =~ /^([^:]*):/;		# Symbols to activate
 	local($look_symbols) = $_[0] =~ /:(.*)/;	# When those are used
 	local(@symbols) = split(' ', $look_symbols);
-	local($where) = "\"$file\", line $. (?W)" unless $where;
 	# A "?W:symbol" line asks metaconfig to define 'symbol' in the wanted file
 	# as a C target iff that word is found within the sources. This is mainly
 	# intended for the built-in interpreter to check for definedness.
@@ -396,9 +506,11 @@ sub p_wanted {
 
 # Process the ?Y: lines
 sub p_layout {
+	local($where) = "\"$file\", line $. (?Y)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	local($_) = @_;
 	chop;
-	local($where) = "\"$file\", line $. (?Y)";
 	s/^\s+//;
 	tr/A-Z/a-z/;			# Layouts are record in lowercase
 	warn "$where: unknown layout directive '$_'.\n"
@@ -423,9 +535,11 @@ sub p_include {
 
 # Process the ?T: lines
 sub p_temp {
+	local($where) = "\"$file\", line $. (?T:)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	local($_) = @_;
 	local(@sym) = split(' ', $_);
-	local($where) = "\"$file\", line $. (?T:)";
 	foreach $sym (@sym) {
 		warn "$where: temporary symbol '\$$sym' multiply declared.\n"
 			if $tempseen{$sym}++ == 1;
@@ -435,9 +549,11 @@ sub p_temp {
 
 # Process the ?F: lines
 sub p_file {
+	local($where) = "\"$file\", line $. (?F:)";
+	warn "$where: directive should come after ?MAKE declarations.\n"
+		unless $makeseen{$unit};
 	local($_) = @_;
 	local(@files) = split(' ', $_);
-	local($where) = "\"$file\", line $. (?F:)";
 	local($uufile);					# Name of file produced in the UU directory
 	local($tmpfile);				# Name of a temporary file
 	# We care only about UU files, i.e. files produced in the UU directory
@@ -446,25 +562,28 @@ sub p_file {
 	# The %prodfile table records all the files produced, so we may detect
 	# inconsistencies between units, while %filemaster records the (first) unit
 	# defining a given UU file to make sure that (special) unit is named in the
-	# dependency line when that UU file. Duplicates will be caught in the
-	# sanity check phase thanks to %prodfile.
+	# dependency line when that UU file if used. Duplicates will be caught in
+	# the sanity check phase thanks to %prodfile.
 	# Temporary files are recorded in %filesetin, so that we may later compare
 	# the list with the UU files to detect possible overwrites.
+	my $is_special = substr($unit, 0, 1) =~ /^[A-Z]/;
 	foreach $file (@files) {
 		warn "$where: produced file '$file' multiply declared.\n"
 			if $fileseen{$file}++ == 1;
 		if (($tmpfile = $file) =~ s/^!//) {
-			$filetmp{$tmpfile}++;
+			$filetmp{$tmpfile} = 'x ';
 			$filesetin{$tmpfile} .= "$unit " if $fileseen{$file} == 1;
 			next;					# Is not a UU file for sure, so skip
 		}
 		$prodfile{$file} .= "$unit " if $fileseen{$file} == 1;
 		($uufile = $file) =~ s|^\./(\S+)$|$1|;
 		next if $file eq $uufile;	# Don't care about non-UU files
-		unless (substr($unit, 0, 1) =~ /^[A-Z]/ || $lintcreated{$uufile}) {
+		unless ($is_special || $lintcreated{$uufile}) {
 			warn "$where: UU file '$uufile' in non-special unit ignored.\n";
+			delete $lintcreated{$uufile};	# Detect spurious LINT
 			next;
 		}
+		delete $lintcreated{$uufile} if !$is_special;	# Detect spurious LINT
 		$filemaster{$uufile} = $unit unless defined $filemaster{$uufile};
 		$filecreated{$uufile} = 'a';	# Will be automagically incremented
 	}
@@ -474,16 +593,21 @@ sub p_file {
 sub p_lint {
 	local($_) = @_;
 	local(@sym);
+	local($where) = "\"$file\", line $. (?LINT:)";
 	s/^\s+//;						# Strip leading spaces
+	unless ($makeseen{$unit}) {
+		warn "$where: directive should come after ?MAKE declarations.\n"
+			unless m/^empty/;
+	}
 	if (s/^set//) {					# Listed variables are set
-		@sym = split(' ', $_);
+		@sym = split(' ', $_);		# Spurious ones will be flagged
 		foreach (@sym) {
-			$symset{$_}++;			# Shell variable set
+			$lintset{$_}++;			# Shell variable set
 		}
 	} elsif (s/^desc\w+//) {		# Listed shell variables are described
-		@sym = split(' ', $_);
+		@sym = split(' ', $_);		# Spurious ones will be flagged
 		foreach (@sym) {
-			$ssym{$_}++;			# Shell variable described
+			$lintsdesc{$_}++;		# Shell variable described
 		}
 	} elsif (s/^creat\w+//) {		# Listed created files in regular units
 		@sym = split(' ', $_);
@@ -491,12 +615,12 @@ sub p_lint {
 			$lintcreated{$_}++;		# Persistent UU file created
 		}
 	} elsif (s/^known//) {			# Listed C variables are described
-		@sym = split(' ', $_);
+		@sym = split(' ', $_);		# Spurious ones will be flagged
 		foreach (@sym) {
-			$csym{$_}++;			# C symbol described
+			$lintcdesc{$_}++;		# C symbol described
 		}
 	} elsif (s/^change//) {			# Shell variable ok to be changed
-		@sym = split(' ', $_);
+		@sym = split(' ', $_);		# Spurious ones will be flagged
 		foreach (@sym) {
 			$lintchange{$_}++;		# Do not complain if changed
 		}
@@ -505,18 +629,35 @@ sub p_lint {
 		foreach (@sym) {
 			$lintextern{$_}++;		# Do not complain if used in a ?H: line
 		}
-	} elsif (s/^use//) {			# Variables declared as used by unit
+	} elsif (s/^usefile//) {		# Files marked as being used
 		@sym = split(' ', $_);
+		foreach (@sym) {
+			$lintfused{$_}++;
+		}
+	} elsif (s/^use//) {			# Variables declared as used by unit
+		@sym = split(' ', $_);		# Spurious ones will be flagged
 		foreach (@sym) {
 			$lintuse{$_}++;			# Do not complain if on ?MAKE and not used
 		}
 	} elsif (s/^def\w+//) {			# Listed variables are defined
-		@sym = split(' ', $_);
+		@sym = split(' ', $_);		# Spurious ones will be flagged
 		foreach (@sym) {
 			$lintseen{$_}++;		# Shell variable defined in this unit
 		}
 	} elsif (m/^empty/) {			# Empty unit file
 		$lintempty{$unit}++;
+	} elsif (m/^unclosed/) {		# Unclosed here-documents
+		@sym = split(' ', $_);
+		foreach (@sym) {
+			$linthere{$_}++;
+		}
+	} elsif (s/^nothere//) {		# Not a here-document name
+		@sym = split(' ', $_);
+		foreach (@sym) {
+			$lintnothere{$_}++;
+		}
+	} elsif (s/^nocomment//) {		# OK if leading unit ': comment' missing
+		$lintnocomment{$unit}++;
 	} else {
 		local($where) = "\"$file\", line $." unless $where;
 		local($word) = /^(\w+)/;
@@ -527,7 +668,7 @@ sub p_lint {
 # Process the body of the unit
 sub p_body {
 	return unless $makeseen{$unit};
-	local($_) = @_;
+	local($_, $special) = @_;
 	local($where) = "\"$file\", line $." unless $where;
 	# Ensure there is no control line in the body of the unit
 	local($control) = /^\?([\w\-]+):/;
@@ -539,6 +680,30 @@ sub p_body {
 		&p_lint($_);
 	}
 	return if $known;
+	# First non-special line should be a ': description' line
+	unless ($special || /^\?/ || /^@/) {
+		warn "$where: first body line should be a general ': description'.\n"
+			unless $past_first_line++ || $lintnocomment{$unit} || /^:\s+\w+/;
+	}
+	# Ensure ': comment' lines do not hold any meta-character
+	# We assume ":)" introduces a case statement.
+	if (/^\s*:/ && !/^\s*:\)/) {
+		warn "$where: missing space after ':' to make it a comment.\n"
+			unless /^\s*:\s/;
+		s/\\.//g;					# simplistic ignoring of "escaped" chars
+		s/".*?"//g;
+		s/'.*?'//g;
+		if ($wiped_unit) {
+			s/<\$\w+>//g;
+			foreach my $wipe (@wiping) {
+				s/<$wipe>//g;
+			}
+		}
+		warn "$where: found unquoted meta-character $1 on comment line.\n"
+			while s/([`()<>;&\{\}\|])//g;
+		warn "$where: found dangling quote on ':' comment line.\n" if /['"]/;
+		return;
+	}
 	# Ingnore interpreted lines and their continuations
 	if ($last_interpreted) {
 		return if /\\$/;			# Still part of the interpreted line
@@ -550,33 +715,52 @@ sub p_body {
 		$last_interpreted = /\\$/;	# Set flag if line is continued
 		return;						# And skip this line
 	}
-	s/^\s+//;						# Remove leading spaces
-	# Detect shell ':' "comment" lines, and perform sanity checks on them...
-	# Also spot any of '<>|&;' since those will have their shell behaviour
-	# behaviour
-	if (s/^:\s+//) {
-		s/<\$?\w+>//g;				# Remove valid <$var> escapes or old <VAR>
-		warn "$where: meaningful shell character '$1' in comment line.\n"
-			while s/([<>&\|;]+)//g;
-		require 'shellwords.pl';
-		eval { &shellwords($_) };
-		return unless $@;			# Ignore comment, no quoting problem
-		local($what) = '';
-		$what = 'double' if $@ =~ /\bdouble\b/;
-		$what = 'single' if $@ =~ /\bsingle\b/;
-		warn "$where: unmatched $what quote in comment line.\n" if $what;
-		warn "$where: $@" unless $what;
+	# Detect ending of "here" documents
+	if ($heredoc ne '' && $_ eq "$heredoc\n") {
+		$heredoc = '';				# Close here-document
+		$heredoc_nosubst = 0;
 		return;
 	}
+	# Detect beginning of "here" document
+	my $began_here = 0;
+	if ($heredoc eq '') {
+		if (/<<\s*''/) {
+			# Discourage it, because we're not processing those...
+			warn "$where: empty here-document name discouraged.\n";
+		} elsif (/<<\s*'([^']+)'/ && !$lintnothere{$1}) {
+			$heredoc = $1;
+			$heredoc_nosubst = 1;
+			$began_here++;
+		} elsif (/<<\s*(\S+)/ && !$lintnothere{$1}) {
+			$heredoc = $1;
+			$began_here++;
+		}
+		# Continue, as we need to look for possible ">file" on the same line
+		# as a possible here document, as in "cat <<EOM >file".
+	} else {
+		return if $heredoc_nosubst;		# Completely opaque to interpretation
+	}
+	$heredoc_line = $. if $began_here;
+
+	# If we've just entered a here document and we're generating a file
+	# that is exported by the unit, then we need to monitor the variables
+	# used to make sure there's no missing dependency.
+	$heredoc_nosubst = 0
+		if $began_here && />>?\s*(\S+)/ && $filemaster{$1} eq $unit;
 
 	# From now on, do all substitutes with ':' since it would be dangerous
 	# to remove things plain and simple. It could yields false matches
 	# afterwards...
 
+	my $check_vars = 1;
+	$chek_vars = 0 if $heredoc_nosubst && !$began_here;
+
 	# Record any attempt made to set a shell variable
 	local($sym);
-	while (s/(\w+)=/:/) {
-		$sym = $1;
+	while ($check_vars && s/(\W?)(\w+)=/$1:/) {
+		my $before = $1;
+		$sym = $2;
+		next unless $before eq '' || $before =~ /["'` \t]/;
 		next if $sym =~ /^\d+/;		# Ignore $1 and friends
 		$symset{$sym}++;			# Shell variable set
 		# Not part of a $cc -DWHATEVER line and not made nor temporary
@@ -584,17 +768,20 @@ sub p_body {
 			if (&wanted($sym)) {
 				warn "$where: variable '\$$sym' is changed.\n"
 					unless $lintchange{$sym};
+				$lintchange_used{$sym}++ if $lintchange{$sym};
 			} else {
 				# Record that the variable is set but not listed locally.
-				$shset{$unit} .= "$sym " unless
-					$shset{$unit} =~ /\b$sym\b/ || $lintchange{$sym};
+				if ($shset{$unit} !~ /\b$sym\b/) {
+					$shset{$unit} .= "$sym " unless $lintchange{$sym};
+					$lintchange_used{$sym}++ if $lintchange{$sym};
+				}
 			}
 		}
 	}
 	# Now look at the shell variables used: can be $var or ${var}
 	local($var);
 	local($line) = $_;
-	while (s/\$\{?(\w+)\}?/:/) {
+	while ($check_vars && s/\$\{?(\w+)\}?/$1/) {
 		$var = $1;
 		next if $var =~ /^\d+/;		# Ignore $1 and friends
 		# Record variable as undeclared but do not issue a message right now.
@@ -605,17 +792,23 @@ sub p_body {
 			$shunknown{$unit} =~ /\b$var\b/;
 		$shused{$unit} .= "\$$var " unless $shused{$unit} =~ /\$$var\b/;
 	}
+
+	return if $heredoc ne '' && !$began_here;	# Still in here-document
+
 	# Now look at private files used by the unit (./file or ..../UU/file)
-	# We look at things like '. ./myread' and `./loc ...` only.
+	# We look at things like '. ./myread' and `./loc ...` as well as "< file"
 	local($file);
 	$_ = $line;
+	s/<\S+?>//g;			# <header.h> would set-off our <file detection
 	while (
 		s!(\.\s+|`\s*)(\S*UU|\.)/([^\$/`\s;]+)\s*!! ||
 		s!(`\s*\$?)cat\s+(\./)?([^\$/`\s;]+)\s*`!! ||
-		s!if(\s+)(\./)([^\$/`\s;]+)\s*!!
+		s!(\s+)(\./)([^\$/`\s;]+)\s*!! ||
+		s!(\s+)<\s*(\./)?([^<\$/`'"\s;]+)!!
 	) {
 		$file = $3;
-		# Found some ". ./file" or `./file` execution, `$cat file`, "if prog"...
+		# Found some ". ./file" or `./file` execution, `$cat file`, or even
+		# "blah <file"...
 		# Record file as used. Later on, we will make sure we had the right
 		# to use that file: either we are in the unit that defines it, or we
 		# include the unit that creates it in our dependencies, relying on ?F:.
@@ -630,8 +823,8 @@ sub p_body {
 	# or usage in conditional expressions such as || and &&. Be sure the file
 	# name is always in $2...
 	while (
-		s!(\.\s+|`\s*)([^\$/`\s;]+)\s*!:!	||	# . myread or `loc`
-		s!(if|\|\||&&)\s+([^\$/`\s;]+)\s*!:!	# if prog, || prog, && prog
+		s!(\.\s+|`\s*)([^\$/`\s;]+)\s*!: !	||	# . myread or `loc`
+		s!(if|\|\||&&)\s+([^\$/`\s;]+)\s*!: !	# if prog, || prog, && prog
 	) {
 		$file = $2;
 		$filemisused{$unit} .= "$file " unless
@@ -641,10 +834,17 @@ sub p_body {
 			if defined $filetmp{$file} && $filetmp{$file} !~ /\bmisused/;
 	}
 	# Locate file creation, >>file or >file
-	while (s!>>?\s*([^\$/`\s;]+)\s*!:!) {
+	while (s!>>?\s*([^\$/`\s;]+)\s*!: !) {
 		$file = $1;
 		next if $file =~ /&\d+/;	# skip >&4 and friends
 		$filecreated{$file}++;
+	}
+	# Look for mentions of known temporary files to avoid complaining
+	# that they were not used.
+	while (s!\s+(\S+)!!) {
+		$file = $1;
+		$filetmp{$file} .= ' used'
+			if defined $filetmp{$file} && $filetmp{$file} !~ /\bused/;
 	}
 }
 
@@ -652,6 +852,27 @@ sub p_body {
 sub p_end {
 	local($last) = @_;				# Last processed line
 	local($where) = "\"$file\"";
+
+	# The ?H: section, if present, must have been closed
+	if ($h_section && $h_section != 2) {
+		 warn "$where: unclosed ?H: section.\n";
+	}
+	$h_section = 0;					# For next unit, which may be empty
+
+	# All opened here-documents must be closed.
+	if ($heredoc ne '') {
+		 my $q = $heredoc_nosubst ? "'" : "";
+		 warn "$where: unclosed here-document $q$heredoc$q " .
+			"started line $heredoc_line.\n"
+			unless $linthere{$heredoc};
+	}
+
+	# Reinitialize for next unit.
+	$heredoc = '';
+	$heredoc_nosubst = 0;
+	$past_first_line = 0;
+	$last_interpreted = 0;
+
 	unless ($makeseen{$unit}) {
 		warn "$where: no ?MAKE: line describing dependencies.\n"
 			unless $lintempty{$unit};
@@ -673,13 +894,19 @@ sub p_end {
 
 	# Make sure every shell symbol described in ?MAKE had a description
 	foreach $sym (sort keys %defseen) {
-		warn "$where: symbol '\$$sym' was not described.\n"
-			unless $ssym{$sym};
+		unless ($ssym{$sym}) {
+			warn "$where: symbol '\$$sym' was not described.\n"
+				unless $lintsdesc{$sym};
+			$lintsdesc_used{$sym}++ if $lintsdesc{$sym};
+		}
 	}
 	# Ensure all the C symbols defined by ?H: lines have a description
 	foreach $sym (sort keys %hcsym) {
-		warn "$where: C symbol '$sym' was not described.\n"
-			unless $csym{$sym};
+		unless ($csym{$sym}) {
+			warn "$where: C symbol '$sym' was not described.\n"
+				unless $lintcdesc{$sym};
+			$lintcdesc_used{$sym}++ if $lintcdesc{$sym};
+		}
 	}
 	# Ensure all the C symbols described by ?C: lines are defined in ?H:
 	foreach $sym (sort keys %csym) {
@@ -691,31 +918,44 @@ sub p_end {
 	# I don't care about the special symbols defined in %Except as I know
 	# they are handled correctly.
 	foreach $sym (sort keys %defseen) {
-		warn "$where: variable '\$$sym' should have been set.\n"
-			unless $symset{$sym} || substr($sym, 0, 1) =~ /^[A-Z]/;
+		unless ($symset{$sym} || substr($sym, 0, 1) =~ /^[A-Z]/) {
+			warn "$where: variable '\$$sym' should have been set.\n"
+				unless $lintset{$sym};
+			$lintset_used{$sym}++ if $lintset{$sym};
+		}
 	}
 	# Make sure every non-special unit declared as wanted is indeed needed
 	foreach $sym (sort keys %depseen) {
-		warn "$where: unused dependency variable '\$$sym'.\n" unless
-			$shused{$unit} =~ /\$$sym\b/ || substr($sym, 0, 1) =~ /^[A-Z]/ ||
-			$lintchange{$sym} || $lintuse{$sym};
+		if ($shused{$unit} !~ /\$$sym\b/ && substr($sym, 0, 1) !~ /^[A-Z]/) {
+			warn "$where: unused dependency variable '\$$sym'.\n" unless
+				$lintchange{$sym} || $lintuse{$sym};
+			$lintchange_used{$sym}++ if $lintchange{$sym};
+			$lintuse_used{$sym}++ if $lintuse{$sym};
+		}
 	}
 	# Idem for conditionally wanted symbols
 	foreach $sym (sort keys %condseen) {
-		warn "$where: unused conditional variable '\$$sym'.\n" unless
-			$shused{$unit} =~ /\$$sym\b/ || substr($sym, 0, 1) =~ /^[A-Z]/ ||
-			$lintchange{$sym} || $lintuse{$sym};
+		if ($shused{$unit} !~ /\$$sym\b/ && substr($sym, 0, 1) !~ /^[A-Z]/) {
+			warn "$where: unused conditional variable '\$$sym'.\n" unless
+				$lintchange{$sym} || $lintuse{$sym};
+			$lintchange_used{$sym}++ if $lintchange{$sym};
+			$lintuse_used{$sym}++ if $lintuse{$sym};
+		}
 	}
 	# Idem for temporary symbols
 	foreach $sym (sort keys %tempseen) {
-		warn "$where: unused temporary variable '\$$sym'.\n" unless
-			$shused{$unit} =~ /\$$sym\b/ || $symset{$sym} || $lintuse{$sym};
+		if ($shused{$unit} !~ /\$$sym\b/ && !$symset{$sym}) {
+			warn "$where: unused temporary variable '\$$sym'.\n" unless
+				$lintuse{$sym};
+			$lintuse_used{$sym}++ if $lintuse{$sym};
+		}
 	}
 	# Idem for local files
 	foreach $file (sort keys %filetmp) {
 		warn "$where: mis-used temporary file '$file'.\n" if
 			$filetmp{$file} =~ /\bmisused/;
 		warn "$where: unused temporary file '$file'.\n" unless
+			$lintfused{$file} || 
 			$filetmp{$file} =~ /\bused/ || $filetmp{$file} =~ /\bmisused/;
 	}
 	# Make sure each private file listed as created on ?F: is really created.
@@ -729,6 +969,34 @@ sub p_end {
 		$value = $filecreated{$file};
 		next if $value > 0;		# Skip non UU-files.
 		warn "$where: file '$file' was not created.\n" if $value eq 'a';
+	}
+	# Check whether some of the LINT directives were useful
+	foreach my $sym (sort keys %lintcreated) {
+		warn "$where: spurious 'LINT create $sym' directive.\n";
+	}
+	foreach my $sym (sort keys %lintuse) {
+		warn "$where: spurious 'LINT use $sym' directive.\n"
+			unless $lintuse_used{$sym};
+	}
+	foreach my $sym (sort keys %lintchange) {
+		warn "$where: spurious 'LINT change $sym' directive.\n"
+			unless $lintchange_used{$sym};
+	}
+	foreach my $sym (sort keys %lintseen) {
+		warn "$where: spurious 'LINT define $sym' directive.\n"
+			unless $lintseen_used{$sym};
+	}
+	foreach my $sym (sort keys %lintsdesc) {
+		warn "$where: spurious 'LINT describe $sym' directive.\n"
+			unless $lintsdesc_used{$sym};
+	}
+	foreach my $sym (sort keys %lintcdesc) {
+		warn "$where: spurious 'LINT known $sym' directive.\n"
+			unless $lintcdesc_used{$sym};
+	}
+	foreach my $sym (sort keys %lintset) {
+		warn "$where: spurious 'LINT set $sym' directive.\n"
+			unless $lintset_used{$sym};
 	}
 }
 

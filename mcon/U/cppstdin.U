@@ -1,12 +1,12 @@
-?RCS: $Id: cppstdin.U,v 3.0.1.4 1994/10/29 16:08:34 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: cppstdin.U,v $
 ?RCS: Revision 3.0.1.4  1994/10/29  16:08:34  ram
@@ -26,7 +26,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?MAKE:cppstdin cppminus cpprun cpplast: contains test Myread Oldconfig Loc \
-	cpp +cc rm
+	cpp +cc rm hint osname gccversion startsh eunicefix
 ?MAKE:	-pick add $@ %<
 ?S:cppstdin:
 ?S:	This variable contains the command which will invoke the C
@@ -37,8 +37,8 @@
 ?S:cppminus:
 ?S:	This variable contains the second part of the string which will invoke
 ?S:	the C preprocessor on the standard input and produce to standard
-?S:	output.  This variable will have the value "-" if cppstdin needs a minus
-?S:	to specify standard input, otherwise the value is "".
+?S:	output.  This variable will have the value "-" if cppstdin needs
+?S:	a minus to specify standard input, otherwise the value is "".
 ?S:.
 ?S:cpprun:
 ?S:	This variable contains the command which will invoke a C preprocessor
@@ -74,7 +74,7 @@
 ?C:	the preprocessor used to compile the C program.
 ?C:.
 ?C:CPPLAST:
-?C: This symbol is intended to be used along with CPPRUN in the same manner
+?C:	This symbol is intended to be used along with CPPRUN in the same manner
 ?C:	symbol CPPMINUS is used with CPPSTDIN. It contains either "-" or "".
 ?C:.
 ?H:#define CPPSTDIN "$cppstdin"
@@ -82,7 +82,7 @@
 ?H:#define CPPRUN "$cpprun"
 ?H:#define CPPLAST "$cpplast"
 ?H:.
-?F:cppstdin
+?F:cppstdin !testcpp.out !testcpp.c
 ?T:wrapper x_cpp x_minus ok
 : see how we invoke the C preprocessor
 echo " "
@@ -93,8 +93,22 @@ cat <<'EOT' >testcpp.c
 ABC.XYZ
 EOT
 cd ..
-echo 'cat >.$$.c; '"$cc"' -E ${1+"$@"} .$$.c; rm .$$.c' >cppstdin
+if $test ! -f cppstdin; then
+	echo "$startsh" >cppstdin
+if $test "X$osname" = "Xaix" -a "X$gccversion" = X; then
+?X: AIX cc -E doesn't show the absolute headerfile
+?X: locations but we'll cheat by using the -M flag.
+	echo 'cat >.$$.c; rm -f .$$.u; '"$cc"' ${1+"$@"} -M -c .$$.c 2>/dev/null; \
+	test -s .$$.u && \
+	awk '"'"'$2 ~ /\.h$/ { print "# 0 \""$2"\"" }'"'"' .$$.u; \
+	rm -f .$$.o .$$.u; '"$cc"' -E ${1+"$@"} .$$.c; rm .$$.c' >> cppstdin
+else
+	echo 'cat >.$$.c; '"$cc"' -E ${1+"$@"} .$$.c; rm .$$.c' >>cppstdin
+fi; else
+	echo "Keeping your $hint cppstdin wrapper."
+fi
 chmod 755 cppstdin
+$eunicefix cppstdin
 wrapper=`pwd`/cppstdin
 ok='false'
 cd UU
@@ -228,7 +242,7 @@ false)
 esac
 
 case "$cppstdin" in
-"$wrapper") ;;
+"$wrapper"|'cppstdin') ;;
 *) $rm -f $wrapper;;
 esac
 $rm -f testcpp.c testcpp.out

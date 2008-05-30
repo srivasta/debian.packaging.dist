@@ -20,15 +20,15 @@ $startperl
 	eval "exec perl -S \$0 \$*"
 		if \$running_under_some_shell;
 
-# $Id: patlog.SH,v 3.0.1.2 1997/02/28 16:33:03 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # $Log: patlog.SH,v $
 # Revision 3.0.1.2  1997/02/28  16:33:03  ram
@@ -103,12 +103,10 @@ if (-s ".logs$bnum") {
 		}
 	}
 	close LOGS;
-	$* = 1;
 	$subj = $logs;
-	$logs =~ s/^patch\d+:\s*/\t/g;
-	$logs =~ s/\n/\n\n/g;
-	$subj =~ s/^patch\d+:\s*/Subject: /g;
-	$* = 0;
+	$logs =~ s/^patch\d+:\s*/\t/gm;
+	$logs =~ s/\n/\n\n/gm;
+	$subj =~ s/^patch\d+:\s*/Subject: /gm;
 } else {
 	$subj = "Subject: \n";
 }

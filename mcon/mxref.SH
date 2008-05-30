@@ -17,18 +17,18 @@ esac
 echo "Extracting mcon/mxref (with variable substitutions)"
 cat >mxref <<!GROK!THIS!
 $startperl
-	eval "exec perl -S \$0 \$*"
+	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: mxref.SH,v 3.0.1.3 1997/02/28 16:30:49 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # Original Author: Harlan Stenn <harlan@mumps.pfcs.com>
 #
@@ -51,6 +51,7 @@ $startperl
 \$MC = '$privlib';
 \$version = '$VERSION';
 \$patchlevel = '$PATCHLEVEL';
+\$revision = '$REVISION';
 \$grep = '$grep';
 !GROK!THIS!
 
@@ -68,13 +69,13 @@ chop($MC = `pwd`);				# Real metaxref lib path (no symbolic links)
 chdir $WD || die "Can't chdir back to $WD: $!\n";
 
 if ($opt_V) {
-	print STDERR "metaxref $version PL$patchlevel\n";
+	print STDERR "metaxref $version-$revision\n";
 	exit 0;
 } elsif ($opt_h) {
 	&usage;
 }
 
-$NEWMANI = $opt_f || 'MANIFEST.new';
+$NEWMANI = $opt_f || (-f 'MANIFEST.new' ? 'MANIFEST.new' : 'MANIFEST');
 
 &init;									# Various initializations
 `mkdir .MT 2>&1` unless -d '.MT';		# For private temporary files
@@ -101,7 +102,6 @@ sub init {
 
 # Record the exceptions -- all symbols but these are lower case
 sub init_except {
-	$Except{'Mcc'}++;
 	$Except{'Author'}++;
 	$Except{'Date'}++;
 	$Except{'Header'}++;

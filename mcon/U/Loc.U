@@ -1,12 +1,12 @@
-?RCS: $Id: Loc.U,v 3.0.1.10 1997/02/28 15:04:16 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Loc.U,v $
 ?RCS: Revision 3.0.1.10  1997/02/28  15:04:16  ram
@@ -61,24 +61,24 @@
 ?X: I put startsh at the end of the dependency list, in order to avoid the
 ?X: loading of the spitshell unit before the instructions.
 ?X:
-?MAKE:Loc Mcc awk ar bash bison byacc cat chgrp chmod chown \
+?MAKE:Loc awk ar bash bison byacc cat chgrp chmod chown \
 	comm compress cp cpio cpp csh date echo egrep emacs expr find flex \
-	gcc gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
-	make mkdir more mv nroff perl pg pmake pr rm rmail sed sendmail \
-	shar sleep smail sort submit tail tar tbl test touch tr troff \
-	uname uniq uuname vi zcat zip:  eunicefix n c Instruct Myread \
-	startsh
+	gmake gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
+	make mkdir more mv nm nroff perl pg pmake pr rm rmail sed sendmail \
+	shar sleep smail sort submit tail tar tbl tee test touch tr troff \
+	uname uniq uuname vi zcat zip:  eunicefix n c startsh Instruct Warn
 ?MAKE:	-pick weed $@ %<
-?LINT:describe Loc Mcc awk ar bash bison byacc cat chgrp chmod chown \
+?LINT: describe awk ar bash bison byacc cat chgrp chmod chown \
 	comm compress cp cpio cpp csh date echo egrep emacs expr find flex \
-	gcc gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
-	make mkdir more mv nroff perl pg pmake pr rm rmail sed sendmail \
-	shar sleep smail sort submit tail tar tbl test touch tr troff \
+	gmake gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
+	make mkdir more mv nm nroff perl pg pmake pr rm rmail sed sendmail \
+	shar sleep smail sort submit tail tar tbl tee test touch tr troff \
 	uname uniq uuname vi zcat zip
 ?V::pth loclist trylist
 ?F:./loc
-?T:thisthing thing xxx dir file say _test
-?LINT:change PATH
+?T:thisthing thing xxx dir file say DJGPP
+?T:_test _grep _cp _gmake _egrep _ln _make dflt
+?LINT: change PATH
 : find out where common programs are
 echo " "
 echo "Locating common programs..." >&4
@@ -114,9 +114,16 @@ for dir in \$*; do
 	if test -f \$thisthing; then
 		echo \$thisthing
 		exit 0
+	elif test -f \$thisthing$_exe; then
+		echo \$thisthing
+		exit 0
 	elif test -f \$dir/\$thing.exe; then
-		: on Eunice apparently
-		echo \$dir/\$thing
+		if test -n "$DJGPP"; then
+			echo \$dir/\$thing.exe
+		else
+			: on Eunice apparently
+			echo \$dir/\$thing
+		fi
 		exit 0
 	fi
 	;;
@@ -140,7 +147,6 @@ loclist="
 ?find:find
 ?grep:grep
 ?ls:ls
-?make:make
 ?mkdir:mkdir
 ?mv:mv
 ?rm:rm
@@ -166,7 +172,7 @@ trylist="
 ?egrep:egrep
 ?emacs:emacs
 ?flex:flex
-?gcc:gcc
+?gmake:gmake
 ?gzip:gzip
 ?inews:inews
 ?ksh:ksh
@@ -178,7 +184,9 @@ trylist="
 ?lpr:lpr
 ?mail:mail
 ?mailx:mailx
+?make:make
 ?more:more
+?nm:nm
 ?nroff:nroff
 ?perl:perl
 ?pg:pg
@@ -191,6 +199,7 @@ trylist="
 ?submit:submit
 ?tar:tar
 ?tbl:tbl
+?tee:tee
 ?test:test
 ?troff:troff
 ?uname:uname
@@ -199,11 +208,11 @@ trylist="
 ?zcat:zcat
 ?zip:zip
 "
-?LINT:set Loc Mcc awk ar bash bison byacc cat chgrp chmod chown \
-	comm compress cp cpio cpp csh date echo egrep emacs expr find flex \
-	gcc gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
-	make mkdir more mv nroff perl pg pmake pr rm rmail sed sendmail \
-	shar sleep smail sort submit tail tar tbl test touch tr troff \
+?LINT: set awk ar bash bison byacc cat chgrp chmod chown \
+	comm compress cp cpio cpp csh date echo emacs expr find flex \
+	gmake gzip grep inews ksh less line lint lp lpr ls mail mailx \
+	mkdir more mv nm nroff perl pg pmake pr rm rmail sed sendmail \
+	shar sleep smail sort submit tail tar tbl tee touch tr troff \
 	uname uniq uuname vi zcat zip
 pth=`echo $PATH | sed -e "s/$p_/ /g"`
 pth="$pth /lib /usr/lib"
@@ -221,14 +230,14 @@ for file in $loclist; do
 		if test -f "$xxx"; then
 			: ok
 		else
-			echo "WARNING: no $xxx -- ignoring your setting for $file." >&4
+			./warn "no $xxx -- ignoring your setting for $file."
 			xxx=`./loc $file $file $pth`
 		fi
 		;;
 	'') xxx=`./loc $file $file $pth`;;
 	*) xxx=`./loc $xxx $xxx $pth`;;
 	esac
-	eval $file=$xxx
+	eval $file=$xxx$_exe
 	eval _$file=$xxx
 	case "$xxx" in
 	/*)
@@ -256,14 +265,14 @@ for file in $trylist; do
 		if test -f "$xxx"; then
 			: ok
 		else
-			echo "WARNING: no $xxx -- ignoring your setting for $file." >&4
+			./warn "no $xxx -- ignoring your setting for $file."
 			xxx=`./loc $file $file $pth`
 		fi
 		;;
 	'') xxx=`./loc $file $file $pth`;;
 	*) xxx=`./loc $xxx $xxx $pth`;;
 	esac
-	eval $file=$xxx
+	eval $file=$xxx$_exe
 	eval _$file=$xxx
 	case "$xxx" in
 	/*)
@@ -283,6 +292,7 @@ case "$egrep" in
 egrep)
 	echo "Substituting grep for egrep."
 	egrep=$grep
+	_egrep=$_grep
 	;;
 esac
 @if ln
@@ -290,6 +300,32 @@ case "$ln" in
 ln)
 	echo "Substituting cp for ln."
 	ln=$cp
+	_ln=$_cp
+	;;
+esac
+@end
+@if make || gmake
+case "$make" in
+make)	
+	case "$gmake" in
+	gmake)
+	echo "I can't find make or gmake, and my life depends on it." >&4
+	echo "Go find a public domain implementation or fix your PATH setting!" >&4
+	exit 1
+	;;
+	esac
+	;;
+esac	
+case "$gmake" in
+gmake)	;;
+*)	# We can't have osname yet.
+	if test -f "/system/gnu_library/bin/ar.pm"; then # Stratus VOS
+		# Assume that gmake, if found, is definitely GNU make
+		# and prefer it over the system make.
+		echo "Substituting gmake for make."
+		make=$gmake
+		_make=$_gmake
+	fi
 	;;
 esac
 @end
