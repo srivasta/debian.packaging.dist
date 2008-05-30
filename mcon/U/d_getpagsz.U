@@ -1,12 +1,12 @@
-?RCS: $Id: d_getpagsz.U,v 3.0.1.1 1994/10/29 16:13:10 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_getpagsz.U,v $
 ?RCS: Revision 3.0.1.1  1994/10/29  16:13:10  ram
@@ -54,7 +54,7 @@ case "$pagesize" in
 '')
 	$cat >page.c <<EOP
 extern int getpagesize();
-main()
+int main()
 {
 	printf("%d\n", getpagesize());
 }
@@ -63,7 +63,7 @@ EOP
 	dflt='4096'
 	case "$d_getpagsz" in
 	"$define")
-		if $cc $ccflags page.c -o page $libs >/dev/null 2>&1; then
+		if $cc $ccflags -o page page.c $libs >/dev/null 2>&1; then
 			dflt=`./page`
 			guess=''
 		else
@@ -71,7 +71,7 @@ EOP
 		fi
 		;;
 	*)
-		if $cc $ccflags page.c -o page $libs -lPW >/dev/null 2>&1; then
+		if $cc $ccflags -o page page.c $libs -lPW >/dev/null 2>&1; then
 			dflt=`./page`
 			guess=''
 			echo "(For your eyes only: I used the getpagesize() from -lPW.)"
@@ -79,12 +79,12 @@ EOP
 			if $contains PAGESIZE `./findhdr sys/param.h` >/dev/null 2>&1; then
 				$cat >page.c <<EOP
 #include <sys/param.h>
-main()
+int main()
 {
 	printf("%d\n", PAGESIZE);
 }
 EOP
-				if $cc $ccflags page.c -o page $libs >/dev/null 2>&1; then
+				if $cc $ccflags -o page page.c $libs >/dev/null 2>&1; then
 					dflt=`./page`
 					guess=''
 					echo "(Using value of PAGESIZE found in <sys/param.h>.)"

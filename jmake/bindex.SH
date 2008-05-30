@@ -22,15 +22,15 @@ $spitshell >>bindex <<'!NO!SUBS!'
 	eval 'exec perl -S $0 "$@"'
 		if $runnning_under_some_shell;
 
-# $Id: bindex.SH,v 3.0.1.1 1993/08/19 06:42:12 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # $Log: bindex.SH,v $
 # Revision 3.0.1.1  1993/08/19  06:42:12  ram
@@ -103,6 +103,7 @@ while (<RULES>) {
 		s/\|suffix/.SUFFIXES:/;	# Make suffix command explicit
 		s/\t/    /g;			# Expand all tabs to 4 chars
 		s/\s*$/\n/;				# Remove any trailing space
+		s|\^\^\^|/***/|;		# Change ^^^ to the more visual /***/
 		s|\^\^|/**/|;			# Restore ^^ to the more visual /**/
 		if (/^$/) {				# If empty line
 			$Index{$current} .= "\n" if $last_was_text;

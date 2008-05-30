@@ -1,12 +1,12 @@
-?RCS: $Id: voidflags.U,v 3.0.1.2 1997/02/28 16:27:58 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: voidflags.U,v $
 ?RCS: Revision 3.0.1.2  1997/02/28  16:27:58  ram
@@ -18,13 +18,16 @@
 ?RCS: Revision 3.0  1993/08/18  12:10:01  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:voidflags defvoidused: cat rm contains +cc +ccflags package \
+?MAKE:voidflags defvoidused: cat sed rm contains +cc +ccflags package \
 	Oldconfig Myread
 ?MAKE:	-pick add $@ %<
 ?S:voidflags:
 ?S:	This variable contains the eventual value of the VOIDFLAGS symbol,
 ?S:	which indicates how much support of the void type is given by this
 ?S:	compiler.  See VOIDFLAGS for more info.
+?S:.
+?S:defvoidused:
+?S:	This variable contains the default value of the VOIDUSED symbol (15).
 ?S:.
 ?X:	Exceptionally, we have to explicitely alias the symbol name for
 ?X: config_h.SH, otherwise the comment would not appear.
@@ -54,23 +57,24 @@
 ?H:?%<:#endif
 ?H:.
 ?W:%<:void
+?F:!.out !try.c !flags
+?LINT:usefile .out flags try.c
 ?INIT:: full support for void wanted by default
 ?INIT:defvoidused=15
 ?INIT:
-?LINT:describe defvoidused
 ?LINT:known void M_VOID VOIDUSED
 : check for void type
 echo " "
 echo "Checking to see how well your C compiler groks the void type..." >&4
-echo " "
-$cat >&4 <<EOM
+$cat >flags <<EOM
+
   Support flag bits are:
     1: basic void declarations.
     2: arrays of pointers to functions returning void.
     4: operations between pointers to and addresses of void functions.
     8: generic void pointers.
+
 EOM
-echo " "
 case "$voidflags" in
 '')
 	$cat >try.c <<'EOCP'
@@ -95,19 +99,21 @@ sub() {
 #endif
 	exit(0);
 }
-main() { sub(); }
+int main() { sub(); }
 EOCP
 ?X: This unit used to use cc -S in those tests to try to speed up things, but
 ?X: unfortunately, AIX 3.2 does not support this option.
 	if $cc $ccflags -c -DTRY=$defvoidused try.c >.out 2>&1 ; then
 		voidflags=$defvoidused
-	echo "It appears to support void to the level $package wants ($defvoidused)."
+		echo "Good.  It appears to support void to the level $package wants."
 		if $contains warning .out >/dev/null 2>&1; then
 			echo "However, you might get some warnings that look like this:"
-			$cat .out
+			$sed -e 's/^/	/' .out
 		fi
 	else
 echo "Hmm, your compiler has some difficulty with void. Checking further..." >&4
+		$cat >&4 flags
+		$rm -f flags
 		if $cc $ccflags -c -DTRY=1 try.c >/dev/null 2>&1; then
 			echo "It supports 1..."
 			if $cc $ccflags -c -DTRY=3 try.c >/dev/null 2>&1; then
@@ -147,13 +153,16 @@ echo "Hmm, your compiler has some difficulty with void. Checking further..." >&4
 esac
 ?X: Only prompt user if support does not match the level we want
 case "$voidflags" in
-"$defvoidused") ;;
+"$defvoidused")
+	echo "Good.  I already know it supports void to the level $package wants."
+	;;
 *)
 	dflt="$voidflags";
+	test -f flags && $cat flags
 	rp="Your void support flags add up to what?"
 	. ./myread
 	voidflags="$ans"
 	;;
 esac
-$rm -f try.* .out
+$rm -f try.* .out flags
 

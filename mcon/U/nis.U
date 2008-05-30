@@ -1,12 +1,12 @@
-?RCS: $Id: nis.U,v 3.0.1.3 1997/02/28 16:17:38 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: nis.U,v $
 ?RCS: Revision 3.0.1.3  1997/02/28  16:17:38  ram
@@ -42,7 +42,7 @@
 ?X: NeXT gives us some fun here, as always, by having both NIS (former YP)
 ?X: and NetInfo. But since it has both, it's ok to put the test inside the if.
 ?X: Contributed by Thomas Neumann <tom@smart.bo.open.de>.
-if $test -d /usr/etc/yp || $test -d /etc/yp; then
+if $test -d /usr/etc/yp || $test -d /etc/yp || $test -d /usr/lib/yp; then
 	if $test -f /usr/etc/nibindd; then
 		echo " "
 		echo "I'm fairly confident you're on a NeXT."
@@ -154,13 +154,16 @@ if $test -d /usr/etc/yp || $test -d /etc/yp; then
 fi
 ?X: Ensure suitable default -- Manoj Srivastava
 case "$hostcat" in
-'') hostcat='cat /etc/hosts';;
+'') hostcat=':'
+	$test -f /etc/hosts && hostcat='cat /etc/hosts';;
 esac
 case "$groupcat" in
-'') groupcat='cat /etc/group';;
+'')	groupcat=':'
+	$test -f /etc/group && groupcat='cat /etc/group';;
 esac
 case "$passcat" in
-'') passcat='cat /etc/passwd';;
+'') passcat=':'
+	$test -f /etc/passwd && passcat='cat /etc/passwd';;
 esac
 case "$hostcat" in
 '') hostcat='cat /etc/hosts';;

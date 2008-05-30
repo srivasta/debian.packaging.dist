@@ -1,12 +1,12 @@
-?RCS: $Id: install.U,v 3.0.1.2 1995/09/25 09:16:37 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: install.U,v $
 ?RCS: Revision 3.0.1.2  1995/09/25  09:16:37  ram
@@ -36,6 +36,7 @@
 ?S:	plain 'mkdir', and cross your fingers!
 ?S:.
 ?T:dir file tryit prog creatdir either
+?F:!tryinst
 : locate a BSD compatible install program
 echo " "
 echo "Looking for a BSD-compatible install program..." >&4
@@ -53,13 +54,13 @@ case "$install" in
 		done
 	done
 	$cat >try.c <<EOC
-main()
+int main()
 {
 	printf("OK\n");
 	exit(0);
 }
 EOC
-	if $cc try.c -o try >/dev/null 2>&1; then
+	if $cc -o try try.c >/dev/null 2>&1; then
 		cp try try.ns
 		strip try >/dev/null 2>&1
 	else
@@ -149,24 +150,29 @@ echo "Ok, let's see how we can create nested directories..." >&4
 case "$installdir" in
 '')
 ?X: First time, maybe we already found out a working one in $creatdir above...
-	case "$creatdir" in
-	'')
-		$mkdir -p foo/bar >/dev/null 2>&1
-		if $test -d foo/bar; then
-			echo "Great, we can build them using 'mkdir -p'."
-			creatdir='mkdir -p'
-		elif eval "$install -d foo/bar"; $test -d foo/bar; then
-			creatdir="install -d"
-			echo "It looks like '$creatdir' will do it for us."
-		fi
-		;;
-	*)
-		eval "$creatdir foo/bar" >/dev/null 2>&1
-		if $test -d foo/bar; then
-			echo "Ah! We can use '$creatdir' to do just that."
-		fi
-		;;
-	esac
+?X: Prefer "mkdir -p" because of bugs in GNU install when not running as root
+	$mkdir -p foo/bar >/dev/null 2>&1
+	if $test -d foo/bar; then
+		echo "Great, we can build them using 'mkdir -p'."
+		creatdir='mkdir -p'
+	else
+		case "$creatdir" in
+		'')
+			if eval "$install -d foo/bar"; $test -d foo/bar; then
+				creatdir="install -d"
+				echo "It looks like '$creatdir' will do it for us."
+			fi
+			;;
+		*)
+			eval "$creatdir foo/bar" >/dev/null 2>&1
+			if $test -d foo/bar; then
+				echo "Ah! We can use '$creatdir' to do just that."
+			else
+				creatdir=''
+			fi
+			;;
+		esac
+	fi
 	$rm -rf foo
 	case "$creatdir" in
 	'')

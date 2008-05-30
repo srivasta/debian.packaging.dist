@@ -1,12 +1,12 @@
-?RCS: $Id: Head.U,v 3.0.1.9 1997/02/28 15:02:09 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Head.U,v $
 ?RCS: Revision 3.0.1.9  1997/02/28  15:02:09  ram
@@ -48,9 +48,13 @@
 ?X: 
 ?MAKE:Head:
 ?MAKE:	-pick wipe $@ %<
-?V:PATH p_ me
-?T:argv Id p paths OS2_SHELL
+?V:PATH p_ _exe me newsh
+?T:argv Id p paths OS2_SHELL DJGPP
 ?T:inksh needksh avoidksh newsh changesh reason
+?F:!*
+?LINT:extern ENV CDPATH SHELL MACHTYPE
+?LINT:change ENV CDPATH
+?LINT:nocomment
 #! /bin/sh
 #
 # If these # comments don't work, trim them. Don't worry about any other
@@ -71,12 +75,10 @@
 ?X:
 ?X: WE ASK YOU NOT TO REMOVE OR ALTER THE FOLLOWING PARAGRAPH, PLEASE:
 ?X:
-# (Note: this Configure script was generated automatically. Rather than
+# Note: this Configure script was generated automatically. Rather than
 # working with this copy of Configure, you may wish to get metaconfig.
-# The dist-3.0 package (which contains metaconfig) was posted in
-# comp.sources.misc and is available on CPAN under authors/id/RAM so
-# you may fetch it yourself from your nearest archive site.)
-#
+# The dist package (which contains metaconfig) is available via SVN:
+#     svn co https://svn.sourceforge.net/svnroot/dist/trunk/dist
 ?X:
 ?X: NOTA BENE:
 ?X: If you develop you own version of metaconfig based on this work,
@@ -84,11 +86,11 @@
 ?X: by your version, not mine: It credits your work.
 ?X:
 
-# $Id: Head.U,v 3.0.1.9 1997/02/28 15:02:09 ram Exp $
+# $Id$
 #
-# Generated on <DATE> [metaconfig <VERSION> PL<PATCHLEVEL>]
+# Generated on <DATE> [metaconfig <VERSION>-<REVISION>]
 
-cat >/tmp/c1$$ <<EOF
+cat >c1$$ <<EOF
 ARGGGHHHH!!!!!
 
 SCO csh still thinks true is false.  Write to SCO today and tell them that next
@@ -99,18 +101,18 @@ we'd have to do is go in and swap the && and || tokens, wherever they are.)
 
 [End of diatribe. We now return you to your regularly scheduled programming...]
 EOF
-cat >/tmp/c2$$ <<EOF
+cat >c2$$ <<EOF
 
 OOPS!  You naughty creature!  You didn't run Configure with sh!
 I will attempt to remedy the situation by running sh for you...
 EOF
 
-true || cat /tmp/c1$$ /tmp/c2$$
+true || cat c1$$ c2$$
 true || exec sh $0 $argv:q
 
-(exit $?0) || cat /tmp/c2$$
+(exit $?0) || cat c2$$
 (exit $?0) || exec sh $0 $argv:q
-rm -f /tmp/c1$$ /tmp/c2$$
+rm -f c1$$ c2$$
 
 : compute my invocation name
 me=$0
@@ -123,16 +125,24 @@ esac
 
 ?X:
 ?X: To be able to run under OS/2, we must detect that early enough to use
-?X: the proper path separator, stored in $p_. It is : on UNIX and \ on OS/2.
+?X: the proper path separator, stored in $p_. It is : on UNIX and ; on
+?X: DOSish systems such as OS/2.
 ?X:
-: Proper PATH separator
+: Proper separator for the PATH environment variable
 p_=:
-: On OS/2 this directory should exist if this is not floppy only system :-]
-if test -d c:/.; then
-	p_=\;
-	PATH=`cmd /c "echo %PATH%" | tr '\\\\' / `
+: On OS/2 this directory should exist if this is not floppy only system ":-]"
+if test -d c:/. ; then
+	if test -n "$OS2_SHELL"; then
+		p_=\;
+		PATH=`cmd /c "echo %PATH%" | tr '\\\\' / `
 ?X: That's a bug in ksh5.22
-	OS2_SHELL=`cmd /c "echo %OS2_SHELL%" | tr '\\\\' / | tr '[A-Z]' '[a-z]'`
+		OS2_SHELL=`cmd /c "echo %OS2_SHELL%" | tr '\\\\' / | tr '[A-Z]' '[a-z]'`
+	elif test -n "$DJGPP"; then
+		case "X${MACHTYPE:-nonesuchmach}" in
+		*cygwin) ;;
+		*) p_=\; ;;
+		esac
+	fi
 fi
 
 ?X:
@@ -149,7 +159,7 @@ fi
 ?X: various permutations on /opt as opposed to /usr or /usr/local.-- ADO
 ?X:
 ?X: We only add directories that are not already in the PATH of the
-?X: user and the directories must exist also. 
+?X: user and the directories must exist also.
 ?X:
 : Proper PATH setting
 paths='/bin /usr/bin /usr/local/bin /usr/ucb /usr/local /usr/lbin'
@@ -160,6 +170,7 @@ paths="$paths /sys5.3/bin /sys5.3/usr/bin /bsd4.3/bin /bsd4.3/usr/ucb"
 paths="$paths /bsd4.3/usr/bin /usr/bsd /bsd43/bin /usr/ccs/bin"
 paths="$paths /etc /usr/lib /usr/ucblib /lib /usr/ccs/lib"
 paths="$paths /sbin /usr/sbin /usr/libexec"
+paths="$paths /system/gnu_library/bin"
 
 for p in $paths
 do
@@ -196,11 +207,21 @@ if test -d /usr/lpp -a -f /usr/bin/bsh -a -f /usr/bin/uname; then
 		newsh=/usr/bin/bsh
 	fi
 fi
+?X: On Digital UNIX, /bin/sh may start up buggy /bin/ksh, use sh
+if test -f /osf_boot -a -f /usr/sbin/setld; then
+	if test X`/usr/bin/uname -s` = XOSF1; then
+		avoidksh="to avoid Digital UNIX' ksh"
+		newsh=/bin/sh
+?X: if BIN_SH is set to 'xpg4', sh will start up ksh
+		unset BIN_SH
+	fi
+fi
 ?X: If we are not in ksh and need it, then feed us back to it
 case "$inksh/$needksh" in
 /[a-z]*)
-?X: Unset ENV to avoid any ~/.kshrc that could alias cd or whatever...
-		unset ENV
+?X: Clear ENV to avoid any ~/.kshrc that could alias cd or whatever...
+?X: Don't use "unset ENV", that is not portable enough
+		ENV=''
 		changesh=true
 		reason="$needksh"
 	;;
@@ -224,6 +245,7 @@ EOM
 esac
 case "$changesh" in
 true)
+	export newsh
 	echo "(Feeding myself to $newsh $reason.)"
 ?X: Make sure they didn't say sh <Configure by checking whether $0 ends
 ?X: with Configure or not. If they did say sh <../../Configure, then too
@@ -237,10 +259,24 @@ true)
 	;;
 esac
 
+?X: Unset CDPATH to avoid surprises when using cd under some shells
+?X: Can't unset it because that's not portable to very old shells.
+?X: Can't set it to '' because then bash 2.02 won't do "cd UU"  --AD  6/98.
+?X: Don't want to set it to '.' because then ksh prints out the
+?X: name of the directory every time you cd to it. --AD 6/98
+?X: In order to inflict the least harm, change it only if it's set.
+: if needed, set CDPATH to a harmless value that is not chatty
+case "$CDPATH" in
+'')	;;
+*)	case "$SHELL" in
+	*bash*) CDPATH='.' ;;
+	*) CDPATH='' ;;
+	esac
+	;;
+esac
+
 : Configure runs within the UU subdirectory
 test -d UU || mkdir UU
 ?X: Use ./* to avoid any confirmation prompts from enhanced shells -- WED
-?X: Unset CDPATH to avoid surprised when using cd under some shells
-unset CDPATH
 cd UU && rm -f ./*
 

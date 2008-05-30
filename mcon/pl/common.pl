@@ -1,12 +1,12 @@
-;# $Id: common.pl,v 3.0.1.4 1994/10/29 16:35:01 ram Exp $
+;# $Id$
 ;#
-;#  Copyright (c) 1991-1993, Raphael Manfredi
+;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
 ;#  You may redistribute only under the terms of the Artistic Licence,
 ;#  as specified in the README file that comes with the distribution.
 ;#  You may reuse parts of this distribution only within the terms of
 ;#  that same Artistic Licence; a copy of which may be found at the root
-;#  of the source tree for dist 3.0.
+;#  of the source tree for dist 4.0.
 ;#
 ;# $Log: common.pl,v $
 ;# Revision 3.0.1.4  1994/10/29  16:35:01  ram
@@ -85,6 +85,8 @@ sub init_extraction {
 	$c_symbol = '';				# Current symbol seen in ?C: lines
 	$s_symbol = '';				# Current symbol seen in ?S: lines
 	$m_symbol = '';				# Current symbol seen in ?M: lines
+	$heredoc = '';				# Last "here" document symbol seen
+	$heredoc_nosubst = 0;		# True for <<'EOM' here docs
 	$condlist = '';				# List of conditional symbols
 	$defined = '';				# List of defined symbols in the unit
 	$body = '';					# No procedure to handle body
@@ -117,7 +119,7 @@ sub p_make {
 			next if $sym =~ s/^\+//;
 			# Only sumbols starting with a lowercase letter are to
 			# appear in config.sh, excepted the ones listed in Except.
-			if ($sym =~ /^[a-z]/ || $Except{$sym}) {
+			if ($sym =~ /^[_a-z]/ || $Except{$sym}) {
 				$shmaster{"\$$sym"} = undef;
 				push(@Master,"?$unit:$sym=''\n");	# Initializations
 			}

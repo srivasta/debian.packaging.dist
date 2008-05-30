@@ -17,18 +17,18 @@ esac
 echo "Extracting mcon/mconfig (with variable substitutions)"
 cat >mconfig <<!GROK!THIS!
 $startperl
-	eval "exec perl -S \$0 \$*"
+	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: mconfig.SH,v 3.0.1.5 1995/07/25 14:19:05 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # Original Author: Larry Wall <lwall@netlabs.com>
 # Key Contributor: Harlan Stenn <harlan@mumps.pfcs.com>
@@ -58,6 +58,7 @@ $startperl
 \$MC = '$privlib';
 \$version = '$VERSION';
 \$patchlevel = '$PATCHLEVEL';
+\$revision = '$REVISION';
 \$grep = '$grep';
 !GROK!THIS!
 
@@ -78,7 +79,7 @@ chdir $WD || die "Can't chdir back to $WD: $!\n";
 ++$opt_M if -f 'confmagic.h';	# Force -M if confmagic.h already there
 
 if ($opt_V) {
-	print STDERR "metaconfig $version PL$patchlevel\n";
+	print STDERR "metaconfig $version-$revision\n";
 	exit 0;
 } elsif ($opt_h) {
 	&usage;
@@ -119,11 +120,16 @@ sub init {
 sub init_constants {
 	$NEWMANI = 'MANIFEST.new';		# List of files to be scanned
 	$MANI = 'MANIFEST';				# For manifake
+
+	# The distinction between MANIFEST.new and MANIFEST can make sense
+	# when the "pat" tools are used, but if only metaconfig is used, then
+	# we can very well leave without a MANIFEST.new.  --RAM, 2006-08-25
+	$NEWMANI = $MANI if -f $MANI && ! -f $NEWMANI;
 }
 
-# Record the exceptions -- all symbols but these are lower case
+# Record the exceptions -- almost all symbols but these are lower case
+# We also use three symbols from Unix.U for default file suffixes.
 sub init_except {
-	$Except{'Mcc'}++;
 	$Except{'Author'}++;
 	$Except{'Date'}++;
 	$Except{'Header'}++;
@@ -134,6 +140,9 @@ sub init_except {
 	$Except{'Revision'}++;
 	$Except{'Source'}++;
 	$Except{'State'}++;
+	$Except{'_a'}++;
+	$Except{'_o'}++;
+	$Except{'_exe'}++;
 }
 
 # Print out metaconfig's usage and exits

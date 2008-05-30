@@ -1,12 +1,12 @@
-?RCS: $Id: usrinc.U,v 3.0.1.3 1997/02/28 16:27:12 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: usrinc.U,v $
 ?RCS: Revision 3.0.1.3  1997/02/28  16:27:12  ram
@@ -21,7 +21,7 @@
 ?RCS: Revision 3.0  1993/08/18  12:09:58  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:usrinc mips incpath mips_type: test cat echo n c +cc Getfile Guess \
+?MAKE:usrinc incpath mips_type: test cat echo n c Getfile Guess \
 	Oldconfig eunicefix contains rm
 ?MAKE:	-pick add $@ %<
 ?S:usrinc:
@@ -38,8 +38,6 @@
 ?S:	Possible values are "BSD 4.3" and "System V".
 ?S:.
 ?D:usrinc='/usr/include'
-?LINT:describe mips
-?LINT:set mips
 ?LINT:create mips
 ?T:xxx_prompt
 ?F:./mips
@@ -60,7 +58,7 @@ if $test -f /bin/mips && /bin/mips; then
 /bsd43
 #endif
 EOCP
-	if $cc -E usr.c > usr.out && $contains / usr.out >/dev/null 2>&1; then
+	if cc -E usr.c > usr.out && $contains / usr.out >/dev/null 2>&1; then
 		dflt='/bsd43/usr/include'
 		incpath='/bsd43'
 		mips_type='BSD 4.3'

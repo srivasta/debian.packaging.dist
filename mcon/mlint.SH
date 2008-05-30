@@ -17,18 +17,18 @@ esac
 echo "Extracting mcon/mlint (with variable substitutions)"
 cat >mlint <<!GROK!THIS!
 $startperl
-	eval "exec perl -S \$0 \$*"
+	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: mlint.SH,v 3.0.1.3 1994/05/06 15:20:42 ram Exp $
+# $Id$
 #
-#  Copyright (c) 1991-1993, Raphael Manfredi
+#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
 #  that same Artistic Licence; a copy of which may be found at the root
-#  of the source tree for dist 3.0.
+#  of the source tree for dist 4.0.
 #
 # Original Author: Harlan Stenn <harlan@mumps.pfcs.com>
 #
@@ -51,6 +51,7 @@ $startperl
 \$MC = '$privlib';
 \$version = '$VERSION';
 \$patchlevel = '$PATCHLEVEL';
+\$revision = '$REVISION';
 \$grep = '$grep';
 !GROK!THIS!
 
@@ -60,7 +61,7 @@ require 'getopts.pl';
 &usage unless &Getopts("hklVL:");
 
 if ($opt_V) {
-	print STDERR "metalint $version PL$patchlevel\n";
+	print STDERR "metalint $version-$revision\n";
 	exit 0;
 } elsif ($opt_h) {
 	&usage;
@@ -97,7 +98,6 @@ sub init {
 
 # Record the exceptions -- all symbols but these are lower case
 sub init_except {
-	$Except{'Mcc'}++;
 	$Except{'Author'}++;
 	$Except{'Date'}++;
 	$Except{'Header'}++;

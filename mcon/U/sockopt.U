@@ -1,12 +1,12 @@
-?RCS: $Id: sockopt.U,v 3.0.1.1 1995/07/25 14:16:14 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: sockopt.U,v $
 ?RCS: Revision 3.0.1.1  1995/07/25  14:16:14  ram
@@ -28,6 +28,7 @@
 ?C:.
 ?H:#$d_keepalive CAN_KEEPALIVE		/**/
 ?H:.
+?F:!socket
 ?LINT:set d_keepalive
 : see if setsockopt with SO_KEEPALIVE works as advertised
 echo " "
@@ -43,7 +44,7 @@ case "$d_oldsock" in
 #include <netinet/in.h>
 #include <netdb.h>
 
-main()
+int main()
 {
 	int s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == -1)
@@ -53,7 +54,7 @@ main()
 	exit(0);
 }
 EOP
-		if $cc $ccflags $sockethdr socket.c -o socket $libs \
+		if $cc $ccflags $sockethdr -o socket socket.c $libs \
 			$socketlib >/dev/null 2>&1; then
 			./socket >/dev/null 2>&1
 			case $? in

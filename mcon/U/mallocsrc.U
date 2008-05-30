@@ -1,12 +1,12 @@
-?RCS: $Id: mallocsrc.U,v 3.0.1.2 1997/02/28 16:10:26 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: mallocsrc.U,v $
 ?RCS: Revision 3.0.1.2  1997/02/28  16:10:26  ram
@@ -22,8 +22,11 @@
 ?MAKE:mallocsrc mallocobj usemymalloc malloctype d_mymalloc \
 	freetype: Myread \
 	Oldconfig package Guess Setvar rm cat +cc +ccflags Findhdr \
-	i_malloc i_stdlib sed libs _o
+	i_malloc i_stdlib sed libs _o ptrsize
 ?MAKE:	-pick add $@ %<
+?X: Put near top so that other tests don't erroneously include
+?X: -lmalloc.  --AD  22 June 1998
+?Y:TOP
 ?S:usemymalloc:
 ?S:	This variable contains y if the malloc that comes with this package
 ?S:	is desired over the system's version of malloc.  People often include
@@ -77,9 +80,14 @@
 : determine which malloc to compile in
 echo " "
 case "$usemymalloc" in
-''|y*|true)	dflt='y' ;;
-n*|false)	dflt='n' ;;
-*)	dflt="$usemymalloc" ;;
+[yY]*|true|$define) dflt='y' ;;
+[nN]*|false|$undef) dflt='n' ;;
+*)
+	case "$ptrsize" in
+	4) dflt='y' ;;
+	*) dflt='n' ;;
+	esac
+	;;
 esac
 rp="Do you wish to attempt to use the malloc that comes with $package?"
 . ./myread

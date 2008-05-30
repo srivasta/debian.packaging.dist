@@ -1,12 +1,12 @@
-;# $Id: cosmetic.pl,v 3.0.1.3 1995/07/25 14:19:16 ram Exp $
+;# $Id$
 ;#
-;#  Copyright (c) 1991-1993, Raphael Manfredi
+;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
 ;#  You may redistribute only under the terms of the Artistic Licence,
 ;#  as specified in the README file that comes with the distribution.
 ;#  You may reuse parts of this distribution only within the terms of
 ;#  that same Artistic Licence; a copy of which may be found at the root
-;#  of the source tree for dist 3.0.
+;#  of the source tree for dist 4.0.
 ;#
 ;# $Log: cosmetic.pl,v $
 ;# Revision 3.0.1.3  1995/07/25  14:19:16  ram
@@ -47,26 +47,22 @@ sub cosmetic_update {
 	$/ = "\n";
 	close NEWMANI;
 
-	$* = 1;					# Multi-line matching
-
-	&mani_add('Configure', 'Portability tool', $spaces) unless /^Configure\b/;
+	&mani_add('Configure', 'Portability tool', $spaces) unless /^Configure\b/m;
 	&mani_add('config_h.SH', 'Produces config.h', $spaces)
-		unless /^config_h\.SH\b/ || !-f 'config_h.SH';
+		unless /^config_h\.SH\b/m || !-f 'config_h.SH';
 	&mani_add('confmagic.h', 'Magic symbol remapping', $spaces)
-		if $opt_M && !/^confmagic\.h\b/;
+		if $opt_M && !/^confmagic\.h\b/m;
 
-	&mani_remove('config_h.SH') if /^config_h\.SH\b/ && !-f 'config_h.SH';
-	&mani_remove('confmagic.h') if /^confmagic.h\b/ && !$opt_M;
+	&mani_remove('config_h.SH') if /^config_h\.SH\b/m && !-f 'config_h.SH';
+	&mani_remove('confmagic.h') if /^confmagic.h\b/m && !$opt_M;
 
 	if ($opt_G) {			# Want a GNU-like configure wrapper
 		&add_configure;
 		&mani_add('configure', 'GNU configure-like wrapper', $spaces)
-			if !/^configure\b/ && -f 'configure';
+			if !/^configure\s/m && -f 'configure';
 	} else {
-		&mani_remove('configure') if /^configure\b/ && !-f 'configure';
+		&mani_remove('configure') if /^configure\s/m && !-f 'configure';
 	}
-
-	$* = 0;
 }
 
 # Add file to MANIFEST.new, with properly indented comment

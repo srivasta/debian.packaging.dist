@@ -20,15 +20,15 @@ $spitshell >metalint.$manext <<!GROK!THIS!
 .TH METALINT $manext "Version $VERSION PL$PATCHLEVEL"
 ''' @(#) Manual page for metalint
 '''
-''' $Id: mlint.SH,v 3.0.1.9 1997/02/28 16:30:25 ram Exp $
+''' $Id$
 '''
-'''  Copyright (c) 1991-1993, Raphael Manfredi
+'''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 '''  
 '''  You may redistribute only under the terms of the Artistic Licence,
 '''  as specified in the README file that comes with the distribution.
 '''  You may reuse parts of this distribution only within the terms of
 '''  that same Artistic Licence; a copy of which may be found at the root
-'''  of the source tree for dist 3.0.
+'''  of the source tree for dist 4.0.
 '''
 ''' $Log: mlint.SH,v $
 ''' Revision 3.0.1.9  1997/02/28  16:30:25  ram
@@ -165,6 +165,30 @@ Apparently, two ?H: lines are defining the same C symbol.
 "(?H) variable '\$xxx' not even listed on ?MAKE: line."
 A variable is used, but not listed on the dependency line.
 .TP
+"(?H) section was already terminated by '?H:.'."
+There can be no more ?H: lines after the first '?H:.' marking the end
+of that section.
+.TP
+"(?H) uncommon cpp line should be protected with '?%<:'."
+All ?H: lines that are recognized by
+.I metaconfig
+and thus
+.I metalint
+have their inclusion in config.h automatically protected by a suitable
+symbol if none is provided.  However, unrecognized lines must be protected
+with the '?%<:' sequence to avoid their inclusion should the unit not be
+loaded in Configure.
+.TP
+"(?H) line should not be listed here but in '?C:'."
+Only cpp lines should appear in the ?H: section.  If you have a comment
+to put regarding the symbol, use ?C:.  If you want to comment a particular
+generation sequence, put them into ?X: comment so that they don't make it
+into config.h.
+.TP
+"(?H) constraint 'xxx' is an unknown symbol."
+All the leading ?sym: constraints on the ?H: lines should be a valid
+shell or C symbol, defined in the unit.
+.TP
 "(?M) syntax error in ?M: construct."
 Self explainatory.
 .TP
@@ -218,6 +242,12 @@ Exceptions allowed if the ?F: line is preceded by a proper ?LINT: hint.
 "(?T) temporary symbol '\$xxx' multiply declared."
 Self explainatory.
 .TP
+"directive should come after ?MAKE declarations."
+The directive listed between () at the beginning of this message should
+really come after the ?MAKE: lines.  You must reorder the unit or
+.I metalint
+will not be able to properly diagnose problems.
+.TP
 "control sequence '?XXX:' ignored within body."
 Attempt to use a control line other than ?X: or ?LINT: in the unit body,
 which should be only shell code
@@ -230,6 +260,29 @@ this message in pathological cases.
 "no ?MAKE: line describing dependencies."
 Every unit should have a dependency line, or it will be silently ignored by
 \fImetaconfig\fR. This message is suppressed by a ?LINT: empty hint.
+.TP
+"first body line should be a general ': description'."
+The very first shell line of the unit that will be added to the generated
+Configure script should hold a description of the unit's purpose, on a ':'
+line.  There must be a space after the ':', since it is interpreted by the
+shell, and the description should avoid meta-characters like '(' or '>' unless
+the whole string is quoted.  This message is suppressed by a ?LINT: nocomment
+hint.
+.TP
+"missing space after ':' to make it a comment."
+A line starting by ':' is interpreted by the shell but will be ignored.  There
+must be a space after the ':' though, or the shell will try to execute an
+unknown command...
+.TP
+"found unquoted meta-character > on comment line."
+A line starting by ':' is interpreted by the shell but will be ignored.
+This means that meaningful meta-characters such as '(' or '>' must be
+quoted or escaped with a leading backslash.
+.TP
+"found dangling quote on ':' comment line."
+An unclosed single or double quote was spotted on a ':' comment line.
+Since those lines are interpreted by the shell, albeit ignored, all quotes
+must match perfectly.
 .TP
 "not ending with a blank line."
 Since all units are gathered together to form one big script, it is recommended
@@ -307,17 +360,9 @@ An obsolete symbol is used in the unit's shell code.
 The unit tries to set a shell variable which has not been otherwise declared
 as made or as a temporary variable, or whatever.
 .TP
-"meaningful shell character '>' in comment line."
-A shell charcter like '>' or ';' was found on a : comment line, which
-is parsed by the shell, although not executed. Therefore, those symbols
-are dangerous and can cause weird behaviour, and should be avoided if
-possible.
-.TP
-"unmatched single quote in comment line."
-The : comment line is parsed by the shell, so any unmatched quote will
-result in having a chunk of the produced Configure script ignored at
-interpretation time, causing trouble at best. A similar message will
-be issued for unmatched double quotes.
+"unclosed ?H: section."
+The ?H: section was not terminated by a single '?H:.' line before
+the body of the unit or the start of another ?C: section.
 .TP
 "C symbol 'xxx' is defined in the following units:"
 The C symbol is defined in more that one unit. Offending units are listed.
@@ -389,6 +434,19 @@ The file does not appear on any ?F: line; however it should.
 "File 'xxx' is defined in the following units:"
 The listed units cannot seem to agree on who is defining the file.
 .TP
+"empty here-document name discouraged."
+You should refrain from using empty names for here documents, as
+.I metalint
+will not monitor those.
+.TP
+"unclosed here-document xxx started line x."
+The opened here-document at line x was never closed in this unit.
+This generally mean that when the unit is used, the generated script will
+not work!
+.TP
+"spurious 'LINT xxx' directive."
+You have inserted a ?LINT: directive that is not used to shut-up warnings.
+.TP
 "Cycle found for:"
 There is a dependency cycle found for the symbols listed. Only the symbols
 involved in the cycle are listed.
@@ -455,11 +513,23 @@ unit file is empty and kept only as a placeholder.
 .I known
 listed C variables are described
 .TP
+.I nocomment
+unit file is special and may miss a leading ': description' line.
+.TP
+.I nothere
+listed names are not here documents (e.g. "1 << foo" in a C program)
+.TP
 .I set
 listed variables are set
 .TP
 .I use
 variables listed are used by this unit
+.TP
+.I unclosed
+listed names of here-documents are not closed in this unit
+.TP
+.I usefile
+listed file is used (do not prepend name with '!' for temporary ones)
 .PD
 .RS -10
 .SH AUTHORS

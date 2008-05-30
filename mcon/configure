@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: configure,v 3.0.1.2 1997/02/28 16:28:49 ram Exp $
+# $Id: configure,v 3.0.1.2 1997/02/28 16:28:49 ram Exp ram $
 #
 # GNU configure-like front end to metaconfig's Configure.
 #

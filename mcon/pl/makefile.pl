@@ -1,12 +1,12 @@
-;# $Id: makefile.pl,v 3.0.1.1 1995/09/25 09:19:42 ram Exp $
+;# $Id$
 ;#
-;#  Copyright (c) 1991-1993, Raphael Manfredi
+;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
 ;#  You may redistribute only under the terms of the Artistic Licence,
 ;#  as specified in the README file that comes with the distribution.
 ;#  You may reuse parts of this distribution only within the terms of
 ;#  that same Artistic Licence; a copy of which may be found at the root
-;#  of the source tree for dist 3.0.
+;#  of the source tree for dist 4.0.
 ;#
 ;# $Log: makefile.pl,v $
 ;# Revision 3.0.1.1  1995/09/25  09:19:42  ram
@@ -90,15 +90,13 @@ sub build_private {
 	print MAKEFILE "SHELL = /bin/sh\n";
 	print MAKEFILE "W = $wanted\n";
 	$saved_dependencies = $dependencies;
-	$* = 1;
 	foreach $sym (@Cond) {
 		if ($symwanted{$sym}) {
-			$dependencies =~ s/\+($sym\s)/$1/g;
+			$dependencies =~ s/\+($sym\s)/$1/gm;
 		} else {
-			$dependencies =~ s/\+$sym(\s)/$1/g;
+			$dependencies =~ s/\+$sym(\s)/$1/gm;
 		}
 	}
-	$* = 0;
 	print MAKEFILE $dependencies;
 	close MAKEFILE;
 }
@@ -161,15 +159,13 @@ sub update_makefile {
 	open(MAKEFILE,">Makefile") || die "Can't create .MT/Makefile.\n";
 	print MAKEFILE "SHELL = /bin/sh\n";
 	print MAKEFILE "W = $wanted\n";
-	$* = 1;
 	foreach $sym (@Cond) {
 		if ($symwanted{$sym}) {
-			$saved_dependencies =~ s/\+($sym\s)/$1/g;
+			$saved_dependencies =~ s/\+($sym\s)/$1/gm;
 		} else {
-			$saved_dependencies =~ s/\+$sym(\s)/$1/g;
+			$saved_dependencies =~ s/\+$sym(\s)/$1/gm;
 		}
 	}
-	$* = 0;
 	print MAKEFILE $saved_dependencies;
 	close MAKEFILE;
 }

@@ -1,12 +1,12 @@
-?RCS: $Id: d_ckeypad.U,v 3.0 1993/08/18 12:05:50 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_ckeypad.U,v $
 ?RCS: Revision 3.0  1993/08/18  12:05:50  ram
@@ -26,7 +26,7 @@
 ?H:#$d_ckeypad HAS_CURSES_KEYPAD	/**/
 ?H:.
 ?LINT:set d_ckeypad
-: check for the keypad() function in the curses library
+: check for the "keypad()" function in the curses library
 echo " "
 case "$termlib" in
 '')
@@ -36,7 +36,7 @@ case "$termlib" in
 echo "Checking the curses library ($termlib) for the keypad() function..." >&4
 	$cat >c_keypad.c <<'EOCP'
 #include <curses.h>
-main() {
+int main() {
 	keypad(stdscr, TRUE);
 	exit(0);
 }

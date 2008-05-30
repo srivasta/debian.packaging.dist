@@ -1,12 +1,12 @@
-?RCS: $Id: usenm.U,v 3.0.1.1 1997/02/28 16:26:40 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: usenm.U,v $
 ?RCS: Revision 3.0.1.1  1997/02/28  16:26:40  ram
@@ -16,8 +16,8 @@
 ?RCS: Revision 3.0  1993/08/18  12:09:57  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:usenm runnm nm_opt nm_so_opt: cat test Myread Oldconfig myuname grep \
-	d_gnulibc
+?MAKE:usenm runnm nm_opt nm_so_opt: cat test Myread Oldconfig grep \
+	d_gnulibc nm egrep rsrc osname Guess
 ?MAKE:	-pick add $@ %<
 ?S:usenm:
 ?S:	This variable contains 'true' or 'false' depending whether the
@@ -46,42 +46,63 @@
 ?X: Don't bother if we're using GNU libc -- skimo
 case "$usenm" in
 '')
+	dflt=''
 	case "$d_gnulibc" in
-	$define)
+	"$define")
+		echo " "
+		echo "$nm probably won't work on the GNU C Library." >&4
 		dflt=n
 		;;
-	*)
-		dflt=`egrep 'inlibc|csym' ../Configure | wc -l 2>/dev/null`
-		if $test $dflt -gt 20; then
-			dflt=y
-		else
+	esac
+	case "$dflt" in
+	'')
+		if $test "$osname" = aix -a ! -f /lib/syscalls.exp; then
+			echo " "
+			echo "Whoops!  This is an AIX system without /lib/syscalls.exp!" >&4
+			echo "'nm' won't be sufficient on this system." >&4
 			dflt=n
+		fi
+		;;
+	esac
+	case "$dflt" in
+	'')
+		if ./gnu; then
+			echo " "
+			echo "Hmm...  A GNU system without a GNU C Library?  Weird..." >&4
+			dflt=n
+		else
+			dflt=`$egrep 'inlibc|csym' $rsrc/Configure | wc -l 2>/dev/null`
+			if $test $dflt -gt 20; then
+				dflt=y
+			else
+				dflt=n
+			fi
 		fi
 		;;
 	esac
 	;;
 *)
 	case "$usenm" in
-	true) dflt=y;;
+	true|$define) dflt=y;;
 	*) dflt=n;;
 	esac
 	;;
 esac
 $cat <<EOM
 
-I can use 'nm' to extract the symbols from your C libraries. This is a time
-consuming task which may generate huge output on the disk (up to 3 megabytes)
-but that should make the symbols extraction faster. The alternative is to skip
-the 'nm' extraction part and to compile a small test program instead to
-determine whether each symbol is present. If you have a fast C compiler and/or
-if your 'nm' output cannot be parsed, this may be the best solution.
-You shouldn't let me use 'nm' if you have the GNU C Library.
+I can use $nm to extract the symbols from your C libraries. This
+is a time consuming task which may generate huge output on the disk (up
+to 3 megabytes) but that should make the symbols extraction faster. The
+alternative is to skip the 'nm' extraction part and to compile a small
+test program instead to determine whether each symbol is present. If
+you have a fast C compiler and/or if your 'nm' output cannot be parsed,
+this may be the best solution.
 
 EOM
 rp='Shall I use nm to extract C symbols from the libraries?'
 . ./myread
 case "$ans" in
-n|N) usenm=false;;
+[Nn]*) usenm=false;;
 *) usenm=true;;
 esac
 
@@ -96,22 +117,24 @@ esac
 : nm options which may be necessary
 case "$nm_opt" in
 '') if $test -f /mach_boot; then
-		nm_opt=''
+		nm_opt=''		# Mach
 	elif $test -d /usr/ccs/lib; then
-		nm_opt='-p'
+		nm_opt='-p'		# Solaris (and SunOS?)
 	elif $test -f /dgux; then
-		nm_opt='-p'
+		nm_opt='-p'		# DG-UX
+	elif $test -f /lib64/rld; then
+		nm_opt='-p'		# 64-bit Irix
 	else
 		nm_opt=''
 	fi;;
 esac
 
-: nm options which may be necessary for shared libraries but illegal
-: for archive libraries.  Thank you, Linux.
+?X: nm options which may be necessary for shared libraries but illegal
+?X: for archive libraries.  Thank you, Linux.
 case "$nm_so_opt" in
-'')	case "$myuname" in
+'')	case "$osname" in
 	*linux*)
-		if nm --help | $grep 'dynamic' > /dev/null 2>&1; then
+		if $nm --help | $grep 'dynamic' > /dev/null 2>&1; then
 			nm_so_opt='--dynamic'
 		fi
 		;;

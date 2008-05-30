@@ -1,12 +1,12 @@
-?RCS: $Id: sig_name.U,v 3.0.1.5 1997/02/28 16:21:25 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: sig_name.U,v $
 ?RCS: Revision 3.0.1.5  1997/02/28  16:21:25  ram
@@ -27,16 +27,41 @@
 ?RCS: Revision 3.0  1993/08/18  12:09:47  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:sig_name sig_num: awk Signal Oldconfig rm
+?MAKE:sig_name sig_name_init sig_num sig_num_init sig_count sig_size: \
+	awk Signal Oldconfig rm
 ?MAKE:	-pick add $@ %<
 ?S:sig_name:
 ?S:	This variable holds the signal names, space separated. The leading
-?S:	SIG in signals name is removed. See sig_num.
+?S:	SIG in signal name is removed.  A ZERO is prepended to the
+?S:	list.  This is currently not used.
+?S:.
+?S:sig_name_init:
+?S:	This variable holds the signal names, enclosed in double quotes and
+?S:	separated by commas, suitable for use in the SIG_NAME definition 
+?S:	below.  A "ZERO" is prepended to the list, and the list is 
+?S:	terminated with a plain 0.  The leading SIG in signal names
+?S:	is removed. See sig_num.
 ?S:.
 ?S:sig_num:
-?S:	This variable holds the signal numbers, space separated. Those numbers
-?S:	correspond to the value of the signal listed in the same place within
-?S:	the sig_name list.
+?S:	This variable holds the signal numbers, space separated. A ZERO is
+?S:	prepended to the list (corresponding to the fake SIGZERO), and 
+?S:	the list is terminated with a 0.  Those numbers correspond to 
+?S:	the value of the signal listed in the same place within the
+?S:	sig_name list.
+?S:.
+?S:sig_num_init:
+?S:	This variable holds the signal numbers, enclosed in double quotes and
+?S:	separated by commas, suitable for use in the SIG_NUM definition 
+?S:	below.  A "ZERO" is prepended to the list, and the list is 
+?S:	terminated with a plain 0.
+?S:.
+?S:sig_count (sig_name.U):
+?S: 	This variable holds a number larger than the largest valid
+?S: 	signal number.  This is usually the same as the NSIG macro.
+?S:.
+?S:sig_size:
+?S: 	This variable contains the number of elements of the sig_name
+?S: 	and sig_num arrays, excluding the final NULL entry.
 ?S:.
 ?C:SIG_NAME:
 ?C:	This symbol contains a list of signal names in order of
@@ -66,10 +91,21 @@
 ?C:	The last element is 0, corresponding to the 0 at the end of
 ?C:	the sig_name list.
 ?C:.
-?H:#define SIG_NAME "`echo $sig_name | sed 's/ /","/g'`",0	/**/
-?H:#define SIG_NUM `echo $sig_num 0 | sed 's/ /,/g'`	/**/
+?C:SIG_COUNT:
+?C:	This variable contains a number larger than the largest
+?C:	signal number.  This is usually the same as the NSIG macro.
+?C:.
+?C:SIG_SIZE:
+?C:	This variable contains the number of elements of the sig_name
+?C:	and sig_num arrays, excluding the final NULL entry.
+?C:.
+?H:#define SIG_NAME $sig_name_init		/**/
+?H:#define SIG_NUM  $sig_num_init		/**/
+?H:#define SIG_COUNT $sig_count			/**/
+?H:#define SIG_SIZE $sig_size			/**/
 ?H:.
-?T:i
+?T:i doinit
+?F:!= !signal_cmd
 ?X:	signal.cmd creates a file  signal.lst which has two columns:
 ?X:	NAME  number, e.g.
 ?X:	 HUP 1
@@ -77,27 +113,30 @@
 ?X:	the end..
 : generate list of signal names
 echo " "
-?X:	Previous versions used a different algorithm to get sig_name,
-?X:	and didn't get sig_num at all.  If either sig_name or sig_num
-?X:	is empty, compute both all over again.  If both are set, it
-?X:	could be a hint file or a previous value, so let it stay.
-case "$sig_name" in
-'')	sig_num='' ;;
+case "$sig_name_init" in
+'') doinit=yes ;;
+*)  case "$sig_num_init" in
+    ''|*,*) doinit=yes ;;
+    esac ;;
 esac
-case "$sig_num" in
-'')	sig_name='' ;;
-esac
-case "$sig_name" in
-'')
+case "$doinit" in
+yes)
 	echo "Generating a list of signal names and numbers..." >&4
-	./signal_cmd
-	sig_name=`$awk '{printf "%s ", $1}' signal.lst`
-	sig_name="ZERO $sig_name"
-	sig_num=`$awk '{printf "%d ", $2}' signal.lst`
-	sig_num="0 $sig_num"
+	. ./signal_cmd
+ 	sig_count=`$awk '/^NSIG/ { printf "%d", $2 }' signal.lst`
+ 	sig_name=`$awk 'BEGIN { printf "ZERO " }
+ 			!/^NSIG/ { printf "%s ", $1 }' signal.lst`
+ 	sig_num=`$awk  'BEGIN { printf "0 " }
+ 			!/^NSIG/ { printf "%d ", $2 }' signal.lst`
+ 	sig_name_init=`$awk 'BEGIN	{ printf "\"ZERO\", " }
+ 			     !/^NSIG/	{ printf "\"%s\", ", $1 }
+ 			     END	{ printf "0\n" }' signal.lst`
+ 	sig_num_init=`$awk  'BEGIN	{ printf "0, " }
+ 			     !/^NSIG/	{ printf "%d, ", $2}
+ 			     END	{ printf "0\n"}' signal.lst`
 	;;
 esac
-echo "The following signals are available:"
+echo "The following $sig_count signals are available:"
 echo " "
 echo $sig_name | $awk \
 'BEGIN { linelen = 0 }
@@ -113,5 +152,6 @@ echo $sig_name | $awk \
 	}
 	printf "\n"
 }'
+sig_size=`echo $sig_name | awk '{print NF}'`
 $rm -f signal signal.c signal.awk signal.lst signal_cmd 
 

@@ -1,12 +1,12 @@
-?RCS: $Id: orderlib.U,v 3.0.1.4 1997/02/28 16:18:18 ram Exp $
+?RCS: $Id$
 ?RCS:
-?RCS: Copyright (c) 1991-1993, Raphael Manfredi
+?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
 ?RCS: You may redistribute only under the terms of the Artistic Licence,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
 ?RCS: that same Artistic Licence; a copy of which may be found at the root
-?RCS: of the source tree for dist 3.0.
+?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: orderlib.U,v $
 ?RCS: Revision 3.0.1.4  1997/02/28  16:18:18  ram
@@ -38,6 +38,7 @@
 ?S:	needed to generate random libraries.  Set to ":" if ar can generate
 ?S:	random libraries or if random libraries are not supported
 ?S:.
+?F:!foobar
 : see if ar generates random libraries by itself
 echo " "
 echo "Checking how to generate random libraries on your machine..." >&4
@@ -50,7 +51,7 @@ echo "Checking how to generate random libraries on your machine..." >&4
 echo 'int bar1() { return bar2(); }' > bar1.c
 echo 'int bar2() { return 2; }' > bar2.c
 $cat > foo.c <<'EOP'
-main() { printf("%d\n", bar1()); exit(0); }
+int main() { printf("%d\n", bar1()); exit(0); }
 EOP
 $cc $ccflags -c bar1.c >/dev/null 2>&1
 $cc $ccflags -c bar2.c >/dev/null 2>&1

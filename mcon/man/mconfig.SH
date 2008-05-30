@@ -20,15 +20,15 @@ $spitshell >metaconfig.$manext <<!GROK!THIS!
 .TH METACONFIG $manext "Version $VERSION PL$PATCHLEVEL"
 ''' @(#) Manual page for metaconfig
 '''
-''' $Id: mconfig.SH,v 3.0.1.17 1997/02/28 16:29:31 ram Exp $
+''' $Id$
 '''
-'''  Copyright (c) 1991-1993, Raphael Manfredi
+'''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 '''  
 '''  You may redistribute only under the terms of the Artistic Licence,
 '''  as specified in the README file that comes with the distribution.
 '''  You may reuse parts of this distribution only within the terms of
 '''  that same Artistic Licence; a copy of which may be found at the root
-'''  of the source tree for dist 3.0.
+'''  of the source tree for dist 4.0.
 '''
 ''' $Log: mconfig.SH,v $
 ''' Revision 3.0.1.17  1997/02/28  16:29:31  ram
@@ -159,7 +159,8 @@ your .SH file).
 .IP \(bu
 Create a MANIFEST.new file in your top level directory that lists all the
 files in your package. This file will remain private and will not be
-part of the final distribution.
+part of the final distribution. (As a convenience, the MANIFEST file will
+be used by \fImetaconfig\fR if there is no MANIFEST.new file yet.)
 The filename should be the first field on each line.
 After some whitespace you can add a short comment describing your file.
 Only source files should be listed in there. The special file
@@ -370,7 +371,13 @@ default.
 Do not use "set -- ..." because '--' does not work with every shell. Use
 "set x ...; shift".
 .IP *
+Do not use "unset ENV" since unset is not fully portable.  Say "ENV=''"
+instead.
+.IP *
 Always use echo " " (with a space) because of Eunice systems.
+.IP *
+Only use \fBtest\fR with \-r, \-w, \-f or \-d since those are the only
+portable switches. In particular, avoid "test -x".
 .IP *
 Use only programs that came with V7, so that you know everyone has them.
 .IP *
@@ -966,6 +973,11 @@ it uses its units and your source code to produce all the needed configuration
 files. If you intend to write new units, you should have a good understanding
 of the whole scheme.
 .PP
+If there is no MANIFEST.new file, \fImetaconfig\fR will try to use the
+MANIFEST file instead, for convenience.  Everywhere we mention MANIFEST.new,
+it can be understood as MANIFEST provided there is no MANIFEST.new file
+found at the root of your package.
+.PP
 Assuming your MANIFEST.new file is properly set and lists all the source
 files you wish to configure, and that you have run \fIpackint\fR in your
 root source directory to create a \fI.package\fR file, you may run
@@ -1443,7 +1455,11 @@ your \fI.package\fR.
 The name of the package, as derived from your \fI.package\fR file.
 .TP
 <PATCHLEVEL>
-The patch level of the \fImetaconfig\fR program.
+The patch level of the \fImetaconfig\fR program (deprecated in favor
+of <REVISION>).
+.TP
+<REVISION>
+The SVN revision level of the \fImetaconfig\fR program.
 .TP
 <VERSION>
 The version number of the \fImetaconfig\fR program.
