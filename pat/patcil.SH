@@ -61,6 +61,8 @@ $startperl
 !GROK!THIS!
 cat >>patcil <<'!NO!SUBS!'
 
+use File::Temp qw/ tempfile tempdir /;
+
 $progname = &profile;			# Read ~/.dist_profile
 require 'getopts.pl';
 &usage unless $#ARGV >= 0;
@@ -504,12 +506,12 @@ x	Toggle patch# prefix.
 
 sub edit {
 	local($text) = join("\n", @_);
-	open(TMP,">/tmp/cil$$") || die "Can't create /tmp/cil$$";
-	print TMP $text;
-	close TMP;
-	system $EDITOR, "/tmp/cil$$";
-	$text = `cat /tmp/cil$$`;
-	unlink "/tmp/cil$$";
+        my $tmp = File::Temp->new();
+	print $tmp $text;
+	close $tmp;
+	system $EDITOR, "$tmp";
+	$text = `cat "$tmp"`;
+	unlink "$tmp";
 	$text;
 }
 
