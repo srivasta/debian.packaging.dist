@@ -443,7 +443,7 @@ he is going to use the final product on.
 Metaconfig reserves the following names in your directory, and if you use such
 a name it may get clobbered or have other unforeseen effects:
 .Ex
-.MT/*
+ \.MT/*
 Configure
 Wanted
 Obsolete
