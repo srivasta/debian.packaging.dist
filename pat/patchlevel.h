@@ -14,7 +14,7 @@
  */
 
 /*
- * $Id$
+ * $Id: patchlevel.h 1 2006-08-24 12:32:52Z rmanfredi $
  *
  *  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
  *  
