@@ -1,4 +1,4 @@
-;# $Id$
+;# $Id: lint.pl 25 2008-05-28 11:19:25Z rmanfredi $
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  

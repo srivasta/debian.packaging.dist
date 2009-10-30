@@ -1,12 +1,12 @@
 ;########################################################################
 ;# Jmake rules for building libraries, programs, scripts, and data files
-;# $Id$
+;# $Id: Jmake.rules 18 2006-12-27 10:35:09Z rmanfredi $
 
 /*
  *		   MACHINE-INDEPENDENT RULES -- DO NOT MODIFY
  */
 
-/* $Id$
+/* $Id: Jmake.rules 18 2006-12-27 10:35:09Z rmanfredi $
  *
  *  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
  *  
