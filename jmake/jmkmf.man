@@ -72,8 +72,7 @@ Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
 .TP 20
 Jmakefile
 High level description of makefile
-.TP
-.package
+.TP .package
 The file marking the top of your package tree
 .PD
 .SH "SEE ALSO"
