@@ -20,7 +20,7 @@ $spitshell >metalint.$manext <<!GROK!THIS!
 .TH METALINT $manext "Version $VERSION PL$PATCHLEVEL"
 ''' @(#) Manual page for metalint
 '''
-''' $Id$
+''' $Id: mlint.SH 1 2006-08-24 12:32:52Z rmanfredi $
 '''
 '''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 '''  

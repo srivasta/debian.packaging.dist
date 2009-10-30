@@ -1,5 +1,5 @@
 .rn '' }`
-''' $Id$
+''' $Id: makedist.man 3 2006-08-25 21:39:07Z rmanfredi $
 '''
 '''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 '''  

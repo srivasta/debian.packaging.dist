@@ -1,4 +1,4 @@
-;# $Id$
+;# $Id: files.pl 23 2008-05-28 08:05:12Z rmanfredi $
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  

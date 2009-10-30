@@ -20,7 +20,7 @@ $spitshell >metaconfig.$manext <<!GROK!THIS!
 .TH METACONFIG $manext "Version $VERSION PL$PATCHLEVEL"
 ''' @(#) Manual page for metaconfig
 '''
-''' $Id$
+''' $Id: mconfig.SH 25 2008-05-28 11:19:25Z rmanfredi $
 '''
 '''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 '''  
