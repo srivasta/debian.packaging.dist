@@ -1,11 +1,11 @@
-?RCS: $Id: d_lockf.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_lockf.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: Original Author: Andy Dougherty <doughera@lafcol.lafayette.edu>
@@ -14,7 +14,7 @@
 ?RCS: Revision 3.0.1.1  1994/08/29  16:09:36  ram
 ?RCS: patch32: created by ADO
 ?RCS:
-?MAKE:d_lockf: Inlibc
+?MAKE:d_lockf: Trylink cat i_unistd
 ?MAKE:	-pick add $@ %<
 ?S:d_lockf:
 ?S:	This variable conditionally defines HAS_LOCKF if lockf() is
@@ -28,6 +28,24 @@
 ?H:.
 ?LINT:set d_lockf
 : see if lockf exists
-set lockf d_lockf
-eval $inlibc
+$cat >try.c <<EOC
+#include <sys/types.h>
+#$i_unistd I_UNISTD
+#ifdef I_UNISTD
+#include <unistd.h>
+#endif
+int main(void)
+{
+	static int fd, ret;
+	static off_t size;
+	ret |= lockf(fd, F_ULOCK, size);
+	ret |= lockf(fd, F_LOCK, size);
+	ret |= lockf(fd, F_TLOCK, size);
+	ret |= lockf(fd, F_TEST, size);
+	return ret ? 0 : 1;
+}
+EOC
+cyn=lockf
+set d_lockf
+eval $trylink
 

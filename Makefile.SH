@@ -1,5 +1,5 @@
-: Makefile.SH generated from Jmake.tmpl and Jmakefile [jmake 3.5-17]
-: $X-Id: Jmake.tmpl 8 2006-08-25 22:27:18Z rmanfredi $
+: Makefile.SH generated from Jmake.tmpl and Jmakefile [jmake 3.5-119]
+: $X-Id: Jmake.tmpl 69 2011-01-09 13:57:07Z rmanfredi $
 
 case $CONFIG in
 '')
@@ -56,12 +56,12 @@ SUBDIRS = bin mcon jmake pat kit lib
 $spitshell >>Makefile <<'!NO!SUBS!'
 ########################################################################
 # Jmake rules for building libraries, programs, scripts, and data files
-# $X-Id: Jmake.rules 18 2006-12-27 10:35:09Z rmanfredi $
+# $X-Id: Jmake.rules 106 2011-11-25 20:36:12Z rmanfredi $
 
 ########################################################################
 # Start of Jmakefile
 
-# $X-Id: Jmakefile 25 2008-05-28 11:19:25Z rmanfredi $
+# $X-Id: Jmakefile 48 2010-11-28 23:05:09Z rmanfredi $
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #
@@ -84,9 +84,11 @@ $spitshell >>Makefile <<'!NO!SUBS!'
 
 all::
 
-depend::
+depend:: sub_depend
+
+sub_depend::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
-	for i in bin mcon pat jmake kit ;\
+	for i in $(SUBDIRS) ;\
 	do \
 		(cd $$i ; echo "Depending" "in $(DIR)$$i..."; \
 			$(MAKE) $(MFLAGS)  depend) || exit 1; \
@@ -133,6 +135,8 @@ local_clobber:: local_realclean
 	$(RM) Makefile
 
 install:: local_install sub_install
+	@exit 0
+
 install.man:: maybe_install.man sub_install.man
 deinstall:: sub_deinstall local_deinstall
 deinstall.man:: sub_deinstall.man maybe_deinstall.man
@@ -172,6 +176,8 @@ tags::
 
 local_clobber::
 	$(RM) tags
+
+depend::
 
 ########################################################################
 # Rules for building in sub-directories -- do not edit

@@ -1,11 +1,11 @@
-?RCS: $Id: d_strxfrm.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_strxfrm.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: Original Author: Andy Dougherty <doughera@lafcol.lafayette.edu>
@@ -14,7 +14,7 @@
 ?RCS: Revision 3.0.1.1  1994/08/29  16:12:04  ram
 ?RCS: patch32: created by ADO
 ?RCS:
-?MAKE:d_strxfrm: Inlibc
+?MAKE:d_strxfrm: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_strxfrm:
 ?S:	This variable conditionally defines HAS_STRXFRM if strxfrm() is
@@ -28,6 +28,17 @@
 ?H:.
 ?LINT:set d_strxfrm
 : see if strxfrm exists
-set strxfrm d_strxfrm
-eval $inlibc
+$cat >try.c <<EOC
+#include <string.h>
+int main(void)
+{
+	static size_t ret, n;
+	static char dst[] = "xxx", *src;
+	ret |= strxfrm(dst, src, n);
+	return ret ? 0 : 1;
+}
+EOC
+cyn=strxfrm
+set d_strxfrm
+eval $trylink
 

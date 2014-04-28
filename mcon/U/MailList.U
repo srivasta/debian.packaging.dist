@@ -1,11 +1,11 @@
-?RCS: $Id: MailList.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: MailList.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS: 
 ?RCS: Original Author: Graham Stoney <greyham@research.canon.oz.au>
@@ -18,7 +18,7 @@
 ?X:
 ?X: This unit offers the user the option of subscribing to the mailing
 ?X: list. To force inclusion of this unit, you must add it's name to the
-?X: dependancies on the MAKE line in your private copy of End.U.
+?X: dependencies on the MAKE line in your private copy of End.U.
 ?X: The address of the mailing list server must be set via a "list_request=..."
 ?X: entry in the .package file. This is usually done by running packinit and
 ?X: answering the proper questions.

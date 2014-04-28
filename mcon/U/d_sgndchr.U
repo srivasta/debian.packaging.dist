@@ -1,11 +1,11 @@
-?RCS: $Id: d_sgndchr.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_sgndchr.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_sgndchr.U,v $
@@ -18,7 +18,7 @@
 ?RCS: Revision 3.0  1993/08/18  12:07:16  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:d_sgndchr: cat rm +cc +ccflags Setvar
+?MAKE:d_sgndchr: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_sgndchr:
 ?S:	This variable conditionally defines the SIGNEDCHAR symbol, which
@@ -31,29 +31,20 @@
 ?C:.
 ?H:#$d_sgndchr SIGNEDCHAR	/**/
 ?H:.
-?F:!try
 ?LINT:set d_sgndchr
 : check for signed chars
-echo " "
-echo "Checking to see if your C compiler can do signed chars..." >&4
-$cat >try.c <<'EOCP'
-int main()
+$cat >try.c <<EOC
+int main(void)
 {
-	char c = 0;
-
-	c--;
-	exit(c >= 0);
+	switch (1) {
+	case 0:
+	case ((char) -1 < 0):
+		break;
+	}
+	return 0;
 }
-EOCP
-$cc $ccflags -o try try.c
-if ./try; then
-	val="$define"
-	echo "It certainly can."
-else
-	val="$undef"
-	echo "It can't.  I'll have to make some things type short."
-fi
+EOC
+cyn="whether your C compiler can do signed chars"
 set d_sgndchr
-eval $setvar
-$rm -f try*
+eval $trylink
 

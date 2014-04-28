@@ -17,10 +17,10 @@ esac
 echo "Extracting kit/kitpost (with variable substitutions)"
 cat >kitpost <<!GROK!THIS!
 $startperl
-	eval "exec perl -S \$0 \$*"
+	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: kitpost.SH 1 2006-08-24 12:32:52Z rmanfredi $
+# $Id: kitpost.SH 31 2010-03-06 20:15:24Z rmanfredi $
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

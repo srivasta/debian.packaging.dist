@@ -1,11 +1,11 @@
-?RCS: $Id: Signal.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: Signal.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Signal.U,v $
@@ -40,7 +40,7 @@
 ?X: This unit is then used by sig_name.U.
 ?X:
 ?MAKE:Signal: test tr rm awk cat grep startsh eunicefix sed sort uniq \
-	Findhdr cppstdin +cppflags cppminus Compile trnl run
+	Findhdr cppstdin +cppflags cppminus Compile trnl run fieldn
 ?MAKE:	-pick add $@ %<
 ?X:all files declared as "public" since they're used from other units
 ?F:signal.c signal_cmd signal.lst signal signal.awk
@@ -160,7 +160,7 @@ echo $xxx | $tr ' ' $trnl | $sort | $uniq | $awk '
 }
 END {
 	printf "#endif /* JUST_NSIG */\n";
-	printf "exit(0);\n}\n";
+	printf "return 0;\n}\n";
 }
 ' >>signal.c
 $cat >signal.awk <<'EOP'

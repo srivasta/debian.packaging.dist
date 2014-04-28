@@ -1,11 +1,11 @@
-?RCS: $Id: voidflags.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: voidflags.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: voidflags.U,v $
@@ -78,6 +78,7 @@ EOM
 case "$voidflags" in
 '')
 	$cat >try.c <<'EOCP'
+extern int doit();
 #if TRY & 1
 void sub() {
 #else
@@ -85,21 +86,34 @@ sub() {
 #endif
 	extern void moo();	/* function returning void */
 	void (*goo)();		/* ptr to func returning void */
-#if TRY & 8
-	void *hue;		/* generic ptr */
-#endif
 #if TRY & 2
-	void (*foo[10])();
+	static void (*foo[10])();
+#endif
+#if TRY & 8
+	void *hue;			/* generic ptr */
+	char buf[] = "buf";
+	int *iptr;
 #endif
 
-#if TRY & 4
-	if(goo == moo) {
-		exit(0);
+#if TRY & 2
+	if (doit()) {
+		foo[0] = moo;
+		(*foo[0])();
 	}
 #endif
-	exit(0);
+#if TRY & 4
+	if (doit())
+		goo = moo;
+	if (goo == moo)
+		doit();
+#endif
+#if TRY & 8
+	hue = buf;
+	if (doit())
+		iptr = hue;
+#endif
+	doit();
 }
-int main() { sub(); }
 EOCP
 ?X: This unit used to use cc -S in those tests to try to speed up things, but
 ?X: unfortunately, AIX 3.2 does not support this option.
@@ -153,9 +167,7 @@ echo "Hmm, your compiler has some difficulty with void. Checking further..." >&4
 esac
 ?X: Only prompt user if support does not match the level we want
 case "$voidflags" in
-"$defvoidused")
-	echo "Good.  I already know it supports void to the level $package wants."
-	;;
+"$defvoidused") ;;
 *)
 	dflt="$voidflags";
 	test -f flags && $cat flags

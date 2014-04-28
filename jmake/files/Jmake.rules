@@ -1,12 +1,12 @@
 ;########################################################################
 ;# Jmake rules for building libraries, programs, scripts, and data files
-;# $Id: Jmake.rules 18 2006-12-27 10:35:09Z rmanfredi $
+;# $Id: Jmake.rules 174 2014-04-05 08:19:48Z rmanfredi $
 
 /*
  *		   MACHINE-INDEPENDENT RULES -- DO NOT MODIFY
  */
 
-/* $Id: Jmake.rules 18 2006-12-27 10:35:09Z rmanfredi $
+/* $Id: Jmake.rules 174 2014-04-05 08:19:48Z rmanfredi $
  *
  *  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
  *  
@@ -78,6 +78,18 @@ local_realclean::			@@\
 	$(RM) depends
 
 /*
+ * AllTargetProgram:
+ *	Generate rules to build necessary things during make all.
+ *	This target is specific to executable.  Use AllTarget() for
+ *	other type of files.
+ */
+#define AllTargetProgram(program)	@!\
+all:: program						@!\
+									@!\
+local_realclean::					@@\
+	$(RM) program^^$(_EXE)
+
+/*
  * RemoveTargetProgram:
  *	This is used in some other macros in order to remove the target
  *	before starting its building (saves disk space).  There should be
@@ -85,9 +97,10 @@ local_realclean::			@@\
  *	used *inside* building rules.
  */
 #define RemoveTargetProgram(program) \
-	$(RM) program @@\
+	-$(RM) program^^$(_EXE) @@\
 	if test -f program^^^$(_EXE); then \ @@\
 		$(MV) program^^^$(_EXE) program^^~^^^$(_EXE); fi
+
 
 /*
  * NormalProgramTarget:
@@ -99,20 +112,31 @@ local_realclean::			@@\
 ++OBJECTS objects @!\
 ++SOURCES sources @!\
 NormalObjectRule()				@!\
-AllTarget(program)				@!\
+AllTargetProgram(program)		@!\
 								@!\
 program: objects				@@\
 	RemoveTargetProgram($@)		@@\
-	$(CC) -o $@ objects $(JLDFLAGS) $(LIBS) @!\
+	$(CC) -o $@$(_EXE) objects $(JLDFLAGS) $(LIBS) @!\
 
 
 /*
- * SingleProgramTarget:
- *	Obsolete version of NormalProgramTarget that doesn't have
- *	deplibs.
+ * NormalProgramLibTarget:
+ *	Generate rules to compile and link the indicated program; since
+ *	it does not use any default object files, it may be used for
+ *	multiple programs in the same Jmakefile.
+ *	The ``libs'' argument is used to depend on locally built libraries,
+ *	in te same Jmakefile.
  */
-#define	SingleProgramTarget(program,objects,libs)		\
-NormalProgramTarget(program,objects,libs)
+#define	NormalProgramLibTarget(program,sources,objects,libs)	@!\
+++OBJECTS objects @!\
+++SOURCES sources @!\
+NormalObjectRule()				@!\
+AllTargetProgram(program)		@!\
+								@!\
+program: objects libs			@@\
+	RemoveTargetProgram($@)		@@\
+	$(CC) -o $@$(_EXE) objects $(JLDFLAGS) libs $(LIBS) @!\
+
 
 /*
  * SimpleProgramTarget:
@@ -122,7 +146,6 @@ NormalProgramTarget(program,objects,libs)
  */
 #define	SimpleProgramTarget(program)	@!\
 NormalProgramTarget(program,program.c,program.o)
-
 
 
 /*
@@ -136,11 +159,11 @@ NormalProgramTarget(program,program.c,program.o)
 ++OBJECTS $(OBJS) @!\
 ++SOURCES $(SRCS) @!\
 NormalObjectRule()					@!\
-AllTarget(program)					@!\
+AllTargetProgram(program)			@!\
 									@!\
 program: $(OBJS)					@@\
 	RemoveTargetProgram($@)			@@\
-	$(CC) -o $@ $(OBJS) $(JLDFLAGS) $(LIBS) @!\
+	$(CC) -o $@$(_EXE) $(OBJS) $(JLDFLAGS) $(LIBS) @!\
 									@!\
 InstallProgram(program,$(BINDIR))	@!\
 InstallManPage(program,$(MANSRC))	@!\
@@ -160,11 +183,11 @@ LintTarget()
 ++OBJECTS $(OBJS1) @!\
 ++SOURCES $(SRCS1) @!\
 NormalObjectRule()					@!\
-AllTarget(program)					@!\
+AllTargetProgram(program)			@!\
 									@!\
 program: $(OBJS1)					@@\
 	RemoveTargetProgram($@)			@@\
-	$(CC) -o $@ $(OBJS1) $(JLDFLAGS) $(LIBS) @!\
+	$(CC) -o $@$(_EXE) $(OBJS1) $(JLDFLAGS) $(LIBS) @!\
 									@!\
 InstallProgram(program,$(BINDIR))	@!\
 InstallManPage(program,$(MANSRC))	@!\
@@ -184,11 +207,11 @@ LintTarget()
 ++OBJECTS $(OBJS2) @!\
 ++SOURCES $(SRCS2) @!\
 NormalObjectRule()					@!\
-AllTarget(program)					@!\
+AllTargetProgram(program)			@!\
 									@!\
 program: $(OBJS2)					@@\
 	RemoveTargetProgram($@)			@@\
-	$(CC) -o $@ $(OBJS2) $(JLDFLAGS) $(LIBS) @!\
+	$(CC) -o $@$(_EXE) $(OBJS2) $(JLDFLAGS) $(LIBS) @!\
 									@!\
 InstallProgram(program,$(BINDIR))	@!\
 InstallManPage(program,$(MANSRC))
@@ -205,11 +228,11 @@ InstallManPage(program,$(MANSRC))
 ++OBJECTS $(OBJS3) @!\
 ++SOURCES $(SRCS3) @!\
 NormalObjectRule()					@!\
-AllTarget(program)					@!\
+AllTargetProgram(program)			@!\
 									@!\
 program: $(OBJS3)					@@\
 	RemoveTargetProgram($@)			@@\
-	$(CC) -o $@ $(OBJS3) $(JLDFLAGS) $(LIBS) @!\
+	$(CC) -o $@$(_EXE) $(OBJS3) $(JLDFLAGS) $(LIBS) @!\
 									@!\
 InstallProgram(program,$(BINDIR))	@!\
 InstallManPage(program,$(MANSRC))
@@ -554,7 +577,7 @@ DeinstallMultipleDest(local_deinstall.man,list,dest)
  *	Generate rules to build the makedepend program.
  */
 #define DependDependency() 			@!\
-depend:: TOPDIR/mkdep				@!\
+local_depend:: TOPDIR/mkdep			@!\
 									@!\
 TOPDIR/mkdep:						@!\
 ?TOP: @echo "You have to run Configure first."; exit 1	@!\
@@ -571,7 +594,8 @@ TOPDIR/mkdep:						@!\
 |once _DependTarget_				@!\
 DependDependency()					@!\
 									@!\
-depend::							@@\
+depend:: local_depend				@!\
+local_depend::						@@\
 	($(SED) '/^# DO NOT DELETE/q' Makefile && \ @@\
 	$(MKDEP) $(SOURCES) | \			@@\
 	$(SED) -e 's:/usr/lib[^ ]*::g; s:$(USRINC)[^ ]*::g; ' \ @@\
@@ -617,7 +641,9 @@ local_clobber:: local_realclean		@!\
  */
 #define	InstallTarget()											@!\
 ?SUBDIRS:install:: local_install sub_install					@!\
-%SUBDIRS:install:: local_install								@!\
+%SUBDIRS:install:: local_install								@@\
+	@exit 0														@!\
+																@!\
 ?SUBDIRS:install.man:: maybe_install.man sub_install.man		@!\
 %SUBDIRS:install.man:: maybe_install.man						@!\
 ?SUBDIRS:deinstall:: sub_deinstall local_deinstall				@!\
@@ -1114,8 +1140,28 @@ NormalLintTarget($(SOURCES))	@!\
  */
 #define LinkSourceFile(src,dir)		@!\
 src:  dir/src			@@\
-	$(RM) $@			@@\
+	$(RM) -f $@			@@\
 	$(LN) $? $@			@!\
+						@!\
+local_depend:: src		@@\
+						@!\
+local_realclean::		@@\
+	$(RM) -f src		@!\
+
+
+/*
+ * LinkSourceFileAlias:
+ *	Snag source file from some other directory with a different local name.
+ */
+#define LinkSourceFileAlias(src,dir,alias)	@!\
+alias:  dir/src			@@\
+	$(RM) -f $@			@@\
+	$(LN) $? $@			@!\
+						@!\
+local_depend:: alias	@@\
+						@!\
+local_realclean::		@@\
+	$(RM) -f alias		@!\
 
 
 /*
@@ -1168,6 +1214,22 @@ name::									@@\
 	
 	
 /*
+ * NamedTargetSubdirsAsRule:
+ *	Recursively make a series of steps in the specified directories,
+ *	where the name of the local rule is different from the recursive
+ *	actions.
+ */
+#define NamedTargetSubdirsAsRule(dirs,localname,name,verb,flags)	@!\
+localname::								@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \		@@\
+	for i in dirs ;\					@@\
+	do \								@@\
+		(cd $$i ; echo verb "in $(DIR)$$i..."; \	@@\
+			$(MAKE) $(MFLAGS) flags name) || exit 1; \	@@\
+	done
+
+
+/*
  * NamedTargetSubdirs:
  *	Recursively make a series of steps.
  */
@@ -1211,7 +1273,8 @@ NamedTargetSubdirs(all,"Making all",^^)
  *	make depend step.
  */
 #define DependDirs(dirs) \
-NamedTargetSubdirsRule(dirs,depend,"Depending",^^)
+depend:: sub_depend		@!\
+NamedTargetSubdirsAsRule(dirs,sub_depend,depend,"Depending",^^)
 
 
 /*

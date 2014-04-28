@@ -1,11 +1,11 @@
-?RCS: $Id: d_dlopen.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_dlopen.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: Original Author: Andy Dougherty <doughera@lafcol.lafayette.edu>
@@ -17,7 +17,7 @@
 ?RCS: Revision 3.0.1.1  1994/08/29  16:07:34  ram
 ?RCS: patch32: created by ADO
 ?RCS:
-?MAKE:d_dlopen: Inlibc runnm
+?MAKE:d_dlopen: Trylink cat i_dlfcn
 ?MAKE:	-pick add $@ %<
 ?S:d_dlopen:
 ?S:	This variable conditionally defines the HAS_DLOPEN symbol, which
@@ -29,17 +29,21 @@
 ?C:.
 ?H:#$d_dlopen HAS_DLOPEN		/**/
 ?H:.
-?T: xxx_runnm
 ?LINT:set d_dlopen
-?X: We don't permanently change runnm, but we do temporarily.
-?LINT: change runnm
 : see if dlopen exists
-?X: On NetBSD and FreeBSD, dlopen is available, but it is in 
-?X: /usr/lib/crt0.o, not in any of the libraries.  Therefore, do not
-?X: use the nm extraction, but use a real compile and link test instead.
-xxx_runnm="$runnm"
-runnm=false
-set dlopen d_dlopen
-eval $inlibc
-runnm="$xxx_runnm"
+$cat >try.c <<EOC
+#$i_dlfcn I_DLFCN
+#ifdef I_DLFCN
+#include <dlfcn.h>
+#endif
+int main(void)
+{
+	void *p;
+	p = dlopen("file", RTLD_GLOBAL);
+	return p ? 0 : 1;
+}
+EOC
+cyn=dlopen
+set d_dlopen '-ldl'
+eval $trylink
 

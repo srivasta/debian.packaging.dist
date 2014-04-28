@@ -1,11 +1,11 @@
-?RCS: $Id: Oldconfig.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: Oldconfig.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Oldconfig.U,v $
@@ -103,10 +103,11 @@
 ?T:tmp tmp_n tmp_c tmp_sh file
 ?T:xxxxfile xxxfile xxfile xfile hintfile newmyuname
 ?T:tans _ isesix INITPROG DJGPP has_uname
+?T:saved_osname saved_osvers saved_libswanted
 ?D:osname=''
 ?LINT:change n c sh
-?LINT:extern hostarch
-?LINT:change hostarch
+?LINT:extern hostarch libswanted libs
+?LINT:change hostarch libswanted libs
 : Determine the name of the machine
 myuname=`$uname -a 2>/dev/null`
 $test -z "$myuname" && myuname=`hostname 2>/dev/null`
@@ -120,7 +121,8 @@ myuname=`echo $myuname | $sed -e 's/^[^=]*=//' -e 's/\///g' | \
 	./tr '[A-Z]' '[a-z]' | $tr $trnl ' '`
 ?X: Save the value we just computed to reset myuname after we get done here.
 newmyuname="$myuname"
-$test -f "$uname$_exe" && has_uname=y
+has_uname=
+$test -f "$uname" && has_uname=y
 
 : Guessing of the OS name -- half the following guesses are probably wrong...
 : If you have better tests or hints, please send them to the metaconfig
@@ -189,7 +191,8 @@ if $test "X$has_uname" != X; then
 				osvers=4
 			elif $contains _SYSV3 /usr/include/stdio.h > /dev/null 2>&1 ; then
 				osvers=3
-			elif $contains _POSIX_SOURCE /usr/include/stdio.h > /dev/null 2>&1 ; then
+			elif $contains _POSIX_SOURCE /usr/include/stdio.h > /dev/null 2>&1
+			then
 				osvers=2
 			fi
 		fi
@@ -202,7 +205,7 @@ if $test "X$has_uname" != X; then
 ?X:  $3 and $4 are version/subversion
 ?X:  $5 is always "pc", but that might not be unique to DJGPP.
 ?X: (e.g. Solaris_x86 has $5 = i86pc, which doesn't actually conflict,
-?X: but it's close enought that I can easily imagine other vendors also 
+?X: but it's close enough that I can easily imagine other vendors also 
 ?X: using variants of pc* in $5.)
 ?X:  The "DJGPP" environment variable is always set when djgpp is active.
 	pc*)
@@ -233,7 +236,10 @@ if $test "X$has_uname" != X; then
 		osvers=`$uname -r`
 		;;
 	cygwin*) osname=cygwin
-		osvers="$3"
+		osvers=`echo "$3" | sed -e 's/\(.*\)(.*/\1/'`
+		;;
+	mingw*) osname=mingw
+		osvers=`echo "$3" | sed -e 's/\(.*\)(.*/\1/'`
 		;;
 	*dc.osx) osname=dcosx
 		osvers="$3"
@@ -442,6 +448,15 @@ case "$knowitall" in
 *) dflt=y;;
 esac
 
+?X: Before loading a previous config.sh, save the variables we've
+?X: just computed above so that we can propagate these new values.
+saved_osname="$osname"
+saved_osvers="$osvers"
+saved_libswanted="$libswanted"
+tmp_n="$n"
+tmp_c="$c"
+tmp_sh="$sh"
+
 : Get old answers from config file if it was generated on the same system
 hint=default
 if $test -f ../config.sh; then
@@ -454,14 +469,19 @@ if $test -f ../config.sh; then
 		myuname="$newmyuname"
 		;;
 	*)  echo "Fetching default answers from your old config.sh file..." >&4
-		tmp_n="$n"
-		tmp_c="$c"
-		tmp_sh="$sh"
 		. ../config.sh
 		cp ../config.sh .
-		n="$tmp_n"
-		c="$tmp_c"
 		hint=previous
+		case "$dflt" in
+		n)
+			echo " "
+			rp="Do you want further invocations to use these defaults?"
+			. ./myread
+			case "$ans" in
+			y*|Y*) myuname="$newmyuname";;
+			esac
+			;;
+		esac
 		;;
 	esac
 fi
@@ -470,9 +490,6 @@ fi
 *)
 	echo " "
 	echo "Fetching default answers from $config_sh..." >&4
-	tmp_n="$n"
-	tmp_c="$c"
-	tmp_sh="$sh"
 	cd ..
 ?X: preserve symbolic links, if any
 	cp $config_sh config.sh 2>/dev/null
@@ -480,8 +497,6 @@ fi
 	. ./config.sh
 	cd UU
 	cp ../config.sh .
-	n="$tmp_n"
-	c="$tmp_c"
 	hint=previous
 	;;
 esac
@@ -495,6 +510,19 @@ $test "$override" && . ./optdef.sh
 for file in $loclist $trylist; do
 	eval $file="\$_$file"
 done
+
+?X: Restore saved variables
+osname="$saved_osname"
+osvers="$saved_osvers"
+n="$tmp_n"
+c="$tmp_c"
+
+?X: Reset libs when libswanted changed since last time
+case "$libswanted" in
+"$saved_libswanted") ;;
+*) libs='';;
+esac
+libswanted="$saved_libswanted"
 
 . ./checkcc
 ?X: Cross-compiling support

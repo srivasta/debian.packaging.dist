@@ -1,11 +1,11 @@
-?RCS: $Id: trnl.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: trnl.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS: 
 ?RCS: Copyright (c) 1998 Andy Dougherty
@@ -23,7 +23,6 @@
 ?S:.
 ?T: DJGPP
 : Find the appropriate value for a newline for tr
-echo " "
 ?X: We can't use $tr since that would cause a circular dependency via Myread
 ?X: dos djgpp uses '\015\012', but reportedly is happy with '\012' in the
 ?X: tr command.  I don't know why it passes the '\n' test but later
@@ -53,7 +52,5 @@ $me: Fatal Error: cannot figure out how to translate newlines with 'tr'.
 
 EOM
 	exit 1
-else
-	echo "We'll use '$trnl' to transliterate a newline."
 fi
 

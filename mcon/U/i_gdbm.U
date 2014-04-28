@@ -1,11 +1,11 @@
-?RCS: $Id: i_gdbm.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: i_gdbm.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: i_gdbm.U,v $
@@ -15,7 +15,7 @@
 ?RCS: Revision 3.0  1993/08/18  12:08:19  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:i_gdbm: Inhdr Inlibc Setvar
+?MAKE:i_gdbm: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:i_gdbm (d_gdbm):
 ?S:	This variable conditionally defines the I_GDBM symbol, which
@@ -28,26 +28,19 @@
 ?C:.
 ?H:#$i_gdbm I_GDBM	/**/
 ?H:.
-?T:t_gdbm d_gdbm_open
 ?LINT:set i_gdbm
 : see if gdbm.h is available
-?X: t_gdbm is a tentative check. We might just have the .h, not the lib -- ADO
-set gdbm.h t_gdbm
-eval $inhdr
-case "$t_gdbm" in
-$define)
-	: see if gdbm_open exists
-	set gdbm_open d_gdbm_open
-	eval $inlibc
-	case "$d_gdbm_open" in
-	$undef)
-		t_gdbm="$undef"
-		echo "We won't be including <gdbm.h>"
-		;;
-	esac
-	;;
-esac
-val="$t_gdbm"
+$cat >try.c <<EOC
+#include <gdbm.h>
+void fatal_func(void) { return; };
+int main(void)
+{
+	GDBM_FILE ret;
+
+	ret = gdbm_open("name", 1, 2, 3, fatal_func);
+	return ret ? 0 : 1;
+}
+EOC
 set i_gdbm
-eval $setvar
+eval $trylink
 

@@ -1,11 +1,11 @@
-?RCS: $Id: d_getpagsz.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_getpagsz.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_getpagsz.U,v $
@@ -15,8 +15,8 @@
 ?RCS: Revision 3.0  1993/08/18  12:06:14  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:d_getpagsz pagesize: Oldconfig Myread Inlibc cat contains +cc +ccflags \
-	libs rm Findhdr
+?MAKE:d_getpagsz pagesize: Oldconfig Myread Trylink cat contains +cc +ccflags \
+	libs rm Findhdr i_unistd
 ?MAKE:	-pick add $@ %<
 ?S:d_getpagsz:
 ?S:	This variable conditionally defines HAS_GETPAGESIZE if getpagesize()
@@ -43,8 +43,21 @@
 ?T:guess
 ?LINT:set d_getpagsz
 : see if getpagesize exists
-set getpagesize d_getpagsz
-eval $inlibc
+$cat >try.c <<EOC
+#$i_unistd I_UNISTD
+#ifdef I_UNISTD
+#include <unistd.h>
+#endif
+int main(void)
+{
+	static int ret;
+	ret |= getpagesize();
+	return ret ? 0 : 1;
+}
+EOC
+cyn=getpagesize
+set d_getpagsz
+eval $trylink
 
 @if pagesize || PAGESIZE_VALUE
 : determine the system page size
@@ -53,8 +66,12 @@ guess=' (OK to guess)'
 case "$pagesize" in
 '')
 	$cat >page.c <<EOP
-extern int getpagesize();
-int main()
+#include <stdio.h>
+#$i_unistd I_UNISTD
+#ifdef I_UNISTD
+#include <unistd.h>
+#endif
+int main(void)
 {
 	printf("%d\n", getpagesize());
 }
@@ -79,9 +96,10 @@ EOP
 			if $contains PAGESIZE `./findhdr sys/param.h` >/dev/null 2>&1; then
 				$cat >page.c <<EOP
 #include <sys/param.h>
-int main()
+#include <stdio.h>
+int main(void)
 {
-	printf("%d\n", PAGESIZE);
+	printf("%d\n", (int) PAGESIZE);
 }
 EOP
 				if $cc $ccflags -o page page.c $libs >/dev/null 2>&1; then

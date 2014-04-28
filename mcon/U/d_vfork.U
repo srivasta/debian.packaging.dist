@@ -1,11 +1,11 @@
-?RCS: $Id: d_vfork.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_vfork.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_vfork.U,v $
@@ -31,7 +31,7 @@
 ?RCS: Revision 3.0  1993/08/18  12:07:55  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:d_vfork usevfork: Inlibc Myread Oldconfig Setvar
+?MAKE:d_vfork usevfork: Trylink Myread Oldconfig Setvar cat i_unistd
 ?MAKE:	-pick add $@ %<
 ?S:d_vfork:
 ?S:	This variable conditionally defines the HAS_VFORK symbol, which
@@ -54,9 +54,23 @@
 ?M:.
 ?LINT:set d_vfork
 : see if there is a vfork
-val=''
-set vfork val
-eval $inlibc
+$cat >try.c <<EOC
+#include <sys/types.h>
+#$i_unistd I_UNISTD
+#ifdef I_UNISTD
+#include <unistd.h>
+#endif
+int main(void)
+{
+	static pid_t ret;
+	ret |= vfork();
+	return ret ? 0 : 1;
+}
+EOC
+cyn=vfork
+set val
+eval $trylink
+
 
 : Ok, but do we want to use it. vfork is reportedly unreliable in 
 : perl on Solaris 2.x, and probably elsewhere.

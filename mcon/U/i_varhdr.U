@@ -1,11 +1,11 @@
-?RCS: $Id: i_varhdr.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: i_varhdr.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: i_varhdr.U,v $
@@ -109,11 +109,12 @@ va_dcl
 	p = va_arg(ap, char *);
 #endif
 	va_end(ap);
+	return 0;
 }
 EOP
 $cat > varargs <<EOP
 $startsh
-if $cc -c $ccflags -D\$1 varargs.c >/dev/null 2>&1; then
+if $cc -c $ccflags -D\$1 varargs.c; then
 	echo "true"
 else
 	echo "false"
@@ -141,7 +142,7 @@ case "$valstd" in
 esac
 case "$val" in
 '')
-	./warn "I could not find the definition for va_dcl... You have problems..."
+	./warn "I could not find the definition for va_dcl... You have problems..." 4>&4
 	val="$undef"; set i_stdarg; eval $setvar
 	val="$undef"; set i_varargs; eval $setvar
 	;;

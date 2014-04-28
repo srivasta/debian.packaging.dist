@@ -1,11 +1,11 @@
-?RCS: $Id: selecttype.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: selecttype.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: Original Author: Andy Dougherty <doughera@lafcol.lafayette.edu>
@@ -21,7 +21,7 @@
 ?RCS: patch30: created by ADO
 ?RCS:
 ?MAKE:selecttype: cat +cc +ccflags rm Oldconfig Myread \
-	d_fd_set d_select d_socket i_systime i_sysselct
+	d_fd_set d_select d_socket i_systime i_sysselct i_winsock2 i_syssock
 ?MAKE:	-pick add $@ %<
 ?S:selecttype:
 ?S:	This variable holds the type used for the 2nd, 3rd, and 4th
@@ -67,16 +67,23 @@ EOM
 	$cat >try.c <<EOCP
 #$i_systime I_SYS_TIME
 #$i_sysselct I_SYS_SELECT
+#$i_syssock I_SYS_SOCKET
+#$i_winsock2 I_WINSOCK2
 #$d_socket HAS_SOCKET
 #include <sys/types.h>
 #ifdef HAS_SOCKET
+#ifdef I_SYS_SOCKET
 #include <sys/socket.h> /* Might include <sys/bsdtypes.h> */
+#endif
 #endif
 #ifdef I_SYS_TIME
 #include <sys/time.h>
 #endif
 #ifdef I_SYS_SELECT
 #include <sys/select.h>
+#endif
+#ifdef I_WINSOCK2
+#include <Winsock2.h>
 #endif
 int main()
 {

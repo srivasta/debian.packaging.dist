@@ -1,11 +1,11 @@
-?RCS: $Id: Oldsym.U 25 2008-05-28 11:19:25Z rmanfredi $
+?RCS: $Id: Oldsym.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Oldsym.U,v $
@@ -28,8 +28,12 @@
 : add special variables
 $test -f $src/patchlevel.h && \
 awk '/^#define/ {printf "%s=%s\n",$2,$3}' $src/patchlevel.h >>config.sh
+?X: In revision.h we expect something like:
+?X: 	#define REVISION "$Revision: 167 $"
+?X: which is supposed to be expanded by the revision control system.
 $test -f $src/revision.h && \
-awk '/^#define/ {printf "%s=%s\n",$2,$3}' $src/revision.h >>config.sh
+sed -ne 's/^#define \([A-Za-z0-9_]*\) ".*: \([0-9]*\).*"/\1=\2/p' \
+	< $src/revision.h >>config.sh
 echo "CONFIG=true" >>config.sh
 
 : propagate old symbols

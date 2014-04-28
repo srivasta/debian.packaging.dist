@@ -2,7 +2,7 @@
  * Jmakefile for metaconfig
  */
 
-;# $Id: Jmakefile 9 2006-08-25 22:31:50Z rmanfredi $
+;# $Id: Jmakefile 177 2014-04-08 10:42:18Z rmanfredi $
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -32,7 +32,9 @@
 SetSubdirs(man)
 AllTarget(Glossary)
 
-Glossary: makegloss
+.FORCE:
+
+Glossary: .FORCE
 	chmod +x makegloss
 	./makegloss
 
@@ -75,7 +77,8 @@ BINSH = \
 	!f.SH \
 -expand \\
 
-depend::
+depend:: local_depend
+local_depend::
 	($(SED) '/^# DO NOT DELETE/q' Makefile && \
 	grep '^\$$grep' $(BINSH) | \
 	$(SED) -e "s/^.*' \([^ ]*\) >>\([^ ]*\)/\2: \1/" \
@@ -84,3 +87,4 @@ depend::
 	cp Makefile.new Makefile
 	$(RM) Makefile.new
 
+mconfig mlint mxref: $(TOP)/revision.h

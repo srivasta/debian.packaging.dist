@@ -1,11 +1,11 @@
-?RCS: $Id: yacc.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: yacc.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: yacc.U,v $
@@ -29,20 +29,20 @@
 : determine compiler compiler
 echo " "
 comp='yacc'
-if $test -f "$byacc$_exe"; then
+if $test -f "$byacc"; then
 	comp="byacc or $comp"
 fi
-if $test -f "$bison$_exe"; then
+if $test -f "$bison"; then
 	comp="$comp or bison -y"
 fi
 case "$yacc" in
 '')
 	yacc=`./loc yacc yacc $pth`
-	if $test -f "$yacc$_exe"; then
+	if $test -f "$yacc"; then
 		dflt='yacc'
-	elif $test -f "$byacc$_exe"; then
+	elif $test -f "$byacc"; then
 		dflt='byacc'
-	elif $test -f "$bison$_exe"; then
+	elif $test -f "$bison"; then
 		dflt='bison'
 	else
 		dflt=''

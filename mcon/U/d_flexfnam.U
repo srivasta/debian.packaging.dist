@@ -1,11 +1,11 @@
-?RCS: $Id: d_flexfnam.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_flexfnam.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_flexfnam.U,v $
@@ -24,8 +24,9 @@
 ?C:.
 ?H:#$d_flexfnam	FLEXFILENAMES		/**/
 ?H:.
-?T:first second
+?T:first second tmpdir
 ?LINT:set d_flexfnam
+?LINT:extern TMPDIR
 : see if we can have long filenames
 echo " "
 ?X:
@@ -34,10 +35,11 @@ echo " "
 ?X: one of those file systems cannot support long filenames, then we assume the
 ?X: whole system can't.
 ?X:
-rmlist="$rmlist /tmp/cf$$"
-$test -d /tmp/cf$$ || mkdir /tmp/cf$$
+tmpdir="${TMPDIR:-/tmp}"
+rmlist="$rmlist $tmpdir/cf$$"
+$test -d "$tmpdir/cf$$" || mkdir "$tmpdir/cf$$"
 first=123456789abcdef
-second=/tmp/cf$$/$first
+second="$tmpdir/cf$$/$first"
 $rm -f $first $second
 if (echo hi >$first) 2>/dev/null; then
 	if $test -f 123456789abcde; then
@@ -45,7 +47,7 @@ if (echo hi >$first) 2>/dev/null; then
 		val="$undef"
 	else
 		if (echo hi >$second) 2>/dev/null; then
-			if $test -f /tmp/cf$$/123456789abcde; then
+			if $test -f "$tmpdir/cf$$/123456789abcde"; then
 				$cat <<'EOM'
 That's peculiar... You can have filenames longer than 14 characters, but only
 on some of the filesystems.  Maybe you are using NFS.  Anyway, to avoid problems
@@ -73,5 +75,5 @@ EOM
 fi 
 set d_flexfnam
 eval $setvar
-$rm -rf /tmp/cf$$ 123456789abcde*
+$rm -rf "$tmpdir/cf$$" 123456789abcde*
 

@@ -11,6 +11,7 @@ case $CONFIG in
 	. $TOP/config.sh
 	;;
 esac
+REVISION=`grep REVISION $TOP/revision.h | head -n1 | cut -d' ' -f4`
 case "$0" in
 */*) cd `expr X$0 : 'X\(.*\)/'` ;;
 esac
@@ -20,7 +21,7 @@ $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: mxref.SH 25 2008-05-28 11:19:25Z rmanfredi $
+# $Id: mxref.SH 114 2012-01-28 13:01:37Z rmanfredi $
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
@@ -57,8 +58,9 @@ $startperl
 
 $spitshell >>mxref <<'!NO!SUBS!'
 &profile;						# Read ~/.dist_profile
-require 'getopts.pl';
-&usage unless &Getopts("df:hkmsVL:");
+
+use Getopt::Std;
+&usage unless getopts("df:hkmsVL:");
 
 chop($date = `date`);
 chop($WD = `pwd`);				# Working directory
