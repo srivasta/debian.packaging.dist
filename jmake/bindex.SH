@@ -20,7 +20,7 @@ $startperl
 !GROK!THIS!
 $spitshell >>bindex <<'!NO!SUBS!'
 	eval 'exec perl -S $0 ${1+"$@"}'
-		if $runnning_under_some_shell;
+		if $running_under_some_shell;
 
 # $Id: bindex.SH 31 2010-03-06 20:15:24Z rmanfredi $
 #
