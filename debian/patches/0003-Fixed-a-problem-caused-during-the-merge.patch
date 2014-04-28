@@ -1,0 +1,27 @@
+From e0b5fbd3e379fa31e3357cd4f6b1f897096f6a69 Mon Sep 17 00:00:00 2001
+From: Manoj Srivastava <srivasta@debian.org>
+Date: Fri, 30 Oct 2009 15:02:41 -0500
+Subject: [PATCH 3/4] Fixed a problem caused during the merge.
+
+Signed-off-by: Manoj Srivastava <srivasta@debian.org>
+---
+ jmake/jmkmf.man | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/jmake/jmkmf.man b/jmake/jmkmf.man
+index 4411f2f..051c143 100644
+--- a/jmake/jmkmf.man
++++ b/jmake/jmkmf.man
+@@ -72,8 +72,7 @@ Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
+ .TP 20
+ Jmakefile
+ High level description of makefile
+-.TP
+-.package
++.TP .package
+ The file marking the top of your package tree
+ .PD
+ .SH "SEE ALSO"
+-- 
+2.0.0.rc0
+
