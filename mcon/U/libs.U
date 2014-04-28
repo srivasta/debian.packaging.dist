@@ -1,11 +1,11 @@
-?RCS: $Id: libs.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: libs.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: libs.U,v $
@@ -88,7 +88,7 @@
 ?INIT:libswanted=''
 ?X: This order is chosen so that libraries  -lndir, -ldir, -lucb, -lbsd,
 ?X: -lBSD, -lPW, and -lx only get used if there are unresolved
-?X: routines at link time.  Usually, these are backwards compatability
+?X: routines at link time.  Usually, these are backwards compatibility
 ?X: libraries, and may not be as reliable as the standard c library.
 ?X:
 ?X: The -lsocket -linet -lnsl order has been reported to be necessary
@@ -127,7 +127,7 @@ case "$usesocks" in
 "$define") libswanted="$libswanted socks5 socks5_sh" ;;
 esac
 ?X: Used later for link checks
-echo "extern char printf(); int main() { printf(); return 0; }" > lt.c
+echo "extern void abort(void); int main(void) { abort(); return 0; }" > lt.c
 libsfound=''
 libsfiles=''
 libsdirs=''
@@ -173,7 +173,7 @@ for thislib in $libswanted; do
 ?X:
 ?X: It is not sufficient to find a .so on the disk.  We must make sure
 ?X: that we can indeed supply the -lfoo line on the cc line to link against
-?X: that library.  On Linux for instance, a versionned .so will not be
+?X: that library.  On Linux for instance, a versioned .so will not be
 ?X: implicitly linked against, whereas it will work fine on Solaris 2.6.
 ?X:		--RAM, 10/10/2003
 ?X:
@@ -210,7 +210,21 @@ for thislib in $libswanted; do
 	    fi	
 	done
 	if $test ! -f "$xxx"; then
-	    echo "No -l$thislib."
+?X:
+?X: Try linking against the library: gcc on linux platforms is notorious for
+?X: using complex library search logic, especially on systems mixing 32-bit
+?X: and 64-bit versions.
+?X:
+		if $cc -o lt $ccflags $ldflags lt.c -l$thislib >/dev/null 2>&1
+		then
+			echo "Found -l$thislib (via $cc)."
+			case " $dflt " in
+			*"-l$thislib "*) ;;
+			*) dflt="$dflt -l$thislib";;
+			esac
+		else
+			echo "No -l$thislib."
+		fi
 	fi
 done
 set X $dflt

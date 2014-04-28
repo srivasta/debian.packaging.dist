@@ -1,11 +1,11 @@
-?RCS: $Id: d_strtok.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_strtok.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_strtok.U,v $
@@ -16,7 +16,7 @@
 ?X:	The strtok routine now appears to be a standard one, but it was
 ?X:	missing in early BSD systems.
 ?X:
-?MAKE:d_strtok: Inlibc
+?MAKE:d_strtok: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_strtok:
 ?S:	This variable conditionally defines HAS_STRTOK if strtok() is
@@ -30,6 +30,16 @@
 ?H:.
 ?LINT:set d_strtok
 : see if strtok exists
-set strtok d_strtok
-eval $inlibc
+$cat >try.c <<EOC
+#include <string.h>
+int main(void)
+{
+	static char s[] = "a.b.c", ret;
+	ret |= *strtok(s, ".");
+	return ret ? 0 : 1;
+}
+EOC
+cyn=strtok
+set d_strtok
+eval $trylink
 

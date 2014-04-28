@@ -1,11 +1,11 @@
-?RCS: $Id: d_attribut.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_attribut.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: Original Author: Andy Dougherty <doughera@lafcol.lafayette.edu>
@@ -20,7 +20,7 @@
 ?RCS: Revision 3.0.1.1  1994/10/29  16:08:55  ram
 ?RCS: patch36: created by ADO
 ?RCS:
-?MAKE:d_attribut: Myread Oldconfig cat cc ccflags rm Setvar contains
+?MAKE:d_attribut: Myread Oldconfig Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_attribut (d_attrib):
 ?S:	This variable conditionally defines HASATTRIBUTE, which
@@ -40,25 +40,12 @@
 ?LINT:set d_attribut
 ?LINT:known __attribute__
 : Look for GNU-cc style attribute checking
-echo " "
-echo "Checking whether your compiler can handle __attribute__ ..." >&4
-$cat >attrib.c <<'EOCP'
+$cat >try.c <<'EOCP'
 #include <stdio.h>
 void croak (char* pat,...) __attribute__((format(printf,1,2),noreturn));
+int main(void) { return 0; }
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
-	if $contains 'warning' attrib.out >/dev/null 2>&1; then
-		echo "Your C compiler doesn't fully support __attribute__."
-		val="$undef"
-	else
-		echo "Your C compiler supports __attribute__."
-		val="$define"
-	fi
-else
-	echo "Your C compiler doesn't seem to understand __attribute__ at all."
-	val="$undef"
-fi
+cyn="whether your compiler can handle __attribute__"
 set d_attribut
-eval $setvar
-$rm -f attrib*
+eval $trylink
 

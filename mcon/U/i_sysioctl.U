@@ -1,11 +1,11 @@
-?RCS: $Id: i_sysioctl.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: i_sysioctl.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: i_sysioctl.U,v $
@@ -46,7 +46,7 @@
 ?S:	This variable conditionally defines USE_IOCNOTTY to indicate that the
 ?S:	ioctl() call with TIOCNOTTY should be used to void tty association.
 ?S:	Otherwise (on USG probably), it is enough to close the standard file
-?S:	decriptors and do a setpgrp().
+?S:	descriptors and do a setpgrp().
 ?S:.
 ?C:I_SYS_IOCTL (I_SYSIOCTL):
 ?C:	This symbol, if defined, indicates that <sys/ioctl.h> exists and should

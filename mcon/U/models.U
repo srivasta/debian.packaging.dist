@@ -1,11 +1,11 @@
-?RCS: $Id: models.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: models.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: models.U,v $
@@ -64,11 +64,11 @@ case "$models" in
 ?X: We may not use Cppsym or we get a circular dependency through cc.
 ?X: But this should work regardless of which cc we eventually use.
 	$cat >pdp11.c <<'EOP'
-int main() {
+int main(void) {
 #ifdef pdp11
-	exit(0);
+	return 0;
 #else
-	exit(1);
+	return 1;
 #endif
 }
 EOP
@@ -207,7 +207,7 @@ none)
 	esac
 	;;
 *)
-	./warn "Unrecognized memory models--you may have to edit Makefile.SH"
+	./warn "Unrecognized memory models--you may have to edit Makefile.SH" 4>&4
 	;;
 esac
 $rm -f pdp11.* pdp11

@@ -1,11 +1,11 @@
-?RCS: $Id: Loc.U 14 2006-08-28 16:51:14Z rmanfredi $
+?RCS: $Id: Loc.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Loc.U,v $
@@ -63,21 +63,23 @@
 ?X:
 ?MAKE:Loc awk ar bash bison byacc cat chgrp chmod chown \
 	comm compress cp cpio cpp csh date echo egrep emacs expr find flex \
-	gmake gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
-	make mkdir more mv nm nroff perl pg pmake pr rm rmail sed sendmail \
+	gcc gmake gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
+	make mkdir more mv nawk nm nroff perl pg pmake pr rm rmail sed sendmail \
 	shar sleep smail sort submit tail tar tbl tee test touch tr troff \
-	uname uniq uuname vi zcat zip:  eunicefix n c startsh Instruct Warn
+	gmsgfmt msgfmt msgmerge xgettext \
+	uname uniq uuname vi wc zcat zip:  eunicefix n c startsh Instruct Warn
 ?MAKE:	-pick weed $@ %<
 ?LINT: describe awk ar bash bison byacc cat chgrp chmod chown \
 	comm compress cp cpio cpp csh date echo egrep emacs expr find flex \
-	gmake gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
-	make mkdir more mv nm nroff perl pg pmake pr rm rmail sed sendmail \
+	gcc gmake gzip grep inews ksh less line lint ln lp lpr ls mail mailx \
+	make mkdir more mv nawk nm nroff perl pg pmake pr rm rmail sed sendmail \
 	shar sleep smail sort submit tail tar tbl tee test touch tr troff \
-	uname uniq uuname vi zcat zip
+	gmsgfmt msgfmt msgmerge xgettext \
+	uname uniq uuname vi wc zcat zip
 ?V::pth loclist trylist
 ?F:./loc
 ?T:thisthing thing xxx dir file say DJGPP
-?T:_test _grep _cp _gmake _egrep _ln _make dflt
+?T:_echo _test _grep _cp _gmake _egrep _ln _make dflt
 ?LINT: change PATH
 : find out where common programs are
 echo " "
@@ -147,6 +149,7 @@ loclist="
 ?find:find
 ?grep:grep
 ?ls:ls
+?make:make
 ?mkdir:mkdir
 ?mv:mv
 ?rm:rm
@@ -173,6 +176,8 @@ trylist="
 ?emacs:emacs
 ?flex:flex
 ?gmake:gmake
+?gcc:gcc
+?gmsgfmt:gmsgfmt
 ?gzip:gzip
 ?inews:inews
 ?ksh:ksh
@@ -184,8 +189,10 @@ trylist="
 ?lpr:lpr
 ?mail:mail
 ?mailx:mailx
-?make:make
 ?more:more
+?msgfmt:msgfmt
+?msgmerge:msgmerge
+?nawk:nawk
 ?nm:nm
 ?nroff:nroff
 ?perl:perl
@@ -205,17 +212,20 @@ trylist="
 ?uname:uname
 ?uuname:uuname
 ?vi:vi
+?wc:wc
+?xgettext:xgettext
 ?zcat:zcat
 ?zip:zip
 "
 ?LINT: set awk ar bash bison byacc cat chgrp chmod chown \
-	comm compress cp cpio cpp csh date echo emacs expr find flex \
-	gmake gzip grep inews ksh less line lint lp lpr ls mail mailx \
-	mkdir more mv nm nroff perl pg pmake pr rm rmail sed sendmail \
+	comm compress cp cpio cpp csh date emacs expr find flex \
+	gcc gmake gzip grep inews ksh less line lint lp lpr ls mail mailx \
+	mkdir more mv nawk nm nroff perl pg pmake pr rm rmail sed sendmail \
 	shar sleep smail sort submit tail tar tbl tee touch tr troff \
-	uname uniq uuname vi zcat zip
+	msgfmt msgmerge \
+	uname uniq uuname vi wc zcat zip
 pth=`echo $PATH | sed -e "s/$p_/ /g"`
-pth="$pth /lib /usr/lib"
+pth="$pth /sbin /usr/sbin /lib /usr/lib /etc"
 for file in $loclist; do
 ?X:
 ?X: Allow them to -Dmake=pmake on the command line for instance...
@@ -230,14 +240,14 @@ for file in $loclist; do
 		if test -f "$xxx"; then
 			: ok
 		else
-			./warn "no $xxx -- ignoring your setting for $file."
+			./warn "no $xxx -- ignoring your setting for $file." 4>&4
 			xxx=`./loc $file $file $pth`
 		fi
 		;;
 	'') xxx=`./loc $file $file $pth`;;
 	*) xxx=`./loc $xxx $xxx $pth`;;
 	esac
-	eval $file=$xxx$_exe
+	eval $file=$xxx
 	eval _$file=$xxx
 	case "$xxx" in
 	/*)
@@ -249,7 +259,7 @@ for file in $loclist; do
 		;;
 	*)
 		echo "I don't know where '$file' is, and my life depends on it." >&4
-		echo "Go find a public domain implementation or fix your PATH setting!" >&4
+		echo "Go find a public domain implementation or fix your PATH!" >&4
 		exit 1
 		;;
 	esac
@@ -265,14 +275,14 @@ for file in $trylist; do
 		if test -f "$xxx"; then
 			: ok
 		else
-			./warn "no $xxx -- ignoring your setting for $file."
+			./warn "no $xxx -- ignoring your setting for $file." 4>&4
 			xxx=`./loc $file $file $pth`
 		fi
 		;;
 	'') xxx=`./loc $file $file $pth`;;
 	*) xxx=`./loc $xxx $xxx $pth`;;
 	esac
-	eval $file=$xxx$_exe
+	eval $file=$xxx
 	eval _$file=$xxx
 	case "$xxx" in
 	/*)
@@ -289,7 +299,7 @@ for file in $trylist; do
 	esac
 done
 case "$egrep" in
-egrep)
+egrep$_exe|egrep)
 	echo "Substituting grep for egrep."
 	egrep=$grep
 	_egrep=$_grep
@@ -297,7 +307,7 @@ egrep)
 esac
 @if ln
 case "$ln" in
-ln)
+ln$_exe|ln)
 	echo "Substituting cp for ln."
 	ln=$cp
 	_ln=$_cp
@@ -306,7 +316,7 @@ esac
 @end
 @if make || gmake
 case "$make" in
-make)	
+make$_exe|make)	
 	case "$gmake" in
 	gmake)
 	echo "I can't find make or gmake, and my life depends on it." >&4
@@ -317,11 +327,13 @@ make)
 	;;
 esac	
 case "$gmake" in
-gmake)	;;
-*)	# We can't have osname yet.
-	if test -f "/system/gnu_library/bin/ar.pm"; then # Stratus VOS
-		# Assume that gmake, if found, is definitely GNU make
-		# and prefer it over the system make.
+gmake$_exe|gmake)	;;
+*)
+?X: We can't have osname yet.
+?X: On Stratus VOS, assume that gmake, if found, is definitely GNU make
+?X: and prefer it over the system make.
+	if test -f "/system/gnu_library/bin/ar.pm"; then
+		: Stratus VOS
 		echo "Substituting gmake for make."
 		make=$gmake
 		_make=$_gmake
@@ -329,9 +341,57 @@ gmake)	;;
 	;;
 esac
 @end
+@if gmsgfmt && msgfmt
+?LINT: extern _msgfmt
+?LINT: change _gmsgfmt
+case "$gmsgfmt" in
+gmsgfmt$_exe|gmsgfmt)
+	echo "Substituting msgfmt for gmsgfmt."
+	gmsgfmt=$msgfmt
+	_gmsgfmt=$_msgfmt
+	;;
+*)
+	if $gmsgfmt --statistics /dev/null >/dev/null 2>&1 &&
+		(if $gmsgfmt --statistics /dev/null 2>&1 >/dev/null | \
+			grep usage >/dev/null; then exit 0; else exit 1; fi)
+	then
+		echo "Your $gmsgfmt is not GNU msgfmt; substituting msgfmt."
+		gmsgfmt=$msgfmt
+		_gmsgfmt=$_msgfmt
+	fi
+	;;
+esac
+@end
+@if xgettext
+?LINT: change _xgettext
+case "$xgettext" in
+xgettext$_exe|xgettext)
+	xgettext=":"
+	_xgettext=":"
+	;;
+*)
+	if $xgettext --omit-header --copyright-holder= /dev/null >/dev/null 2>&1 &&
+		(if $xgettext --omit-header --copyright-holder= \
+			/dev/null 2>&1 >/dev/null | \
+			grep usage >/dev/null; then exit 0; else exit 1; fi)
+	then
+		echo "Your $xgettext is not GNU xgettext; ignoring it."
+		xgettext=":"
+		_xgettext=":"
+	elif $xgettext --from-code=UTF-8 /dev/null >/dev/null 2>&1; then
+		: ok
+	else
+		 echo "Your $xgettext does not support --from-code; ignoring it."
+		 xgettext=":"
+		 _xgettext=":"
+	fi
+	;;
+esac
+@end
 case "$test" in
-test)
+test|test$_exe)
 	echo "Hopefully test is built into your sh."
+	test=test
 	;;
 *)
 	if `sh -c "PATH= test true" >/dev/null 2>&1`; then
@@ -348,14 +408,15 @@ test)
 esac
 ?LINT:change n c
 case "$echo" in
-echo)
+echo|echo$_exe)
 	echo "Hopefully echo is built into your sh."
+	echo=echo
 	;;
 ?X: For those rare cases where we don't need $echo...
 '') ;;
 *)
 	echo " "
-echo "Checking compatibility between $echo and builtin echo (if any)..." >&4
+echo "Checking compatibility between $_echo and builtin echo (if any)..." >&4
 	$echo $n "hi there$c" >foo1
 	echo $n "hi there$c" >foo2
 	if cmp foo1 foo2 >/dev/null 2>&1; then

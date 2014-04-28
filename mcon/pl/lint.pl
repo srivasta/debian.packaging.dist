@@ -1,4 +1,4 @@
-;# $Id: lint.pl 25 2008-05-28 11:19:25Z rmanfredi $
+;# $Id: lint.pl 132 2012-02-09 19:15:13Z rmanfredi $
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -778,10 +778,10 @@ sub p_body {
 			}
 		}
 	}
-	# Now look at the shell variables used: can be $var or ${var}
+	# Now look at the shell variables used: can be $var or ${var} or ${var:
 	local($var);
 	local($line) = $_;
-	while ($check_vars && s/\$\{?(\w+)\}?/$1/) {
+	while ($check_vars && s/\$\{?(\w+)[\}:]?/$1/) {
 		$var = $1;
 		next if $var =~ /^\d+/;		# Ignore $1 and friends
 		# Record variable as undeclared but do not issue a message right now.
@@ -793,14 +793,26 @@ sub p_body {
 		$shused{$unit} .= "\$$var " unless $shused{$unit} =~ /\$$var\b/;
 	}
 
-	return if $heredoc ne '' && !$began_here;	# Still in here-document
+	local($file);
+
+	if ($heredoc ne '' && !$began_here) {
+		# Still in here-document
+		# Just look for included files from C programs expected to be local
+		# in case they missed the special unit that produces these files.
+		if (s!#(\s*)include(\s+)"([\w.]+)"!!) {
+			$file = $3;
+			$fileused{$unit} .= "$file " unless
+				$filetmp{$file} || $fileused{$unit} =~ /\b$file\b/;
+		}
+		return;
+	}
 
 	# Now look at private files used by the unit (./file or ..../UU/file)
 	# We look at things like '. ./myread' and `./loc ...` as well as "< file"
-	local($file);
 	$_ = $line;
 	s/<\S+?>//g;			# <header.h> would set-off our <file detection
 	while (
+		s!#(\s*)include(\s+)"([\w.]+)"!! ||
 		s!(\.\s+|`\s*)(\S*UU|\.)/([^\$/`\s;]+)\s*!! ||
 		s!(`\s*\$?)cat\s+(\./)?([^\$/`\s;]+)\s*`!! ||
 		s!(\s+)(\./)([^\$/`\s;]+)\s*!! ||
@@ -812,8 +824,10 @@ sub p_body {
 		# Record file as used. Later on, we will make sure we had the right
 		# to use that file: either we are in the unit that defines it, or we
 		# include the unit that creates it in our dependencies, relying on ?F:.
-		$fileused{$unit} .= "$file " unless
-			$filetmp{$file} || $fileused{$unit} =~ /\b$file\b/;
+		if ($file =~ /^\w/) {
+			$fileused{$unit} .= "$file " unless
+				$filetmp{$file} || $fileused{$unit} =~ /\b$file\b/;
+		}
 		# Mark temporary file as being used, to spot useless local declarations
 		$filetmp{$file} .= ' used'
 			if defined $filetmp{$file} && $filetmp{$file} !~ /\bused/;
@@ -827,8 +841,10 @@ sub p_body {
 		s!(if|\|\||&&)\s+([^\$/`\s;]+)\s*!: !	# if prog, || prog, && prog
 	) {
 		$file = $2;
-		$filemisused{$unit} .= "$file " unless
-			$filetmp{$file} || $filemisused{$unit} =~ /\b$file\b/;
+		if ($file =~ /^\w/) {
+			$filemisused{$unit} .= "$file " unless
+				$filetmp{$file} || $filemisused{$unit} =~ /\b$file\b/;
+		}
 		# Temporary files should be used with ./ anyway
 		$filetmp{$file} .= ' misused'
 			if defined $filetmp{$file} && $filetmp{$file} !~ /\bmisused/;

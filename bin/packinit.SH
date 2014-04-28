@@ -18,10 +18,10 @@ echo "Extracting bin/packinit (with variable substitutions)"
 cat >packinit <<!GROK!THIS!
 #! /usr/bin/perl
 # feed this into perl
-	eval "exec perl -S \$0 \$*"
+	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: packinit.SH 1 2006-08-24 12:32:52Z rmanfredi $
+# $Id: packinit.SH 31 2010-03-06 20:15:24Z rmanfredi $
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

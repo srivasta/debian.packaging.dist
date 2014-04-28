@@ -1,18 +1,18 @@
-?RCS: $Id: d_gethbynm.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_gethbynm.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_gethbynm.U,v $
 ?RCS: Revision 3.0  1993/08/18  12:06:08  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:d_gethbynm: Inlibc
+?MAKE:d_gethbynm: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_gethbynm (d_gethhstby):
 ?S:	This variable conditionally defines the HAS_GETHOSTBYNAME symbol, which
@@ -27,6 +27,16 @@
 ?H:.
 ?LINT:set d_gethbynm
 : see if gethostbyname exists
-set gethostbyname d_gethbynm
-eval $inlibc
+$cat >try.c <<EOC
+#include <netdb.h>
+int main(void)
+{
+	struct hostent *he;
+	he = gethostbyname("hostname");
+	return he ? 0 : 1;
+}
+EOC
+cyn=gethostbyname
+set d_gethbynm '-lnsl'
+eval $trylink
 

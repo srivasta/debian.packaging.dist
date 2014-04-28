@@ -1,18 +1,18 @@
-?RCS: $Id: d_ulimit.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: d_ulimit.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: d_ulimit.U,v $
 ?RCS: Revision 3.0  1993/08/18  12:07:51  ram
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
-?MAKE:d_ulimit: Inlibc
+?MAKE:d_ulimit: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_ulimit:
 ?S:	This variable conditionally defines HAS_ULIMIT if ulimit() is
@@ -26,6 +26,17 @@
 ?H:.
 ?LINT:set d_ulimit
 : see if ulimit exists
-set ulimit d_ulimit
-eval $inlibc
+$cat >try.c <<EOC
+#include <ulimit.h>
+int main(void)
+{
+	static long ret;
+	ret |= ulimit(UL_GETFSIZE);
+	ret |= ulimit(UL_SETFSIZE, 1L);
+	return ret ? 0 : 1;
+}
+EOC
+cyn=ulimit
+set d_ulimit
+eval $trylink
 

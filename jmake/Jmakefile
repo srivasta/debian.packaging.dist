@@ -2,7 +2,7 @@
  * Jmakefile for jmake
  */
 
-;# $Id: Jmakefile 3 2006-08-25 21:39:07Z rmanfredi $
+;# $Id: Jmakefile 173 2014-04-05 08:10:18Z rmanfredi $
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -25,7 +25,7 @@
 
 AllTarget(Index)
 
-Index: bindex
+Index: bindex files/Jmake.rules
 	chmod +x bindex
 	./bindex
 
@@ -40,7 +40,8 @@ InstallMultipleFlags(files/Jmake*,$(PRIVLIB)/files,-m 444)
 
 BINSH = jmake.SH fixcpp.SH
 
-depend::
+depend:: local_depend
+local_depend::
 	($(SED) '/^# DO NOT DELETE/q' Makefile && \
 	grep '^\$$grep' $(BINSH) | \
 	$(SED) -e "s/^.*' \([^ ]*\) >>\([^ ]*\)/\2: \1/" \
@@ -49,3 +50,4 @@ depend::
 	cp Makefile.new Makefile
 	$(RM) Makefile.new
 
+fixcpp jmake: $(TOP)/revision.h

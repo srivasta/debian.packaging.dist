@@ -11,16 +11,17 @@ case $CONFIG in
 	. $TOP/config.sh
 	;;
 esac
+REVISION=`grep REVISION $TOP/revision.h | head -n1 | cut -d' ' -f4`
 case "$0" in
 */*) cd `expr X$0 : 'X\(.*\)/'` ;;
 esac
 echo "Extracting jmake/fixcpp (with variable substitutions)"
 $spitshell >fixcpp <<!GROK!THIS!
 $startperl
-	eval 'exec perl -S \$0 "\$@"'
+	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$runnning_under_some_shell;
 
-# $Id: fixcpp.SH 25 2008-05-28 11:19:25Z rmanfredi $
+# $Id: fixcpp.SH 42 2010-11-28 18:15:13Z rmanfredi $
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

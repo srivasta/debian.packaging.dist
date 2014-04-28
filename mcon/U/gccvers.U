@@ -1,11 +1,11 @@
-?RCS: $Id: gccvers.U 28 2008-06-16 18:04:21Z cbiere $
+?RCS: $Id: gccvers.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: Copyright (c) 2000, Jarkko Hietaniemi
@@ -45,7 +45,8 @@ gcc_version_patchlevel __GNUC_PATCHLEVEL__
 EOM
 if $cc -E try.c > try 2>&1
 then
-	gccversion=`sed -n 's/^gcc_version_major[^0-9]*//p' try`
+	gccversion=`$grep gcc_version_major try |
+		sed 's/^.*gcc_version_major[\t ]*//'`
 	case "$gccversion" in
 	'') echo "You are not using GNU cc." ;;
 	*)  echo "You are using GNU cc $gccversion."

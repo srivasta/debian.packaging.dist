@@ -1,11 +1,11 @@
-?RCS: $Id: mallocsrc.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: mallocsrc.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: mallocsrc.U,v $
@@ -21,7 +21,7 @@
 ?RCS:
 ?MAKE:mallocsrc mallocobj usemymalloc malloctype d_mymalloc \
 	freetype: Myread \
-	Oldconfig package Guess Setvar rm cat +cc +ccflags Findhdr \
+	Oldconfig package spackage Guess Setvar rm cat +cc +ccflags Findhdr \
 	i_malloc i_stdlib sed libs _o ptrsize
 ?MAKE:	-pick add $@ %<
 ?X: Put near top so that other tests don't erroneously include
@@ -30,7 +30,7 @@
 ?S:usemymalloc:
 ?S:	This variable contains y if the malloc that comes with this package
 ?S:	is desired over the system's version of malloc.  People often include
-?S:	special versions of malloc for effiency, but such versions are often
+?S:	special versions of malloc for efficiency, but such versions are often
 ?S:	less portable.  See also mallocsrc and mallocobj.
 ?S:	If this is 'y', then -lmalloc is removed from $libs.
 ?S:.
@@ -68,15 +68,15 @@
 ?H:#define Malloc_t $malloctype			/**/
 ?H:#define Free_t $freetype			/**/
 ?H:.
-?C:MYMALLOC:
+?C:USE_MY_MALLOC (MYMALLOC):
 ?C:	This symbol, if defined, indicates that we're using our own malloc.
 ?C:.
-?H:#$d_mymalloc MYMALLOC			/**/
+?H:#$d_mymalloc USE_MY_MALLOC		/**/
 ?H:.
 ?LINT:change libs
 ?X: Cannot test for mallocsrc; it is the unit's name and there is a bug in
 ?X: the interpreter which defines all the names, even though they are not used.
-@if mallocobj
+@if mallocobj || USE_MY_MALLOC
 : determine which malloc to compile in
 echo " "
 case "$usemymalloc" in
@@ -89,7 +89,17 @@ case "$usemymalloc" in
 	esac
 	;;
 esac
-rp="Do you wish to attempt to use the malloc that comes with $package?"
+$cat <<EOM
+$spackage comes with its own malloc() implementation that will supersede
+the version included in your C library.  Since proper memory allocation is 
+critical, you may choose to opt out from this specific implementation and
+rely on the (hopefully) more thoroughly tested version in the C library.
+
+If you change your mind later, you can always re-run this configuration
+script and recompile $package from scratch.
+
+EOM
+rp="Do you wish to attempt to use the malloc() that comes with $package?"
 . ./myread
 usemymalloc="$ans"
 case "$ans" in
@@ -100,7 +110,7 @@ y*|true)
 	d_mymalloc="$define"
 ?X:	Maybe libs.U should be dependent on mallocsrc.U, but then
 ?X:	most packages that use dist probably don't supply their own
-?X:	malloc, so this is probably an o.k. comprpomise
+?X:	malloc, so this is probably an o.k. compromise
 	case "$libs" in
 	*-lmalloc*)
 		: Remove malloc from list of libraries to use

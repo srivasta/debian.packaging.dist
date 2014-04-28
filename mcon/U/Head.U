@@ -1,11 +1,11 @@
-?RCS: $Id: Head.U 25 2008-05-28 11:19:25Z rmanfredi $
+?RCS: $Id: Head.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: Head.U,v $
@@ -78,7 +78,7 @@
 # Note: this Configure script was generated automatically. Rather than
 # working with this copy of Configure, you may wish to get metaconfig.
 # The dist package (which contains metaconfig) is available via SVN:
-#     svn co https://svn.sourceforge.net/svnroot/dist/trunk/dist
+#     svn co https://svn.code.sf.net/p/dist/code/trunk/dist
 ?X:
 ?X: NOTA BENE:
 ?X: If you develop you own version of metaconfig based on this work,
@@ -86,7 +86,7 @@
 ?X: by your version, not mine: It credits your work.
 ?X:
 
-# $Id: Head.U 25 2008-05-28 11:19:25Z rmanfredi $
+# $Id: Head.U 167 2013-05-08 17:58:00Z rmanfredi $
 #
 # Generated on <DATE> [metaconfig <VERSION>-<REVISION>]
 
@@ -139,7 +139,7 @@ if test -d c:/. ; then
 		OS2_SHELL=`cmd /c "echo %OS2_SHELL%" | tr '\\\\' / | tr '[A-Z]' '[a-z]'`
 	elif test -n "$DJGPP"; then
 		case "X${MACHTYPE:-nonesuchmach}" in
-		*cygwin) ;;
+		*cygwin|*msys) ;;
 		*) p_=\; ;;
 		esac
 	fi
@@ -149,7 +149,7 @@ fi
 ?X: There are two schools of thoughts here. Some people correctly argue that
 ?X: the user has a better chance than we do of setting a reasonable PATH and
 ?X: others argue that Configure is the best place there is to set up a suitable
-?X: PATH. Well, here we try to compromize by keeping the user's PATH and
+?X: PATH. Well, here we try to compromise by keeping the user's PATH and
 ?X: appending some directories which are known to work on some machine or the
 ?X: other. The rationale behind this being that a novice user might not have a
 ?X: proper environment variable set, and some directories like /etc (where

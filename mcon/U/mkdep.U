@@ -1,11 +1,11 @@
-?RCS: $Id: mkdep.U 1 2006-08-24 12:32:52Z rmanfredi $
+?RCS: $Id: mkdep.U 167 2013-05-08 17:58:00Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
-?RCS: You may redistribute only under the terms of the Artistic Licence,
+?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
-?RCS: that same Artistic Licence; a copy of which may be found at the root
+?RCS: that same Artistic License; a copy of which may be found at the root
 ?RCS: of the source tree for dist 4.0.
 ?RCS:
 ?RCS: $Log: mkdep.U,v $
@@ -39,6 +39,8 @@
 ?S:.
 ?F:mkdep
 ?T:IFS arg flags takeflags srcfile toplev filebase inc dir files file dep c
+?T:tmpdir
+?LINT:extern TMPDIR
 : find out how to generate dependencies
 echo " "
 echo "Checking how to generate makefile dependencies on your machine..." >&4
@@ -136,7 +138,7 @@ EOM
 	chmod +x $mkdep
 	$eunicefix $mkdep
 	if $mkdep dep.c >dep.out 2>/dev/null &&
-		$contains "dep$_o: dep.h" dep.out >/dev/null 2>&1
+		$contains "dep$_o:.*dep\.h" dep.out >/dev/null 2>&1
 	then
 		echo "Looks like we can use $cc -MM."
 	else
@@ -200,7 +202,8 @@ do
 done
 set X \$files
 shift
-trap "$rm -f /tmp/mkdep\$\$; exit 1" 1 2 3 15
+tmpdir="${TMPDIR:-/tmp}"
+trap "$rm -f "$tmpdir/mkdep\$\$"; exit 1" 1 2 3 15
 for srcfile
 do
 	case "\$srcfile" in
@@ -214,7 +217,7 @@ do
 	$sed -n -e 's/#[   ]*include[  ]*//' \\
 		-e '/<\(.*\)>/ d' \\
 		-e 's/:[^"]*"\([^"]*\)".*/: \1/' \\
-		-e "s/\\.c:/$_o:/p" > /tmp/mkdep\$\$
+		-e "s/\\.c:/$_o:/p" > "$tmpdir/mkdep\$\$"
 ?X: Deal with directories specified via -I requests to locate files
 	IFS=': '
 	while read file dep; do
@@ -225,9 +228,9 @@ do
 			fi
 		done
 		echo "\$file: \$dep" | $sed -e 's,: \./,: ,'
-	done </tmp/mkdep\$\$
+	done <"$tmpdir/mkdep\$\$"
 	IFS=' '
-	$rm -f /tmp/mkdep\$\$
+	$rm -f "$tmpdir/mkdep\$\$" 
 done
 exit 0
 EOS
