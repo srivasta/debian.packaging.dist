@@ -19,7 +19,7 @@ echo "Extracting jmake/fixcpp (with variable substitutions)"
 $spitshell >fixcpp <<!GROK!THIS!
 $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
-		if \$runnning_under_some_shell;
+		if \$running_under_some_shell;
 
 # $Id: fixcpp.SH 42 2010-11-28 18:15:13Z rmanfredi $
 #

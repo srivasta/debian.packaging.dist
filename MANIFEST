@@ -150,7 +150,7 @@ mcon/U/cc.U                Which C compiler should be used?
 mcon/U/ccflags.U           Any additional C flags?
 mcon/U/cf_email.U          Computes user's e-mail address
 mcon/U/cf_name.U           Computes user's full name
-mcon/U/cf_who.U            Who configured the sytem, where and when
+mcon/U/cf_who.U            Who configured the system, where and when
 mcon/U/charorder.U         Character order within a byte
 mcon/U/charsize.U          What is the size of "char"?
 mcon/U/contains.U          Makes status-returning grep

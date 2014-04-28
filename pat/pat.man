@@ -2,7 +2,7 @@
 .\" $Id: pat.man 3 2006-08-25 21:39:07Z rmanfredi $
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"  
+.\"
 .\"  You may redistribute only under the terms of the Artistic Licence,
 .\"  as specified in the README file that comes with the distribution.
 .\"  You may reuse parts of this distribution only within the terms of
@@ -229,7 +229,7 @@ then use that file list.
 If every file of the list is removed, \fIpat\fR will be aborted.
 .PP
 .I Patcil
-is used to do a ci -l on any listed files.
+is used to do a ci \-l on any listed files.
 (It is assumed that you always want to keep your files checked out.)
 In addition to the
 .B \-a
@@ -251,7 +251,7 @@ which is passed through to the ci to force unchanged files to be checked in.
 To check in a new trunk revision, I say
 .nf
 
-	patcil -s -f -a
+	patcil \-s \-f \-a
 
 .fi
 .PP
@@ -285,15 +285,15 @@ initialize the RCS file.
 can be used to reset the patch base to the current version when
 you've scrapped the previous patch sequence and are making a new distribution
 kit.
-What it really does is an rcs -Nlastpat:REV, where REV is the current
+What it really does is an rcs \-Nlastpat:REV, where REV is the current
 revision.
 If patdiff blows up and you want to set the patch base back to some previous
-version, you have to call rcs -Nlastpat:REV yourself.
+version, you have to call rcs \-Nlastpat:REV yourself.
 .PP
 .I Patdiff
 actually does the diffs that go into the patch, comparing whatever
-version -Nlastpat points to with the most recently checked in version.
-It then updates -Nlastpat to point to the current version.
+version \-Nlastpat points to with the most recently checked in version.
+It then updates \-Nlastpat to point to the current version.
 It leaves the diff sitting in the bugs subdirectory for patmake to pick up.
 It can either use rcsdiff, or a diff command of your choice specified when
 you run packinit, in case your diff is better than rcsdiff.

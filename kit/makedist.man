@@ -100,7 +100,7 @@ automatically split in smaller parts. Only the first 11 characters of the file
 will be kept though, and \fImakedist\fR will abort if two distinct files are
 to be split and have the same 11 first characters in their names. The split
 files will automatically be reconstructed at the end of the archive extraction
-by runnning a script generated in PACKNOTES.
+by running a script generated in PACKNOTES.
 .PP
 You may then mail your kits via \fIkitsend\fR or post them with \fIkitpost\fR.
 .SH OPTIONS

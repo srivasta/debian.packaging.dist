@@ -23,7 +23,7 @@ $spitshell >metaconfig.$manext <<!GROK!THIS!
 .\" $Id: mconfig.SH 25 2008-05-28 11:19:25Z rmanfredi $
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"  
+.\"
 .\"  You may redistribute only under the terms of the Artistic Licence,
 .\"  as specified in the README file that comes with the distribution.
 .\"  You may reuse parts of this distribution only within the terms of
@@ -32,7 +32,7 @@ $spitshell >metaconfig.$manext <<!GROK!THIS!
 .\"
 .\" $Log: mconfig.SH,v $
 .\" Revision 3.0.1.17  1997/02/28  16:29:31  ram
-.\" patch61: documents the runnning environment and the src.U unit
+.\" patch61: documents the running environment and the src.U unit
 .\" patch61: added warnings for $_a and $_o, as well as "startsh"
 .\"
 .\" Revision 3.0.1.16  1995/09/25  09:17:48  ram
@@ -304,7 +304,7 @@ formats allowed:
 ?X: A contrived example
 ?X:
 ?MAKE:d_one two: three +four Five
-?MAKE:	-pick add \$@ %<
+?MAKE:	\-pick add \$@ %<
 ?Y:DEFAULT
 ?S:d_one:
 ?S:	First shell symbol, conditionally defines ONE.
@@ -365,10 +365,10 @@ of general interest.
 .PP
 Notes for writing .U files:
 .IP * 5
-Always use "rm -f" because there are systems where rm is interactive by
+Always use "rm \-f" because there are systems where rm is interactive by
 default.
 .IP *
-Do not use "set -- ..." because '--' does not work with every shell. Use
+Do not use "set \-\- ..." because '\-\-' does not work with every shell. Use
 "set x ...; shift".
 .IP *
 Do not use "unset ENV" since unset is not fully portable.  Say "ENV=''"
@@ -377,7 +377,7 @@ instead.
 Always use echo " " (with a space) because of Eunice systems.
 .IP *
 Only use \fBtest\fR with \-r, \-w, \-f or \-d since those are the only
-portable switches. In particular, avoid "test -x".
+portable switches. In particular, avoid "test \-x".
 .IP *
 Use only programs that came with V7, so that you know everyone has them.
 .IP *
@@ -417,7 +417,7 @@ Use the \fI\$_o\fR and \fI\$_a\fR variables instead (see Unix.U).
 .IP *
 When doing a compile-link-execute test, always write it like this:
 .Ex
-\$\&cc \$\&ccflags \$\&ldflags try.c -o try \$\&libs
+\$\&cc \$\&ccflags \$\&ldflags try.c \-o try \$\&libs
 .Ef
 because some systems require that linking flags be specified before
 the compiled target (with the exception of trailing linking libraries).
@@ -514,7 +514,7 @@ not be lost when facing a new distribution.
 .TP
 \fB\-L\fI dir\fR
 Override default library location. Normally only useful for metaconfig
-maintainers to locally use the units being developped instead of the
+maintainers to locally use the units being developed instead of the
 publicly available ones. The \fIdir\fR specified is the one containing the
 units \fIU\fR directory.
 .TP
@@ -550,8 +550,8 @@ some standard trial, guessing and messing around with system includes and
 types.
 .PP
 However, despite all his talent, the author cannot possibly know that
-some system has a broken system call, or that some sytem structure lacks
-one otherwise standard field, or simply wheter a given include file exists
+some system has a broken system call, or that some system structure lacks
+one otherwise standard field, or simply whether a given include file exists
 or not. And I'm not considering the implicit assumptions, like the type
 returned by the \fImalloc()\fR function or the presence of the \fIrename()\fR
 system call to name a few. But that knowledge is necessary to achieve real
@@ -648,7 +648,7 @@ unless the identifier is surrounded by single quotes. For instance:
 .Ex
 var='first'
 tar='second'
-echo "--> first here document:"
+echo "\--> first here document:"
 cat <<EOM
 var='\$var'
 tar='\$\&tar'
@@ -1166,7 +1166,7 @@ the C symbol will be controlled, i.e. if the \fIalias\fR symbol is wanted,
 then that C symbol will be written in the \fIconfig_h.SH\fR file. Usually,
 the alias is just '%<' (stands for the unit's name) and there is also
 a ?W: line mapping a C symbol to the \fIalias\fR. Also the relevant parts
-of the ?H: lines are explicitely protected by a '?%<' condition. See
+of the ?H: lines are explicitly protected by a '?%<' condition. See
 the symbol aliasing paragraph for more details.
 The remaining of the line is the optional \fIobsolete symbol list\fR,
 which lists old equivalents for the new \fIsymbol_name\fR.
@@ -1507,7 +1507,7 @@ check whether a given C symbol is defined or not. A typical use is:
 set symbol result [-fva] [previous]
 eval \$\&csym
 .Ef
-That will set the \fIresult\fR variable to 'true' if the 
+That will set the \fIresult\fR variable to 'true' if the
 function [-f],
 variable [-v] or
 array [-a]
@@ -1642,7 +1642,7 @@ argument specifies the file to be located, the second argument is what
 will be returned if the search fails, and the reamining arguments are a
 list of directories where the file is to be searched. For instance:
 .Ex
-dflt=\`./loc sendmail.cf X /usr/lib /var/adm/sendmail /lib\`
+dflt=\`./loc sendmail.cf X /usr/lib /var/lib/sendmail /lib\`
 .Ef
 would set \fI\$dflt\fR to \fIX\fR if no \fIsendmail.cf\fR file was found
 under the listed directories, or something like \fI/usr/lib/sendmail.cf\fR
@@ -1718,7 +1718,7 @@ to an empty string if the prefix changed, to \fI\$var\fR otherwise.
 .TP
 Prefixup.U
 The intent of thit unit is similar to that of Prefixit.U, i.e. it helps
-fixing the default string to accomodate prefix changes. However, the shell
+fixing the default string to accommodate prefix changes. However, the shell
 variable \fI\$prefixup\fR, when evaluated, will only restore ~name expansions,
 should prefix use such an escape mechanism. Use it as:
 .Ex
