@@ -1,7 +1,7 @@
 /*
  * Generic jmake template
  *
- * $Id: Jmake.tmpl 156 2012-12-19 16:44:39Z rmanfredi $
+ * $Id: Jmake.tmpl 183 2015-04-12 09:48:11Z rmanfredi $
  *
  *  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
  *  
@@ -27,7 +27,7 @@
  */
 
 : Makefile.SH generated from Jmake.tmpl and Jmakefile <TAG>
-: $Id: Jmake.tmpl 156 2012-12-19 16:44:39Z rmanfredi $
+: $Id: Jmake.tmpl 183 2015-04-12 09:48:11Z rmanfredi $
 
 /*************************************************************************
  *                                                                       *
@@ -217,6 +217,7 @@ MakeSubdirs()
  * in this directory.
  */
 local_install::
+local_install-strip::
 local_deinstall::
 local_install.man::
 local_deinstall.man::
@@ -228,6 +229,9 @@ local_deinstall.man::
 
 local_install::
 	@echo "install in $(CURRENT) done."
+
+local_install-strip::
+	@echo "install (strip) in $(CURRENT) done."
 
 local_deinstall::
 	@echo "deinstall in $(CURRENT) done."
