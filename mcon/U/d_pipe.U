@@ -1,4 +1,4 @@
-?RCS: $Id: d_pipe.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id: d_pipe.U 196 2015-11-01 14:35:37Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
@@ -21,7 +21,7 @@
 ?S:	indicates to the C program that the pipe() routine is available
 ?S:	to create an inter-process channel.
 ?S:.
-?C:HAS_PIPE :
+?C:HAS_PIPE:
 ?C:	This symbol, if defined, indicates that the pipe routine is
 ?C:	available to create an inter-process channel.
 ?C:.

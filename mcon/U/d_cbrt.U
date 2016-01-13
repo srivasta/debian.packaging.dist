@@ -1,4 +1,4 @@
-?RCS: $Id: d_cbrt.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id: d_cbrt.U 182 2014-11-23 16:40:05Z rmanfredi $
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ?RCS: 
@@ -15,7 +15,7 @@
 ?MAKE:d_cbrt: Trylink cat
 ?MAKE:	-pick add $@ %<
 ?S:d_cbrt:
-?S:	This variable conditionally defines the CBRT symbol, which
+?S:	This variable conditionally defines the HAS_CBRT symbol, which
 ?S:	indicates to the C program that the cbrt() (cube root) function
 ?S:	is available.
 ?S:.
