@@ -49,10 +49,10 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	dh_auto_build
-	bash -m debian/postinst
-	bash -n debian/config
-	bash -n debian/postrm
-	bash -n debian/prerm
+	bash -m debian/dist.postinst
+	bash -n debian/dist.config
+	bash -n debian/dist.postrm
+	bash -n debian/dist.prerm
 
 override_dh_install:
 	test -d $(MAN1DIR) || $(make_directory) $(MAN1DIR)
