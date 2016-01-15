@@ -3,10 +3,11 @@ dist (1:3.5-36.0001-1) unstable; urgency=low
   * New upstream snapshot.
   * Bug fix: "please make the build reproducible", thanks to Reiner
     Herrmann. Applied the supplied patch. (Closes: #785549).
-  * Update the VCS-Git filed to use https transport.
+  * Update the VCS-Git filed to use HTTPS transport.
   * Update the standard version to 3.6.0. No changes needed.
+  * Updated the copyright file to the DEP-5 format.
 
- -- Manoj Srivastava <srivasta@debian.org>  Thu, 14 Jan 2016 23:28:24 -0800
+ -- Manoj Srivastava <srivasta@debian.org>  Thu, 14 Jan 2016 23:46:21 -0800
 
 dist (1:3.5-36-2) unstable; urgency=low
 
