@@ -43,11 +43,11 @@
 ?V:trylink:cyn
 ?S:trylink:
 ?S:	This shell variable is used internally by Configure to check
-?S:	wether a given function is defined or not. A typical use is:
+?S:	whether a given function is defined or not. A typical use is:
 ?S:		create try.c
 ?S:		set d_func [optional cc flags to try in sequence]
 ?S:		eval $trylink
-?S:	That will print a message, saying wether function was found or
+?S:	That will print a message, saying whether function was found or
 ?S:	not and set d_func accordingly.
 ?S:.
 ?T:var file val nparams msg yes no

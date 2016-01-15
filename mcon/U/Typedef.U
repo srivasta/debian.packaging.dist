@@ -32,7 +32,7 @@
 ?V:typedef
 ?S:typedef:
 ?S:	This shell variable is used internally by Configure to check
-?S:	wether a given typedef is defined or not. A typical use is:
+?S:	whether a given typedef is defined or not. A typical use is:
 ?S:		set typedef val_t default [includes]
 ?S:		eval $typedef
 ?S:	That will return val_t set to default if the typedef was not found,

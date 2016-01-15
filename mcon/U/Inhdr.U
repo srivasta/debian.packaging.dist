@@ -19,7 +19,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?X:
-?X: This unit checks wether a set of header files exists or not.
+?X: This unit checks whether a set of header files exists or not.
 ?X:	If the first header is not found, the function tries to locate
 ?X: the next header, and so on, until one is found or there is no
 ?X: more header in the list.
@@ -34,10 +34,10 @@
 ?V:inhdr
 ?S:inhdr:
 ?S:	This shell variable is used internally by Configure to check
-?S:	wether a set of headers exist or not. A typical use is:
+?S:	whether a set of headers exist or not. A typical use is:
 ?S:		set header i_header [ header2 i_header2 ... ]
 ?S:		eval $inhdr
-?S:	That will print a message, saying wether header was found or
+?S:	That will print a message, saying whether header was found or
 ?S:	not and set i_header* accordingly. If the first header is not
 ?S: found, we try the next one, until the list is empty or one is found.
 ?S:.

@@ -399,7 +399,7 @@ as backslash, point, etc...
 .PP
 The \fIonce\fR command is tagged with a name. The first time the name
 appears, the once construct is ignored and the text up to '\-once' will
-be copied in the generated Makefile.SH.  However, future occurences of
+be copied in the generated Makefile.SH.  However, future occurrences of
 the same name will be ignored (\fIonce\fR will behave like \fIskip\fR).
 .sp
 Example:

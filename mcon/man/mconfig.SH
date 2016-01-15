@@ -909,7 +909,7 @@ multiple inclusions of this file. Then comes the heart of the file...
 .PP
 It helps to know that \fI\$d_*\fR and \fI\$i_*\fR variables are set to
 either '\fIdefine\fR' or '\fIundef\fR' by \fIConfigure\fR, depending on
-wether a function or an include file is present on the system or not.
+whether a function or an include file is present on the system or not.
 That means the:
 .Ex
 #\$\&d_bcopy HAS_BCOPY /**/

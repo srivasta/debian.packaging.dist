@@ -28,10 +28,10 @@
 ?V:inlibc
 ?S:inlibc:
 ?S:	This shell variable is used internally by Configure to check
-?S:	wether a given function is defined or not. A typical use is:
+?S:	whether a given function is defined or not. A typical use is:
 ?S:		set function d_func
 ?S:		eval $inlibc
-?S:	That will print a message, saying wether function was found or
+?S:	That will print a message, saying whether function was found or
 ?S:	not and set d_func accordingly.
 ?S:.
 ?T:was tx sym tres td tu var

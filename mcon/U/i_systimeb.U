@@ -13,7 +13,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?X:
-?X: This unit looks wether <sys/timeb.h> should be included
+?X: This unit looks whether <sys/timeb.h> should be included
 ?X: or not when using ftime() (for struct timeb definition).
 ?X:
 ?X:	Force looking for <sys/time.h> for struct timeb.

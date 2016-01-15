@@ -13,7 +13,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?X:
-?X:	Look wether <sys/resource.h> needs to be included
+?X:	Look whether <sys/resource.h> needs to be included
 ?X:
 ?MAKE:i_sysresrc: Inhdr
 ?MAKE:	-pick add $@ %<

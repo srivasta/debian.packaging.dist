@@ -16,7 +16,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?X:
-?X:	Look wether <sys/select.h> exists
+?X:	Look whether <sys/select.h> exists
 ?X:
 ?MAKE:i_sysselct: Inhdr
 ?MAKE:	-pick add $@ %<
