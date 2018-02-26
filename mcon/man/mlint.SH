@@ -20,7 +20,7 @@ $spitshell >metalint.$manext <<!GROK!THIS!
 .TH METALINT $manext "Version $VERSION PL$PATCHLEVEL"
 ''' @(#) Manual page for metalint
 '''
-''' $Id: mlint.SH 1 2006-08-24 12:32:52Z rmanfredi $
+''' $Id$
 '''
 '''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 '''  
@@ -113,6 +113,19 @@ Print version number and exit.
 .SH DIAGNOSTICS
 The following diagnostics may be emitted by \fImetalint\fR:
 .TP 5
+"(?MAKE) command line must start with a leading TAB character."
+Self explanatory.
+.TP
+"(?MAKE) fourth pick argument is missing."
+Self explanatory.
+.TP
+"(?MAKE) fourth pick argument should probably be the %< macro."
+When the fourth argument is not a relative path, it is expected to be the
+current unit name, which is best described using the "%<" string, a macro
+handled by
+.I metaconfig
+and which is substituted with the current unit name.
+.TP
 "(?MAKE) ignoring duplicate dependency listing line."
 More than one ?MAKE: line bearing dependencies was found in the unit. There
 may be only one such line, although multiple ?MAKE action lines may occur.
@@ -136,6 +149,19 @@ Symbol is listed as a normal dependency and as a conditional one.
 will consider this as being a full dependency, but that may not be what you
 initially wanted...
 .TP
+"(?MAKE) pick needs a command argument."
+There is no command name after the special "pick" directive, which is invalid.
+.TP
+"(?MAKE) third pick argument must be \$@.
+The third argument to the special "pick" directive must be \$@, litterally.
+.TP
+"(?MAKE) unknown pick command 'xxx'.
+The command argument listed for the special "pick" directive is unknown.
+.TP
+"(?MAKE) weird fourth argument 'xxx' to pick.
+The fourth argument for pick, the target file, should be a unit name, a file
+path introduced by "./" or the special "%<" token.
+.TP
 "(?Y) unknown layout directive 'xxx'."
 Layout directives may only be one of \fItop\fR, \fIdefault\fR or \fIbottom\fR,
 but case does not matter. An unknown directive is just ignored and
@@ -150,14 +176,14 @@ The unit describes a shell symbol entry which cannot be used externally since
 not listed as a dependency.
 .TP
 "(?S) syntax error in ?S: construct."
-Self explainatory.
+Self explanatory.
 .TP
 "(?C) duplicate description for symbol 'XXX'."
 C symbol is described more than once, and that will produce two entries for
 it in the Glossary.
 .TP
 "(?C) syntax error in ?C: construct."
-Self explainatory.
+Self explanatory.
 .TP
 "(?H) symbol 'XXX' was already defined."
 Apparently, two ?H: lines are defining the same C symbol.
@@ -190,7 +216,7 @@ All the leading ?sym: constraints on the ?H: lines should be a valid
 shell or C symbol, defined in the unit.
 .TP
 "(?M) syntax error in ?M: construct."
-Self explainatory.
+Self explanatory.
 .TP
 "(?M) symbol 'xxx' already listed on a ?M: line in 'yyy'."
 A magic definition for symbol xxx is attempted, but another one was
@@ -219,7 +245,7 @@ The variable was already made visible as read-write by another unit.
 The variable was already made visible as read-only by another unit.
 .TP
 "(?W) variable '\$xxx' already wanted."
-Variable is already wanted, there is no need to explicitely ask for it here.
+Variable is already wanted, there is no need to explicitly ask for it here.
 .TP
 "(?W) variable '\$xxx' also locally defined."
 A wanted variable would conflict with a locally defined variable and could
@@ -240,7 +266,7 @@ later perusal by \fIConfigure\fR) may only be created in special units.
 Exceptions allowed if the ?F: line is preceded by a proper ?LINT: hint.
 .TP
 "(?T) temporary symbol '\$xxx' multiply declared."
-Self explainatory.
+Self explanatory.
 .TP
 "directive should come after ?MAKE declarations."
 The directive listed between () at the beginning of this message should
@@ -375,22 +401,22 @@ A shell symbol is defined by some units, obsoleted by others and used as
 a temporary.
 .TP
 "Shell symbol 'xxx' is both defined and obsoleted:"
-Self explainatory.
+Self explanatory.
 .TP
 "Shell symbol 'xxx' is both defined and used as temporary:"
-Self explainatory.
+Self explanatory.
 .TP
 "Shell symbol 'xxx' obsoleted also used as temporary:"
-Self explainatory.
+Self explanatory.
 .TP
 "definition of '\$xxx' not closed by '?S:.'."
-Self explainatory.
+Self explanatory.
 .TP
 "definition of 'XXX' not closed by '?C:.'."
-Self explainatory.
+Self explanatory.
 .TP
 "magic definition of 'xxx' not closed by '?M:.'."
-Self explainatory.
+Self explanatory.
 .TP
 "variable '\$xxx' is defined externally."
 A variable defined externally (i.e. in another unit) is used, without proper
@@ -400,7 +426,7 @@ dependency information. Use the \fIextern\fR lint hint to suppress this message.
 A file listed as a private UU file is not created by the special unit.
 Creation is detected by seing an explicit shell redirection to the file,
 not by an implicit creation (such as a C compilation would for instance).
-All special units should create only shell scripts explicitely anyway so this
+All special units should create only shell scripts explicitly anyway so this
 message cannot be suppressed via a lint hint.
 .TP
 "local file 'xxx' may override the one set by 'unit.U'."
@@ -536,7 +562,7 @@ listed file is used (do not prepend name with '!' for temporary ones)
 Harlan Stenn <harlan@mumps.pfcs.com> wrote the first version, based on
 Larry Wall's \fImetaconfig\fR from dist 2.0.
 .br
-Raphael Manfredi <ram@hptnos02.grenoble.hp.com> rewrote it from scratch for
+Raphael Manfredi <Raphael.Manfredi@pobox.com> rewrote it from scratch for
 3.0 with a few enhancements.
 .SH FILES
 .TP 10

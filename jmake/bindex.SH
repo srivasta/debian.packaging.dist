@@ -22,7 +22,7 @@ $spitshell >>bindex <<'!NO!SUBS!'
 	eval 'exec perl -S $0 ${1+"$@"}'
 		if $runnning_under_some_shell;
 
-# $Id: bindex.SH 31 2010-03-06 20:15:24Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

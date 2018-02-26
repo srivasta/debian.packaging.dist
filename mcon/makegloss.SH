@@ -22,7 +22,7 @@ $startperl
 
 !GROK!THIS!
 $spitshell >>makegloss <<'!NO!SUBS!'
-# $Id: makegloss.SH 22 2008-05-28 08:01:59Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

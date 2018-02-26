@@ -1,7 +1,7 @@
-?RCS: $Id: d_gconvert.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id$
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-?RCS: 
+?RCS:
 ?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
@@ -21,7 +21,7 @@
 ?RCS: Revision 3.0.1.1  1994/10/29  16:12:51  ram
 ?RCS: patch36: created by ADO
 ?RCS:
-?MAKE:d_Gconvert: cat cc ccflags ldflags libs rm _o
+?MAKE:d_Gconvert: cat cc ccflags ldflags libs rm_try
 ?MAKE:	-pick add $@ %<
 ?S:d_Gconvert:
 ?S:	This variable holds what Gconvert is defined as to convert
@@ -47,7 +47,7 @@
 ?H:.
 ?T: xxx_list xxx_convert
 ?F:!try
-?X: 
+?X:
 : Check how to convert floats to strings.
 echo " "
 echo "Checking for an efficient way to convert floats to strings."
@@ -124,7 +124,7 @@ esac
 
 for xxx_convert in $xxx_list; do
 	echo "Trying $xxx_convert"
-	$rm -f try try$_o
+	$rm_try
 	if $cc $ccflags -DTRY_$xxx_convert $ldflags -o try \
 		try.c $libs > /dev/null 2>&1 ; then
 		echo "$xxx_convert" found. >&4

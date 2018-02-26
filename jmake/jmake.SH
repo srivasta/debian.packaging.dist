@@ -21,7 +21,7 @@ $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$runnning_under_some_shell;
 
-# $Id: jmake.SH 47 2010-11-28 22:23:13Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

@@ -1,8 +1,8 @@
-?RCS: $Id: Unix.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id$
 ?RCS:
 ?RCS: Copyright (c) 1996, Andy Dougherty
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-?RCS: 
+?RCS:
 ?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
@@ -19,7 +19,7 @@
 ?X: environment, then some of the following variables can be redefined in hint
 ?X: files.
 ?X:
-?MAKE:Unix _a _o firstmakefile archobjs: Oldconfig
+?MAKE:Unix _a _o firstmakefile archobjs rm_try: Oldconfig rm
 ?MAKE:	-pick add $@ %<
 ?S:_a (lib_ext):
 ?S:	This variable defines the extension used for ordinary libraries.
@@ -44,6 +44,10 @@
 ?S:	or other facilities.  For perl on OS/2, for example, this would
 ?S:	include os2/os2.obj.
 ?S:.
+?S:rm_try:
+?S:	This is a cleanup variable for try test programs.
+?S:	Internal Configure use only.
+?S:.
 ?INIT:: Extra object files, if any, needed on this platform.
 ?INIT:archobjs=''
 : Define several unixisms.
@@ -54,6 +58,8 @@ esac
 case "$_o" in
 '') _o='.o';;
 esac
+
+rm_try="$rm -f try try$_exe a.out .out try.[cho] try.$_o core core.try* try.core*"
 
 @if firstmakefile
 : Which makefile gets called first.  This is used by make depend.
