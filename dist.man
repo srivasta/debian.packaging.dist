@@ -1,7 +1,7 @@
 .\" $Id: dist.man 3 2006-08-25 21:39:07Z rmanfredi $
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"  
+.\"
 .\"  You may redistribute only under the terms of the Artistic Licence,
 .\"  as specified in the README file that comes with the distribution.
 .\"  You may reuse parts of this distribution only within the terms of
@@ -31,7 +31,7 @@
 .\" Revision 3.0  1993/08/18  12:04:07  ram
 .\" Baseline for dist 3.0 netwide release.
 .\"
-.\" 
+.\"
 .de Ex		\" Start of Example
 .sp
 .in +5
@@ -183,7 +183,7 @@ format:
 .Ex
 profile-component: \fIvalue\fR
 .Ef
-whith shell-style comments (#) allowed provided they start the line.
+with shell-style comments (#) allowed provided they start the line.
 .PP
 Each command looks for a profile component entry matching its
 name and loads the \fIvalue\fR as if it were arguments specified

@@ -1,19 +1,18 @@
 Source: dist
 VCS-Git: https://anonscm.debian.org/git/users/srivasta/debian/dist.git
-VCS-Browser: http://anonscm.debian.org/gitweb/?p=users/srivasta/debian/dist.git
+VCS-Browser: http://anonscm.debian.org/git/users/srivasta/debian/dist.git
 Section: devel
 Priority: optional
 Maintainer: Manoj Srivastava <srivasta@debian.org>
 Standards-Version: 4.1.3
 Build-Depends-Indep: debhelper (>= 11), sharutils, po-debconf,
-                     gettext, dpkg-dev (>= 1.16.0),
-                     libperl4-corelibs-perl | perl (<< 5.12.3-7)
+                     gettext, dpkg-dev
 
 Package: dist
 Architecture: all
 Multi-Arch: foreign
 Depends: perl, debconf (>= 1.2.0) | debconf-2.0,
-          ${misc:Depends}, libperl4-corelibs-perl | perl (<< 5.12.3-7)
+          ${misc:Depends}
 Description: Tools for developing, maintaining and distributing software
  The dist package is a set of tools meant to ease the construction
  and maintenance of portable software.

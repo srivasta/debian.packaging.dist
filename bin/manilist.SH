@@ -23,7 +23,7 @@ $startperl
 # $Id: manilist.SH 31 2010-03-06 20:15:24Z rmanfredi $
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-#  
+#
 #  You may redistribute only under the terms of the Artistic Licence,
 #  as specified in the README file that comes with the distribution.
 #  You may reuse parts of this distribution only within the terms of
@@ -79,7 +79,7 @@ $spitshell >>manilist <<'!NO!SUBS!'
 
 $format = 'A:%c %n';
 
-# By default, only the source files whith the following extensions are reported
+# By default, only the source files with the following extensions are reported
 # (but a -a option will report ALL the files, and a -i option can specify some
 # other extensions as well).
 #  .sh .SH .c .h .l .y .man
@@ -293,7 +293,7 @@ sub report {
 	local($fmt) = $format;
 	local($postproc) = 0;		# Do we need formatting post-processing ?
 	$fmt =~ s/^\w+://;
-	$fmt =~ s/\|/\02/g && ($postproc = 1);		# Formatted colum separator
+	$fmt =~ s/\|/\02/g && ($postproc = 1);		# Formatted column separator
 
 	# If neither 'd' nor 'f' is specified, then all the files are candidate
 	# for report. Specifying 'df' is the same, but is less efficient.

@@ -79,7 +79,7 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 
 	* bin/packinit.SH: Fixed one wrong ':' comment in .package.
 
-	* jmake/files/Jmake.rules: Now handles USRINC for dependencies. 
+	* jmake/files/Jmake.rules: Now handles USRINC for dependencies.
 	Smarter about dependencies computation.
 
 	* jmake/files/Jmake.tmpl: Lex path can now be configured.
@@ -109,13 +109,13 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 
 	* mcon/U/Instruct.U: Logname / whoami sequence rewritten to use case.
 
-	* mcon/U/Loc.U: Allow users to specify paths on the command line. 
+	* mcon/U/Loc.U: Allow users to specify paths on the command line.
 	Will now substitute cp for ln if not supported.
 
-	* mcon/U/Myread.U: Myread script now starts with a "startsh". 
+	* mcon/U/Myread.U: Myread script now starts with a "startsh".
 	Miscellaneous fixes.
 
-	* mcon/U/Oldconfig.U: Added support for src.U.  New OSNAME define. 
+	* mcon/U/Oldconfig.U: Added support for src.U.  New OSNAME define.
 	Can now sense new OSes.
 
 	* mcon/U/Options.U: Optdef.sh now starts with a "startsh".  Moved
@@ -154,7 +154,7 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 	* mcon/U/d_csh.U: Added full_csh to preserve the full path even when
 	portable.
 
-	* mcon/U/d_dosuid.U: Moved unit to TOP via a ?Y: layout directive. 
+	* mcon/U/d_dosuid.U: Moved unit to TOP via a ?Y: layout directive.
 	Tell them /dev/fd is not about floppy disks.
 
 	* mcon/U/d_gconvert.U: Integrated new unit from perl5.
@@ -170,7 +170,7 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 
 	* mcon/U/d_newsadm.U: Added Guess dependency.
 
-	* mcon/U/d_pidcheck.U: Replaced .o with $_o all over the place. 
+	* mcon/U/d_pidcheck.U: Replaced .o with $_o all over the place.
 	Added ?F: metalint hint.
 
 	* mcon/U/d_poll.U: Mention that <poll.h> can be included if HAS_POLL
@@ -182,7 +182,7 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 	* mcon/U/d_setpgid.U: Reworded symbol comments.
 
 	* mcon/U/d_setpgrp.U: Obsoleted USE_BSDGRP in favor of
-	USE_BSD_SETPGRP.  Another unit now also defines a USE_BSD_GETPGRP. 
+	USE_BSD_SETPGRP.  Another unit now also defines a USE_BSD_GETPGRP.
 	Fallback for test program failure improved.
 
 	* mcon/U/d_sgndchr.U, mcon/U/d_wifstat.U: Added a ?F: metalint hint.
@@ -198,21 +198,21 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 
 	* mcon/U/i_varhdr.U: Varargs script now starts with leading "startsh".
 
-	* mcon/U/intsize.U: Avoid prompting the user if the test runs ok. 
+	* mcon/U/intsize.U: Avoid prompting the user if the test runs ok.
 	Moved code from longsize.U into there.  New tests for shortsize as
 	well.
 
 	* mcon/U/libc.U: Replaced .a with $_a all over the place.  Added
 	support for HPUX-10 nm output.
 
-	* mcon/U/libnlist.U: Added usrinc and mips on the dependency line. 
+	* mcon/U/libnlist.U: Added usrinc and mips on the dependency line.
 	Make sure we call ./mips.  Added a ?LINT: hint.
 
 	* mcon/U/libpth.U: New loclibpth variable.
 
 	* mcon/U/longsize.U: Code moved to intsize.U.
 
-	* mcon/U/mallocsrc.U: Added support for Free_t, the type of free(). 
+	* mcon/U/mallocsrc.U: Added support for Free_t, the type of free().
 	Replaced .o with $_o all over the place.
 
 	* mcon/U/manfmt.U, mcon/U/mansrc.U: Don't ask for AFS when they
@@ -227,7 +227,7 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 
 	* mcon/U/nis.U: Ensure suitable defaults for hostcat and friends.
 
-	* mcon/U/orderlib.U: Replaced .a with $_a all over the place. 
+	* mcon/U/orderlib.U: Replaced .a with $_a all over the place.
 	Likewise for .o replaced by $_o.  Now uses the ar located by Loc.U.
 
 	* mcon/U/randbits.U: Added <unistd.h> and <stdlib.h> to the C program
@@ -262,13 +262,13 @@ Fri Feb 28 17:48:41 MET 1997   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.co
 	* mcon/U/voidflags.U: Don't prompt them if the void support is high
 	enough for us.
 
-	* mcon/configure: Added the srcdir support now that we have src.U. 
+	* mcon/configure: Added the srcdir support now that we have src.U.
 	Random cleanup for nicer help message.
 
 	* mcon/man/mconfig.SH: Documents the running environment and the
 	src.U unit.  Added warnings for $_a and $_o, as well as "startsh".
 
-	* mcon/man/mlint.SH: New "create" and "empty" lint directives. 
+	* mcon/man/mlint.SH: New "create" and "empty" lint directives.
 	Documented new messages.
 
 	* mcon/mxref.SH, mcon/man/mxref.SH: New -L option to match metaconfig
@@ -341,7 +341,7 @@ Mon Sep 25 10:33:26 MET 1995   Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
 
 	* mcon/U/Config_h.U: Commented the purpose of the #un-def directive.
 
-	* mcon/U/Loc.U: Commented the purpose of the #un-def directive. 
+	* mcon/U/Loc.U: Commented the purpose of the #un-def directive.
 	Abort Configure run when mandatory command is missing.
 
 	* mcon/U/Options.U: Protected option parsing code against 'echo -*'
@@ -492,7 +492,7 @@ Tue Jul 25 16:41:40 METDST 1995   Raphael Manfredi <ram@hptnos02.grenoble.hp.com
 	* mcon/U/libs.U, mcon/U/Loc.U, mcon/U/Guess.U, mcon/U/Oldconfig.U,
 	mcon/U/libc.U: Now knows about OS/2 platforms.
 
-	* mcon/U/Head.U: Added SVR4-ish /opt directories to path list (ADO). 
+	* mcon/U/Head.U: Added SVR4-ish /opt directories to path list (ADO).
 	OS/2 platforms are using another path separator.
 
 	* mcon/U/Typedef.U: Added backslash escapes within evals to prevent
@@ -668,7 +668,7 @@ Fri May 12 14:39:16 METDST 1995   Raphael Manfredi <ram@hptnos02.grenoble.hp.com
 	by checking both header and lib (ADO).
 
 	* mcon/U/libc.U: Made sure only most recent version of shared lib is
-	picked.  Final "nm -p" check now uses xscan and xrun like everybody. 
+	picked.  Final "nm -p" check now uses xscan and xrun like everybody.
 	Can now grok linux nm output with lead __IO (ADO).  Added support for
 	linux ELF output, using 'W' for alias (ADO).
 
@@ -693,7 +693,7 @@ Tue Mar 21 09:55:57 MET 1995   Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
 	Jmake was not working at all on HP-UX due to the way their cpp
 	systematically removes trailing backslashes in text. The new
 	fixcpp script is now a wrapper over cpp to first escape those
-	backslashes that should be preserved accross cpp before feeding
+	backslashes that should be preserved across cpp before feeding
 	it with the text of the Jmakefile...
 
 	Suppressed extra argument to NormalProgramTarget call in jmake rules.
@@ -722,7 +722,7 @@ Tue Mar 21 09:55:57 MET 1995   Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
 	* jmake/fixcpp.SH, mcon/U/d_wifstat.U: Created.
 
 	* jmake/jmake.SH: Now invokes cpp through new fixcpp script.  First
-	pass now skips cpp comments alltogether.
+	pass now skips cpp comments altogether.
 
 	* mcon/U/Head.U: Definition of paths wrongly added spurious ':' chars.
 
@@ -990,7 +990,7 @@ Wed Jan 11 17:03:22 MET 1995   Raphael Manfredi <ram@acri.fr>
 	* mcon/U/Config_sh.U: Moved path stripping from d_portable.U to end
 	of Configure.
 
-	* mcon/U/Cppsym.U: New cc vs. cpp symbol checking suggested by JHI. 
+	* mcon/U/Cppsym.U: New cc vs. cpp symbol checking suggested by JHI.
 	Added more cpp symbols (JHI).
 
 	* mcon/U/Getfile.U: Added support for escaping answers to skip
@@ -1088,7 +1088,7 @@ Mon Oct 31 10:57:05 MET 1994   Raphael Manfredi <ram@acri.fr>
 
 	Also, the leading comment in Chk_MANI.U now explains how this
 	unit gets included into the Configure script. There used to be
-	an explaination there, but it was no longer accurate.
+	an explanation there, but it was no longer accurate.
 
 	One new unit file (Begin.U).
 
@@ -1312,7 +1312,7 @@ Sat Oct 29 18:16:03 MET 1994   Raphael Manfredi <ram@acri.fr>
 	* mcon/U/Loc.U: Added ?F: line for metalint file checking.  Be
 	careful and guard against wildcard searching (ADO).
 
-	* mcon/U/Oldconfig.U: Added ?F: line for metalint file checking. 
+	* mcon/U/Oldconfig.U: Added ?F: line for metalint file checking.
 	Merged with the version used for perl5's Configure (ADO).
 
 	* mcon/U/Options.U: Ensure option definition file is removed before
@@ -1335,7 +1335,7 @@ Sat Oct 29 18:16:03 MET 1994   Raphael Manfredi <ram@acri.fr>
 	mcon/U/d_dlerror.U, mcon/U/d_sysconf.U, mcon/U/i_dld.U,
 	mcon/U/modetype.U: Created by ADO.
 
-	* mcon/U/cc.U: Detect gcc even when not called as 'gcc' (ADO). 
+	* mcon/U/cc.U: Detect gcc even when not called as 'gcc' (ADO).
 	Simplified gcc version checking (ADO).  Added ?F: line for metalint
 	file checking.
 
@@ -1418,7 +1418,7 @@ Sat Oct 29 18:16:03 MET 1994   Raphael Manfredi <ram@acri.fr>
 	* mcon/U/so.U: Now tells user how he can suppress shared lib lookup
 	(ADO).  Removed echo at the top, since it's now in the here-doc (ADO).
 
-	* mcon/U/ssizetype.U: Added ?F: line for metalint file checking. 
+	* mcon/U/ssizetype.U: Added ?F: line for metalint file checking.
 	Added 'ldflags' to the test compile line (ADO).
 
 	* mcon/man/mconfig.SH: Added nroff protection for lines beginning
@@ -1444,14 +1444,13 @@ Sat Oct 29 18:16:03 MET 1994   Raphael Manfredi <ram@acri.fr>
 
 	* pat/pat.SH: Now unlinks all the files created by patlog in bugs.
 
-	* pat/pat.man: Documents new patlog script and the files it uses. 
+	* pat/pat.man: Documents new patlog script and the files it uses.
 	The RCS layer section has been extended slightly.
 
 	* pat/patcil.SH: Now honors the VISUAL and EDITOR environment
-	variables.  Newer RCS programs chop trailing spaces in log messages. 
+	variables.  Newer RCS programs chop trailing spaces in log messages.
 	Separated V/E and v/e commands.  New 'v' command to edit the file
 	being patcil'ed.  Added hook for 'V' command (not implemented yet).
 
 	* pat/patmake.SH: A lot of setup is now performed by patlog.  Added
 	various escapes in strings for perl5 support.
-
