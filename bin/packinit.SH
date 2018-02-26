@@ -21,7 +21,7 @@ cat >packinit <<!GROK!THIS!
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: packinit.SH 31 2010-03-06 20:15:24Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
@@ -191,6 +191,19 @@ no specific file extensions are used.
 EOM
 $shext = &myread('Additional file extensions to identify SH files?', $dflt);
 $shext = '' if $shext eq 'none';
+
+$dflt = 'none';
+print <<'EOM';
+
+If your package sources contains symbols that metaconfig will mistake for the
+names of symbols defined by its units, you can list them in an exclusions file.
+(See the documentation of "metaconfig -X".) What file would you like metaconfig
+to consult for those symbols? Say "none" if you don't need to exclude any
+symbols.
+
+EOM
+$exclusions_file = &myread('File to consult for excluded symbols?', $dflt);
+$exclusions_file = '' if $exclusions_file eq 'none';
 
 $dflt = $copyright eq ' ' ? 'n' : 'y';
 print <<'EOM';
@@ -427,6 +440,8 @@ changercs=$changercs
 : File lookup extensions
 cext='$cext'
 shext='$shext'
+: File to consult for symbol exclusions
+exclusions_file='$exclusions_file'
 : Mailing list variables
 list_users='$list_users'
 list_name='$list_name'

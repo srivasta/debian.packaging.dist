@@ -17,7 +17,7 @@ $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: makedist.SH 31 2010-03-06 20:15:24Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  
@@ -273,7 +273,7 @@ sub manimake {
 Filename                   Kit Description
 --------                   --- -----------
 ";
-	for (sort keys(comment)) {
+	for (sort keys(%comment)) {
 		printf PACKLIST "%-27s %2s %.47s\n", $_, $kit{$_}, $comment{$_};
 	}
 	close PACKLIST;

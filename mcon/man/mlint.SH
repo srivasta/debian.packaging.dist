@@ -18,54 +18,54 @@ echo "Extracting mcon/man/metalint.$manext (with variable substitutions)"
 $rm -f metalint.$manext
 $spitshell >metalint.$manext <<!GROK!THIS!
 .TH METALINT $manext "Version $VERSION PL$PATCHLEVEL"
-.\" @(#) Manual page for metalint
-.\"
-.\" $Id: mlint.SH 1 2006-08-24 12:32:52Z rmanfredi $
-.\"
-.\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"  
-.\"  You may redistribute only under the terms of the Artistic Licence,
-.\"  as specified in the README file that comes with the distribution.
-.\"  You may reuse parts of this distribution only within the terms of
-.\"  that same Artistic Licence; a copy of which may be found at the root
-.\"  of the source tree for dist 4.0.
-.\"
-.\" $Log: mlint.SH,v $
-.\" Revision 3.0.1.9  1997/02/28  16:30:25  ram
-.\" patch61: new "create" and "empty" lint directives
-.\" patch61: documented new messages
-.\"
-.\" Revision 3.0.1.8  1995/09/25  09:18:07  ram
-.\" patch59: documented new ?Y: directive
-.\" patch59: fixed my e-mail address
-.\"
-.\" Revision 3.0.1.7  1995/07/25  14:18:51  ram
-.\" patch56: added two new warnings for : comments lines in Configure
-.\"
-.\" Revision 3.0.1.6  1994/10/29  16:33:56  ram
-.\" patch36: documents new ?F: lines and the related metalint warnings
-.\" patch36: removed statement in BUGS since all warnings may now be shut
-.\"
-.\" Revision 3.0.1.5  1994/05/06  15:20:30  ram
-.\" patch23: added -L switch to override public unit repository path
-.\" patch23: two new warnings concerning last unit lines
-.\"
-.\" Revision 3.0.1.4  1994/01/24  14:20:39  ram
-.\" patch16: can now easily suppress warning about made "special units"
-.\"
-.\" Revision 3.0.1.3  1993/11/10  17:37:39  ram
-.\" patch14: documents stale ?M: dependency check
-.\"
-.\" Revision 3.0.1.2  1993/10/16  13:52:23  ram
-.\" patch12: added support for ?M: lines and fixed some typos
-.\"
-.\" Revision 3.0.1.1  1993/08/19  06:42:24  ram
-.\" patch1: leading config.sh searching was not aborting properly
-.\"
-.\" Revision 3.0  1993/08/18  12:10:15  ram
-.\" Baseline for dist 3.0 netwide release.
-.\"
-.\"
+''' @(#) Manual page for metalint
+'''
+''' $Id$
+'''
+'''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
+'''
+'''  You may redistribute only under the terms of the Artistic Licence,
+'''  as specified in the README file that comes with the distribution.
+'''  You may reuse parts of this distribution only within the terms of
+'''  that same Artistic Licence; a copy of which may be found at the root
+'''  of the source tree for dist 4.0.
+'''
+''' $Log: mlint.SH,v $
+''' Revision 3.0.1.9  1997/02/28  16:30:25  ram
+''' patch61: new "create" and "empty" lint directives
+''' patch61: documented new messages
+'''
+''' Revision 3.0.1.8  1995/09/25  09:18:07  ram
+''' patch59: documented new ?Y: directive
+''' patch59: fixed my e-mail address
+'''
+''' Revision 3.0.1.7  1995/07/25  14:18:51  ram
+''' patch56: added two new warnings for : comments lines in Configure
+'''
+''' Revision 3.0.1.6  1994/10/29  16:33:56  ram
+''' patch36: documents new ?F: lines and the related metalint warnings
+''' patch36: removed statement in BUGS since all warnings may now be shut
+'''
+''' Revision 3.0.1.5  1994/05/06  15:20:30  ram
+''' patch23: added -L switch to override public unit repository path
+''' patch23: two new warnings concerning last unit lines
+'''
+''' Revision 3.0.1.4  1994/01/24  14:20:39  ram
+''' patch16: can now easily suppress warning about made "special units"
+'''
+''' Revision 3.0.1.3  1993/11/10  17:37:39  ram
+''' patch14: documents stale ?M: dependency check
+'''
+''' Revision 3.0.1.2  1993/10/16  13:52:23  ram
+''' patch12: added support for ?M: lines and fixed some typos
+'''
+''' Revision 3.0.1.1  1993/08/19  06:42:24  ram
+''' patch1: leading config.sh searching was not aborting properly
+'''
+''' Revision 3.0  1993/08/18  12:10:15  ram
+''' Baseline for dist 3.0 netwide release.
+'''
+'''
 .SH NAME
 metalint \- a metaconfig unit consistency checker
 .SH SYNOPSIS
@@ -113,6 +113,19 @@ Print version number and exit.
 .SH DIAGNOSTICS
 The following diagnostics may be emitted by \fImetalint\fR:
 .TP 5
+"(?MAKE) command line must start with a leading TAB character."
+Self explanatory.
+.TP
+"(?MAKE) fourth pick argument is missing."
+Self explanatory.
+.TP
+"(?MAKE) fourth pick argument should probably be the %< macro."
+When the fourth argument is not a relative path, it is expected to be the
+current unit name, which is best described using the "%<" string, a macro
+handled by
+.I metaconfig
+and which is substituted with the current unit name.
+.TP
 "(?MAKE) ignoring duplicate dependency listing line."
 More than one ?MAKE: line bearing dependencies was found in the unit. There
 may be only one such line, although multiple ?MAKE action lines may occur.
@@ -136,6 +149,19 @@ Symbol is listed as a normal dependency and as a conditional one.
 will consider this as being a full dependency, but that may not be what you
 initially wanted...
 .TP
+"(?MAKE) pick needs a command argument."
+There is no command name after the special "pick" directive, which is invalid.
+.TP
+"(?MAKE) third pick argument must be \$@.
+The third argument to the special "pick" directive must be \$@, litterally.
+.TP
+"(?MAKE) unknown pick command 'xxx'.
+The command argument listed for the special "pick" directive is unknown.
+.TP
+"(?MAKE) weird fourth argument 'xxx' to pick.
+The fourth argument for pick, the target file, should be a unit name, a file
+path introduced by "./" or the special "%<" token.
+.TP
 "(?Y) unknown layout directive 'xxx'."
 Layout directives may only be one of \fItop\fR, \fIdefault\fR or \fIbottom\fR,
 but case does not matter. An unknown directive is just ignored and
@@ -150,14 +176,14 @@ The unit describes a shell symbol entry which cannot be used externally since
 not listed as a dependency.
 .TP
 "(?S) syntax error in ?S: construct."
-Self explainatory.
+Self explanatory.
 .TP
 "(?C) duplicate description for symbol 'XXX'."
 C symbol is described more than once, and that will produce two entries for
 it in the Glossary.
 .TP
 "(?C) syntax error in ?C: construct."
-Self explainatory.
+Self explanatory.
 .TP
 "(?H) symbol 'XXX' was already defined."
 Apparently, two ?H: lines are defining the same C symbol.
@@ -190,7 +216,7 @@ All the leading ?sym: constraints on the ?H: lines should be a valid
 shell or C symbol, defined in the unit.
 .TP
 "(?M) syntax error in ?M: construct."
-Self explainatory.
+Self explanatory.
 .TP
 "(?M) symbol 'xxx' already listed on a ?M: line in 'yyy'."
 A magic definition for symbol xxx is attempted, but another one was
@@ -240,7 +266,7 @@ later perusal by \fIConfigure\fR) may only be created in special units.
 Exceptions allowed if the ?F: line is preceded by a proper ?LINT: hint.
 .TP
 "(?T) temporary symbol '\$xxx' multiply declared."
-Self explainatory.
+Self explanatory.
 .TP
 "directive should come after ?MAKE declarations."
 The directive listed between () at the beginning of this message should
@@ -375,22 +401,22 @@ A shell symbol is defined by some units, obsoleted by others and used as
 a temporary.
 .TP
 "Shell symbol 'xxx' is both defined and obsoleted:"
-Self explainatory.
+Self explanatory.
 .TP
 "Shell symbol 'xxx' is both defined and used as temporary:"
-Self explainatory.
+Self explanatory.
 .TP
 "Shell symbol 'xxx' obsoleted also used as temporary:"
-Self explainatory.
+Self explanatory.
 .TP
 "definition of '\$xxx' not closed by '?S:.'."
-Self explainatory.
+Self explanatory.
 .TP
 "definition of 'XXX' not closed by '?C:.'."
-Self explainatory.
+Self explanatory.
 .TP
 "magic definition of 'xxx' not closed by '?M:.'."
-Self explainatory.
+Self explanatory.
 .TP
 "variable '\$xxx' is defined externally."
 A variable defined externally (i.e. in another unit) is used, without proper
@@ -536,7 +562,7 @@ listed file is used (do not prepend name with '!' for temporary ones)
 Harlan Stenn <harlan@mumps.pfcs.com> wrote the first version, based on
 Larry Wall's \fImetaconfig\fR from dist 2.0.
 .br
-Raphael Manfredi <ram@hptnos02.grenoble.hp.com> rewrote it from scratch for
+Raphael Manfredi <Raphael.Manfredi@pobox.com> rewrote it from scratch for
 3.0 with a few enhancements.
 .SH FILES
 .TP 10

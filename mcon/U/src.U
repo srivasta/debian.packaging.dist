@@ -1,8 +1,8 @@
-?RCS: $Id: src.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id$
 ?RCS:
 ?RCS: Copyright (c) 1996, Cygnus Support
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-?RCS: 
+?RCS:
 ?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
@@ -32,10 +32,14 @@
 : Find the path to the source tree
 case "$src" in
 '') case "$0" in
-    */*)
-		src=`echo $0 | sed -e 's%/[^/][^/]*$%%'`
-		;;
-    *)	src='.';;
+    */*) src=`echo $0 | sed -e 's%/[^/][^/]*$%%'`
+         case "$src" in
+	 /*)	;;
+	 .)	;;
+         *)	src=`cd ../$src && pwd` ;;
+	 esac
+         ;;
+    *)   src='.';;
     esac;;
 esac
 case "$src" in

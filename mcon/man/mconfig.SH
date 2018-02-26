@@ -18,88 +18,88 @@ echo "Extracting mcon/man/metaconfig.$manext (with variable substitutions)"
 $rm -f metaconfig.$manext
 $spitshell >metaconfig.$manext <<!GROK!THIS!
 .TH METACONFIG $manext "Version $VERSION PL$PATCHLEVEL"
-.\" @(#) Manual page for metaconfig
-.\"
-.\" $Id: mconfig.SH 25 2008-05-28 11:19:25Z rmanfredi $
-.\"
-.\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"
-.\"  You may redistribute only under the terms of the Artistic Licence,
-.\"  as specified in the README file that comes with the distribution.
-.\"  You may reuse parts of this distribution only within the terms of
-.\"  that same Artistic Licence; a copy of which may be found at the root
-.\"  of the source tree for dist 4.0.
-.\"
-.\" $Log: mconfig.SH,v $
-.\" Revision 3.0.1.17  1997/02/28  16:29:31  ram
-.\" patch61: documents the running environment and the src.U unit
-.\" patch61: added warnings for $_a and $_o, as well as "startsh"
-.\"
-.\" Revision 3.0.1.16  1995/09/25  09:17:48  ram
-.\" patch59: documented new ?Y: directive
-.\" patch59: fixed my e-mail address
-.\"
-.\" Revision 3.0.1.15  1995/07/25  14:18:24  ram
-.\" patch56: added extra nroff escapes at line heads to keep leading dots
-.\" patch56: documented new -G option
-.\" patch56: extended description of the Csym.U unit
-.\" patch56: now mentions what a compile-link test line should look like
-.\"
-.\" Revision 3.0.1.14  1995/05/12  12:25:02  ram
-.\" patch54: documented new -K switch for knowledgeable users
-.\"
-.\" Revision 3.0.1.13  1995/01/30  14:46:39  ram
-.\" patch49: documented new special units Prefixit.U and Prefixup.U
-.\"
-.\" Revision 3.0.1.12  1995/01/11  15:39:16  ram
-.\" patch45: documents new -O option and new Getfile escape supports
-.\" patch45: documents the & escape in Myread and the new cc symbol lookup
-.\"
-.\" Revision 3.0.1.11  1994/10/29  16:32:38  ram
-.\" patch36: added nroff protection for lines beginning with '.'
-.\" patch36: documents new ?F: line for file declarations
-.\" patch36: added example showing how ./loc can be used
-.\"
-.\" Revision 3.0.1.10  1994/08/29  16:33:40  ram
-.\" patch32: documented new Typedef.U unit for typedef lookup
-.\"
-.\" Revision 3.0.1.9  1994/06/20  07:10:14  ram
-.\" patch30: added -L option for easier unit testing
-.\" patch30: new -D and -U options supported by Configure
-.\"
-.\" Revision 3.0.1.8  1994/05/13  15:29:16  ram
-.\" patch27: now understands macro definitions in ?H: lines
-.\"
-.\" Revision 3.0.1.7  1994/05/06  15:19:25  ram
-.\" patch23: documented the new 'p' option in Getfile.U
-.\"
-.\" Revision 3.0.1.6  1994/01/24  14:19:47  ram
-.\" patch16: symbols defined in a unit can be tagged "internal use only"
-.\" patch16: documents new MailList.U special unit
-.\" patch16: new general <\$variable> macro substitution
-.\"
-.\" Revision 3.0.1.5  1993/10/16  13:51:50  ram
-.\" patch12: new option -M to activate ?M: lines
-.\" patch12: documents new ?M: lines format
-.\" patch12: new internal Makefile command cm_h_weed for ?M: support
-.\" patch12: documents usage for new confmagic.h file
-.\"
-.\" Revision 3.0.1.4  1993/09/09  11:50:35  ram
-.\" patch9: lots of typo fixes and abusive variable substitution problems
-.\"
-.\" Revision 3.0.1.3  1993/08/30  08:53:51  ram
-.\" patch8: wrongly stated that patchlevel.h should not be part of MANIFEST.new
-.\"
-.\" Revision 3.0.1.2  1993/08/24  12:13:32  ram
-.\" patch3: typo fixes
-.\"
-.\" Revision 3.0.1.1  1993/08/19  06:42:23  ram
-.\" patch1: leading config.sh searching was not aborting properly
-.\"
-.\" Revision 3.0  1993/08/18  12:10:14  ram
-.\" Baseline for dist 3.0 netwide release.
-.\"
-.\"
+''' @(#) Manual page for metaconfig
+'''
+''' $Id$
+'''
+'''  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
+'''
+'''  You may redistribute only under the terms of the Artistic Licence,
+'''  as specified in the README file that comes with the distribution.
+'''  You may reuse parts of this distribution only within the terms of
+'''  that same Artistic Licence; a copy of which may be found at the root
+'''  of the source tree for dist 4.0.
+'''
+''' $Log: mconfig.SH,v $
+''' Revision 3.0.1.17  1997/02/28  16:29:31  ram
+''' patch61: documents the runnning environment and the src.U unit
+''' patch61: added warnings for $_a and $_o, as well as "startsh"
+'''
+''' Revision 3.0.1.16  1995/09/25  09:17:48  ram
+''' patch59: documented new ?Y: directive
+''' patch59: fixed my e-mail address
+'''
+''' Revision 3.0.1.15  1995/07/25  14:18:24  ram
+''' patch56: added extra nroff escapes at line heads to keep leading dots
+''' patch56: documented new -G option
+''' patch56: extended description of the Csym.U unit
+''' patch56: now mentions what a compile-link test line should look like
+'''
+''' Revision 3.0.1.14  1995/05/12  12:25:02  ram
+''' patch54: documented new -K switch for knowledgeable users
+'''
+''' Revision 3.0.1.13  1995/01/30  14:46:39  ram
+''' patch49: documented new special units Prefixit.U and Prefixup.U
+'''
+''' Revision 3.0.1.12  1995/01/11  15:39:16  ram
+''' patch45: documents new -O option and new Getfile escape supports
+''' patch45: documents the & escape in Myread and the new cc symbol lookup
+'''
+''' Revision 3.0.1.11  1994/10/29  16:32:38  ram
+''' patch36: added nroff protection for lines beginning with '.'
+''' patch36: documents new ?F: line for file declarations
+''' patch36: added example showing how ./loc can be used
+'''
+''' Revision 3.0.1.10  1994/08/29  16:33:40  ram
+''' patch32: documented new Typedef.U unit for typedef lookup
+'''
+''' Revision 3.0.1.9  1994/06/20  07:10:14  ram
+''' patch30: added -L option for easier unit testing
+''' patch30: new -D and -U options supported by Configure
+'''
+''' Revision 3.0.1.8  1994/05/13  15:29:16  ram
+''' patch27: now understands macro definitions in ?H: lines
+'''
+''' Revision 3.0.1.7  1994/05/06  15:19:25  ram
+''' patch23: documented the new 'p' option in Getfile.U
+'''
+''' Revision 3.0.1.6  1994/01/24  14:19:47  ram
+''' patch16: symbols defined in a unit can be tagged "internal use only"
+''' patch16: documents new MailList.U special unit
+''' patch16: new general <\$variable> macro substitution
+'''
+''' Revision 3.0.1.5  1993/10/16  13:51:50  ram
+''' patch12: new option -M to activate ?M: lines
+''' patch12: documents new ?M: lines format
+''' patch12: new internal Makefile command cm_h_weed for ?M: support
+''' patch12: documents usage for new confmagic.h file
+'''
+''' Revision 3.0.1.4  1993/09/09  11:50:35  ram
+''' patch9: lots of typo fixes and abusive variable substitution problems
+'''
+''' Revision 3.0.1.3  1993/08/30  08:53:51  ram
+''' patch8: wrongly stated that patchlevel.h should not be part of MANIFEST.new
+'''
+''' Revision 3.0.1.2  1993/08/24  12:13:32  ram
+''' patch3: typo fixes
+'''
+''' Revision 3.0.1.1  1993/08/19  06:42:23  ram
+''' patch1: leading config.sh searching was not aborting properly
+'''
+''' Revision 3.0  1993/08/18  12:10:14  ram
+''' Baseline for dist 3.0 netwide release.
+'''
+'''
 .de Ex		\" Start of Example
 .sp
 .in +5
@@ -349,7 +349,7 @@ Put the unit into the public or private U directory as appropriate.
 .IP \(bu
 Rerun \fImetaconfig\fR.
 .IP \(bu
-Send your unit to ram@acri.fr (Raphael Manfredi) for inclusion
+Send your unit to Raphael.Manfredi@pobox.com (Raphael Manfredi) for inclusion
 in the master copy, if you think it's of general interest.
 .PP
 In order to add a new program to be located:
@@ -528,9 +528,22 @@ option permanently.
 .TP
 .B \-V
 Print version number and exit.
-.\"
-.\" T u t o r i a l
-.\"
+.TP
+\fB\-X\fI file\fR
+When examining the source files, ignore any symbols listed in the \fIfile\fR.
+This is useful in situations where a particular unit is known not to be needed
+for your package's portability targets, but your source files nevertheless
+contain occurrences of words that look to \fImetaconfig\fR like symbols defined
+in that unit. (For example, you might need the word "index" in a source file,
+but not need the unit that determines whether \fIstrcpy\fR or \fIindex\fR
+should be used.)
+The \fIfile\fR can contain blank lines, comment lines introduced with '#', and
+lines containing a single symbol.
+If this option is not supplied, any \fI$exclusions_file\fR variable in
+\fI.package\fR is honored instead.
+'''
+''' T u t o r i a l
+'''
 .SH TUTORIAL
 This (long) section is an introduction to \fImetaconfig\fR, in which we will
 learn all the basics. If you already know how to use \fImetaconfig\fR, you
@@ -2077,7 +2090,7 @@ Larry Wall <lwall@netlabs.com> for version 2.0.
 .br
 Harlan Stenn <harlan@mumps.pfcs.com> for important unit extensions.
 .br
-Raphael Manfredi <ram@hptnos02.grenoble.hp.com>.
+Raphael Manfredi <Raphael.Manfredi@pobox.com>.
 .br
 Many other contributors for the
 \fImetaconfig\fR units. See the credit file for a list.

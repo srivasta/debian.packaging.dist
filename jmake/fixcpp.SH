@@ -21,7 +21,7 @@ $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: fixcpp.SH 42 2010-11-28 18:15:13Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

@@ -1,4 +1,4 @@
-;# $Id: lint.pl 132 2012-02-09 19:15:13Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -110,7 +110,8 @@ sub init_extraction {
 	@make = ();					# Records make dependency lines
 	$body = 'p_body';			# Procedure to handle body
 	$ending = 'p_end';			# Called at the end of each unit
-	@wiping = qw( 				# The keywords we recognize for "wiped" units
+	@wiping =				# The keywords we recognize for "wiped" units
+	qw(
 		PACKAGENAME
 		MAINTLOC
 		VERSION
@@ -125,6 +126,50 @@ sub init_extraction {
 sub end_extraction {
 }
 
+# Process the command line of ?MAKE: lines
+sub p_make_command {
+	local ($_) = @_;
+	my $where = "\"$file\", line $. (?MAKE:)";
+	unless (s/^\t+//) {
+		warn "$where: command line must start with a leading TAB character.\n";
+		s/^\s+//;				# Remove spaces and continue
+	}
+	return unless s/^-?pick\b//;
+	# Validate the special "pick" make command, processed internally
+	# by metaconfig.
+	my %valid = map { $_ => 1 } qw(
+		add add.Config_sh add.Null
+		c_h_weed cm_h_weed close.Config_sh
+		prepend weed wipe
+
+	);
+	my $cmd;
+	$cmd = $1 if s/^\s+(\S+)//;
+	unless (defined $cmd) {
+		warn "$where: pick needs a command argument.\n";
+		return;
+	}
+	$wiped_unit++ if $cmd eq 'wipe';
+	warn "$where: unknown pick command '$cmd'.\n" unless $valid{$cmd};
+	s/^\s+//;
+	unless (s/^\$\@//) {
+		warn "$where: third pick argument must be \$\@\n";
+		return;
+	}
+	s/^\s+//;
+	my $target;
+	$target = $1 if s/^(\S+)//;
+	unless (defined $target) {
+		warn "$where: fourth pick argument is missing\n";
+		return;
+	}
+	return if $target =~ m|^\./|;
+	warn "$where: weird fourth argument '$target' to pick.\n"
+		unless $target =~ /^\w+$/;
+	warn "$where: fourth pick argument should probably be the %< macro.\n"
+		unless $target eq $unit;
+}
+
 # Process the ?MAKE: line
 sub p_make {
 	local($_) = @_;
@@ -132,7 +177,7 @@ sub p_make {
 	local(@dep);					# Dependencies
 	local($where) = "\"$file\", line $. (?MAKE:)";
 	unless (/^[\w+ ]*:/) {
-		$wiped_unit++ if /^\t+-pick\s+wipe\b/;
+		&p_make_command;
 		return;						# We only want the main dependency rule
 	}
 	warn "$where: ignoring duplicate dependency listing line.\n"
@@ -753,7 +798,7 @@ sub p_body {
 	# afterwards...
 
 	my $check_vars = 1;
-	$chek_vars = 0 if $heredoc_nosubst && !$began_here;
+	$check_vars = 0 if $heredoc_nosubst && !$began_here;
 
 	# Record any attempt made to set a shell variable
 	local($sym);

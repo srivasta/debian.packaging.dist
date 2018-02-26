@@ -1,4 +1,4 @@
-;# $Id: makefile.pl 20 2008-01-04 23:14:00Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  

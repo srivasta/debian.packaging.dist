@@ -1,4 +1,4 @@
-;# $Id: depend.pl 1 2006-08-24 12:32:52Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -52,6 +52,9 @@ sub p_wanted {
 		$cmaster{$_} = undef;					# Asks for look-up in C files
 		$cwanted{$_} = "$active" if $active;	# Shell symbols to activate
 	}
+
+	delete @cmaster{keys %excluded_symbol};
+	delete @cwanted{keys %excluded_symbol};
 }
 
 # Process the ?INIT: lines

@@ -1,7 +1,7 @@
-?RCS: $Id: ccflags.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id$
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-?RCS: 
+?RCS:
 ?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
@@ -47,7 +47,7 @@
 ?RCS:
 ?MAKE:ccflags ldflags lkflags cppflags optimize pthread locincpth: test cat \
 	Myread Guess Options Oldconfig gccversion mips_type +usrinc \
-	package contains rm +cc cppstdin cppminus cpprun cpplast libpth \
+	package contains rm rm_try +cc cppstdin cppminus cpprun cpplast libpth \
 	loclibpth hint
 ?MAKE:	-pick add $@ %<
 ?S:ccflags:
@@ -453,5 +453,5 @@ y)
 	;;
 n) echo "OK, that should do.";;
 esac
-$rm -f try try.* core
+$rm_try
 
