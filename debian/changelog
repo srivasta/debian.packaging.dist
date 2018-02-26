@@ -1,3 +1,17 @@
+dist (1:3.5-36.0001-3) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Mark dist Multi-Arch: foreign.
+
+ [ Manoj Srivastava ]
+  * Update the copyright file
+  * Incorporated Helmut's chqange, which, unless I missed it, newver made
+    it out.
+  * Bug fix: "mark dist Multi-Arch: foreign", thanks to Helmut Grohne
+    (Closes: #891134).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Sun, 25 Feb 2018 17:47:27 -0800
+
 dist (1:3.5-36.0001-2) unstable; urgency=low
 
   * Fix upstream spelling errors that resulterd in Lintian warnings.
