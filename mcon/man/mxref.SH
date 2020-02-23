@@ -20,7 +20,7 @@ $spitshell >metaxref.$manext <<!GROK!THIS!
 .TH METAXREF $manext "Version $VERSION PL$PATCHLEVEL"
 .\" @(#) Manual page for metaxref
 .\"
-.\" $Id: mxref.SH 1 2006-08-24 12:32:52Z rmanfredi $
+.\" $Id$
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 .\"  
@@ -99,6 +99,19 @@ can be found).
 .TP
 .B \-V
 Print version number and exit.
+.TP
+\fB\-X\fI file\fR
+When examining the source files, ignore any symbols listed in the \fIfile\fR.
+This is useful in situations where a particular unit is known not to be needed
+for your package's portability targets, but your source files nevertheless
+contain occurrences of words that look to \fImetaconfig\fR like symbols defined
+in that unit. (For example, you might need the word "index" in a source file,
+but not need the unit that determines whether \fIstrcpy\fR or \fIindex\fR
+should be used.)
+The \fIfile\fR can contain blank lines, comment lines introduced with '#', and
+lines containing a single symbol.
+If this option is not supplied, any \fI$exclusions_file\fR variable in
+\fI.package\fR is honored instead.
 .SH AUTHOR
 Harlan Stenn <harlan@mumps.pfcs.com>
 .SH FILES

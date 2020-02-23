@@ -1,4 +1,4 @@
-;# $Id: files.pl 23 2008-05-28 08:05:12Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -28,6 +28,9 @@
 ;# in the $cext and $shext variables from .package so that people can add new
 ;# extensions to their packages. For instance, perl5 adds .xs files holding
 ;# some C symbols.
+;#
+;# The read_exclusions() routine honours the .package $exclusions_file
+;# variable if its argument is undefined.
 ;#
 # Extract filenames from manifest
 sub extract_filenames {
@@ -104,5 +107,28 @@ sub q {
 	local($_) = @_;
 	s/^://gm;
 	$_;
+}
+
+sub read_exclusions {
+	my ($filename) = @_;
+	if (!defined $filename) {
+		$filename = $exclusions_file; # default to name from .package
+		return if !defined $filename || $filename eq '';
+	}
+	print "Reading exclusions from $filename...\n" unless $opt_s;
+	open(EXCLUSIONS, "< $filename\0") || die "Can't read $filename: $!\n";
+	local $_;
+	while (<EXCLUSIONS>) {
+		if (/^\s*#|^\s*$/) {
+			# comment or blank line, ignore
+		}
+		elsif (/^\s*(\w+)\s*$/) {
+			$excluded_symbol{$1} = 1;
+		}
+		else {
+			die "$filename:$.: unrecognised line\n";
+		}
+	}
+	close(EXCLUSIONS) || die "Can't close $filename: $!\n";
 }
 

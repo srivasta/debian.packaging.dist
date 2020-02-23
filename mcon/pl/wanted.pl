@@ -1,4 +1,4 @@
-;# $Id: wanted.pl 1 2006-08-24 12:32:52Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  

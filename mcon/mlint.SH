@@ -21,7 +21,7 @@ $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: mlint.SH 114 2012-01-28 13:01:37Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #  

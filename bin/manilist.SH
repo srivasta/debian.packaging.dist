@@ -20,7 +20,7 @@ $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;
 
-# $Id: manilist.SH 31 2010-03-06 20:15:24Z rmanfredi $
+# $Id$
 #
 #  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 #
@@ -213,7 +213,7 @@ if ($opt_d) {
 }
 
 @manifest = sort @manifest;
-@files = sort @files if defined(@files);
+@files = sort @files if @files;
 
 # Build up the %manifest array so that we quickly know whether a file is in the
 # manifest or not.

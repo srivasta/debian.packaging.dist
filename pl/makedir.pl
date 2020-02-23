@@ -1,4 +1,4 @@
-;# $Id: makedir.pl 1 2006-08-24 12:32:52Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -22,7 +22,7 @@ sub makedir {
     local($dir) = $_;
     if (!-d && $_ ne '') {
         # Make dirname first
-        do makedir($_) if s|(.*)/.*|\1|;
+        &makedir($_) if s|(.*)/.*|\1|;
 		mkdir($dir, 0700) if ! -d $dir;
     }
 }

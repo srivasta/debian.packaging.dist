@@ -20,10 +20,10 @@ $spitshell >metaconfig.$manext <<!GROK!THIS!
 .TH METACONFIG $manext "Version $VERSION PL$PATCHLEVEL"
 .\" @(#) Manual page for metaconfig
 .\"
-.\" $Id: mconfig.SH 25 2008-05-28 11:19:25Z rmanfredi $
+.\" $Id$
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"
+.\"  
 .\"  You may redistribute only under the terms of the Artistic Licence,
 .\"  as specified in the README file that comes with the distribution.
 .\"  You may reuse parts of this distribution only within the terms of
@@ -349,7 +349,7 @@ Put the unit into the public or private U directory as appropriate.
 .IP \(bu
 Rerun \fImetaconfig\fR.
 .IP \(bu
-Send your unit to ram@acri.fr (Raphael Manfredi) for inclusion
+Send your unit to Raphael.Manfredi@pobox.com (Raphael Manfredi) for inclusion
 in the master copy, if you think it's of general interest.
 .PP
 In order to add a new program to be located:
@@ -528,6 +528,19 @@ option permanently.
 .TP
 .B \-V
 Print version number and exit.
+.TP
+\fB\-X\fI file\fR
+When examining the source files, ignore any symbols listed in the \fIfile\fR.
+This is useful in situations where a particular unit is known not to be needed
+for your package's portability targets, but your source files nevertheless
+contain occurrences of words that look to \fImetaconfig\fR like symbols defined
+in that unit. (For example, you might need the word "index" in a source file,
+but not need the unit that determines whether \fIstrcpy\fR or \fIindex\fR
+should be used.)
+The \fIfile\fR can contain blank lines, comment lines introduced with '#', and
+lines containing a single symbol.
+If this option is not supplied, any \fI$exclusions_file\fR variable in
+\fI.package\fR is honored instead.
 .\"
 .\" T u t o r i a l
 .\"
@@ -2077,7 +2090,7 @@ Larry Wall <lwall@netlabs.com> for version 2.0.
 .br
 Harlan Stenn <harlan@mumps.pfcs.com> for important unit extensions.
 .br
-Raphael Manfredi <ram@hptnos02.grenoble.hp.com>.
+Raphael Manfredi <Raphael.Manfredi@pobox.com>.
 .br
 Many other contributors for the
 \fImetaconfig\fR units. See the credit file for a list.

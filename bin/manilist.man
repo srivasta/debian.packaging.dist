@@ -1,4 +1,4 @@
-.\" $Id: manilist.man 3 2006-08-25 21:39:07Z rmanfredi $
+.\" $Id$
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 .\"  
@@ -327,6 +327,6 @@ Default manifest file, listing files and giving a small description for each
 of them.
 .PD
 .SH AUTHOR
-Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
+Raphael Manfredi <Raphael.Manfredi@pobox.com>
 .SH "SEE ALSO"
 manifake(1), makedist(1), pat(1).

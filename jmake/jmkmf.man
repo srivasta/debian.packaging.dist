@@ -1,4 +1,4 @@
-.\" $Id: jmkmf.man 3 2006-08-25 21:39:07Z rmanfredi $
+.\" $Id$
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 .\"  
@@ -66,7 +66,7 @@ end of the name as in
 and
 .I make Makefiles.
 .SH AUTHOR
-Raphael Manfredi <ram@hptnos02.grenoble.hp.com>
+Raphael Manfredi <Raphael.Manfredi@pobox.com>
 .SH FILES
 .PD 0
 .TP 20

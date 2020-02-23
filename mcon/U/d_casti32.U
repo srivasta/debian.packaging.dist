@@ -1,7 +1,7 @@
-?RCS: $Id: d_casti32.U 167 2013-05-08 17:58:00Z rmanfredi $
+?RCS: $Id$
 ?RCS:
 ?RCS: Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-?RCS: 
+?RCS:
 ?RCS: You may redistribute only under the terms of the Artistic License,
 ?RCS: as specified in the README file that comes with the distribution.
 ?RCS: You may reuse parts of this distribution only within the terms of
@@ -23,7 +23,7 @@
 ?X:
 ?X:	Can the compiler cast large floats to 32-bit integers?
 ?X:
-?MAKE:d_casti32: cat +cc +ccflags rm intsize Setvar test signal_t
+?MAKE:d_casti32: cat +cc +ccflags rm_try intsize Setvar test signal_t
 ?MAKE:	-pick add $@ %<
 ?S:d_casti32:
 ?S:	This variable conditionally defines CASTI32, which indicates
@@ -83,5 +83,5 @@ case "$yyy" in
 esac
 set d_casti32
 eval $setvar
-$rm -f try try.*
+$rm_try
 

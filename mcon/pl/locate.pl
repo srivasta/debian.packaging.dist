@@ -1,4 +1,4 @@
-;# $Id: locate.pl 1 2006-08-24 12:32:52Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -122,7 +122,7 @@ sub units_path {
 	print "Locating in $MC/$dir...\n" if $main'opt_v;
 	@contents = readdir DIR;			# Slurp the whole thing
 	closedir DIR;						# And close dir, ready for recursion
-	foreach (@contents) {
+	foreach (sort @contents) {
 		next if $_ eq '.' || $_ eq '..';
 		if (/\.U$/) {					# A unit, definitely
 			($unit_name) = /^(.*)\.U$/;

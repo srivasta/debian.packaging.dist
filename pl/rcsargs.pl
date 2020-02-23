@@ -1,4 +1,4 @@
-;# $Id: rcsargs.pl 1 2006-08-24 12:32:52Z rmanfredi $
+;# $Id$
 ;#
 ;#  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
 ;#  
@@ -19,11 +19,11 @@ sub rcsargs {
 	while ($_ = shift(@_)) {
 		if ($_ =~ /^-/) {
 			$result .= $_ . ' ';
-		} elsif ($#_ >= 0 && do equiv($_,$_[0])) {
+		} elsif ($#_ >= 0 && &equiv($_,$_[0])) {
 			$result .= $_ . ' ' . $_[0] . ' ';
 			shift(@_);
 		} else {
-			$result .= $_ . ' ' . do other($_) . ' ';
+			$result .= $_ . ' ' . &other($_) . ' ';
 		}
 	}
 	$result;
