@@ -165,4 +165,16 @@ case "$passcat" in
 '') passcat=':'
 	$test -f /etc/passwd && passcat='cat /etc/passwd';;
 esac
+case "$hostcat" in
+'') hostcat='cat /etc/hosts';;
+*)  ;;
+esac
+case "$groupcat" in
+'') groupcat='cat /etc/group';;
+*)  ;;
+esac
+case "$passcat" in
+'') passcat='cat /etc/passwd';;
+*)  ;;
+esac
 

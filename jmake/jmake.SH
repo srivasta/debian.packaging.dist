@@ -19,7 +19,7 @@ echo "Extracting jmake/jmake (with variable substitutions)"
 $spitshell >jmake <<!GROK!THIS!
 $startperl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
-		if \$runnning_under_some_shell;
+		if \$running_under_some_shell;
 
 # $Id$
 #

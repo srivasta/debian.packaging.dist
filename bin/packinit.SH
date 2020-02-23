@@ -16,6 +16,7 @@ case "$0" in
 esac
 echo "Extracting bin/packinit (with variable substitutions)"
 cat >packinit <<!GROK!THIS!
+#!/usr/bin/perl
 # feed this into perl
 	eval 'exec perl -S \$0 \${1+"\$@"}'
 		if \$running_under_some_shell;

@@ -449,10 +449,10 @@ esac
 
 case "$sh" in
 '')	cat >&2 <<EOM
-$me:  Fatal Error:  I can't find a Bourne Shell anywhere.  
+$me:  Fatal Error:  I can't find a Bourne Shell anywhere.
 
 Usually it's in /bin/sh.  How did you even get this far?
-Please contact me (Raphael Manfredi) at Raphael_Manfredi@pobox.com and 
+Please contact me (Raphael Manfredi) at Raphael_Manfredi@pobox.com and
 we'll try to straighten this all out.
 EOM
 	exit 1
@@ -683,7 +683,7 @@ while test $# -gt 0; do
                  case "$zzz" in
                  *:*) zzz='' ;;
                  *)   xxx=append
-                      zzz=" "`echo "$yyy"|sed 's!^[^=]*=!!'` 
+                      zzz=" "`echo "$yyy"|sed 's!^[^=]*=!!'`
                       yyy=`echo "$yyy"|sed 's!=.*!!'` ;;
                  esac
                  ;;
@@ -697,7 +697,7 @@ while test $# -gt 0; do
                  *)   xxx=`echo "$yyy"|sed 's!:.*!!'`
                       yyy=`echo "$yyy"|sed 's!^[^:]*:!!'` ;;
                  esac
-                 ;;       
+                 ;;
             esac
 	    case "$xxx" in
 	    append)
@@ -1214,7 +1214,7 @@ if $contains "^$user\$" ../.config/instruct >/dev/null 2>&1; then
 fi
 if $needman; then
 	cat <<EOH
- 
+
 This installation shell script will examine your system and ask you questions
 to determine how the dist package should be installed. If you get
 stuck on a question, you may use a ! shell escape to start a subshell or
@@ -1238,7 +1238,7 @@ in the default answer, as if the default line was a set of arguments given to a
 script shell.  This means you may also use $* to repeat the whole default line,
 so you do not have to re-type everything to add something to the default.
 
-Everytime there is a substitution, you will have to confirm.  If there is an
+Every time there is a substitution, you will have to confirm.  If there is an
 error (e.g. an unmatched backtick), the default answer will remain unchanged
 and you will be prompted again.
 
@@ -1462,7 +1462,7 @@ ln$_exe|ln)
 	;;
 esac
 case "$make" in
-make$_exe|make)	
+make$_exe|make)
 	case "$gmake" in
 	gmake)
 	echo "I can't find make or gmake, and my life depends on it." >&4
@@ -1471,7 +1471,7 @@ make$_exe|make)
 	;;
 	esac
 	;;
-esac	
+esac
 case "$gmake" in
 gmake$_exe|gmake)	;;
 *)
@@ -1570,12 +1570,12 @@ EOM
                         echo "Cannot find myread, sorry.  Aborting." >&2
                         exit 1
                     fi
-                fi  
+                fi
                 case "$ans" in
                 [yY]*) cc=gcc; ccname=gcc; ccflags=''; despair=no;
                        $cat *.cbu >checktmp 2>/dev/null
                        if $contains ccflags checktmp >/dev/null; then
-                           ./warn 4>&4 <<EOM 
+                           ./warn 4>&4 <<EOM
 Any previous setting of the C compiler flags has been lost.
 It may be necessary to pass -Dcc=gcc to Configure right away.
 EOM
@@ -1594,9 +1594,9 @@ cat <<EOS >checkcc
 $startsh
 EOS
 cat <<'EOSC' >>checkcc
-case "$cc" in        
+case "$cc" in
 '') ;;
-*)  $rm -f try try.*              
+*)  $rm -f try try.*
     $cat >try.c <<EOM
 int main(int argc, char *argv[]) {
   (void) argc;
@@ -1610,7 +1610,7 @@ EOM
         if $test X"$despair" = Xyes; then
            echo "Uh-oh, the C compiler '$cc' doesn't seem to be working." >&4
         fi
-        $cat >&4 <<EOM         
+        $cat >&4 <<EOM
 You need to find a working C compiler.
 Either (purchase and) install the C compiler supplied by your OS vendor,
 or for a free C compiler try http://gcc.gnu.org/
@@ -1674,7 +1674,7 @@ case "$lns" in
 				;;
 			*)	issymlink='' ;;
 			esac
-		fi		
+		fi
 	fi
 	if $test "X$issymlink" = X; then
 		if $test -L sym 2>/dev/null; then
@@ -1956,16 +1956,16 @@ if $test "X$has_uname" != X; then
 	domainos) osname=apollo
 		osvers="$3"
 		;;
-	dgux) osname=dgux 
+	dgux) osname=dgux
 		osvers="$3"
 		;;
 	dynixptx*) osname=dynixptx
 		osvers=`echo "$4"|sed 's/^v//'`
 		;;
-	freebsd) osname=freebsd 
+	freebsd) osname=freebsd
 		osvers="$3" ;;
 	genix) osname=genix ;;
-	hp*) osname=hpux 
+	hp*) osname=hpux
 		osvers=`echo "$3" | $sed 's,.*\.\([0-9]*\.[0-9]*\),\1,'`
 		;;
 	irix*) osname=irix
@@ -2058,7 +2058,7 @@ if $test "X$has_uname" != X; then
 		*freebsd*) ;;
 		svr*)
 			: svr4.x or possibly later
-			case "svr$3" in	
+			case "svr$3" in
 			${osname}*)
 				osname=svr$3
 				osvers=$4
@@ -2306,7 +2306,7 @@ fi
 : determine where manual pages are on this system
 echo " "
 case "$sysman" in
-'') 
+'')
 	syspath='/usr/share/man/man1 /usr/man/man1'
 	syspath="$syspath /usr/man/mann /usr/man/manl /usr/man/local/man1"
 	syspath="$syspath /usr/man/u_man/man1 /usr/share/man/man1"
@@ -2328,9 +2328,9 @@ case "$d_portable" in
 *)	dflt=n;;
 esac
 $cat <<'EOH'
- 
+
 I can set things up so that your shell scripts and binaries are more portable,
-at what may be a noticable cost in performance.  In particular, if you
+at what may be a noticeable cost in performance.  In particular, if you
 ask to be portable, the following happens:
 
      1) Shell scripts will rely on the PATH variable rather than using
@@ -2537,7 +2537,7 @@ while test "$type"; do
 				for fp in $gfpth; do
 					if test "X$fp" = X.; then
 					    pf="$ansexp"
-					else    
+					else
 					    pf="$fp/$ansexp"
 					fi
 					if test -f "$pf"; then
@@ -2558,7 +2558,7 @@ while test "$type"; do
 					if test "X$fp" = X.; then
 					    dir="$ans"
 					    direxp="$ansexp"
-					else    
+					else
 					    dir="$fp/$ansexp"
 					    direxp="$fp/$ansexp"
 					fi
@@ -2830,12 +2830,12 @@ case "$scriptdir" in
 	;;
 esac
 $cat <<EOM
- 
+
 Some installations have a separate directory just for executable scripts so
 that they can mount it across multiple architectures but keep the scripts in
 one spot.  You might, for example, have a subdirectory of /usr/share for this.
 Or you might just lump your scripts in with all your other executables.
- 
+
 EOM
 fn=d~
 rp='Where do you keep publicly executable scripts?'
@@ -3383,7 +3383,7 @@ else
 fi
 $rm -f foo.c foo.cpp
 
-: Check whether they have gcc in any guise.  
+: Check whether they have gcc in any guise.
 echo " "
 echo "Checking for GNU cc in disguise and/or its version number..." >&4
 $cat >try.c <<EOM
@@ -3406,7 +3406,7 @@ then
 	case "$gccversion" in
 	'') echo "You are not using GNU cc." ;;
 	*)  echo "You are using GNU cc $gccversion."
-	    ccname=gcc	
+	    ccname=gcc
 	    ;;
 	esac
 else
@@ -3855,7 +3855,7 @@ esac
 for thislibdir in $libpth; do
 	case " $loclibpth " in
 	*" $thislibdir "*)
-		case "$dflt " in 
+		case "$dflt " in
 		*"-L$thislibdir "*) ;;
 		*)  dflt="$dflt -L$thislibdir" ;;
 		esac
@@ -4207,7 +4207,7 @@ case "$orgname" in
 *)  dflt="$orgname";;
 esac
 $cat << 'EOH'
- 
+
 Please type the name of your organization as you want it to appear on the
 Organization line of outgoing articles.  (It's nice if this also specifies
 your location.  Your city name is probably sufficient if well known.)
@@ -4736,4 +4736,3 @@ $rm -f kit*isdone ark*isdone
 $rm -rf UU
 
 : End of Configure
-

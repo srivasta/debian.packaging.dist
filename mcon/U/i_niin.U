@@ -13,7 +13,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?X:
-?X: This unit looks wether <netinet/in.h> is available or not
+?X: This unit looks whether <netinet/in.h> is available or not
 ?X:
 ?MAKE:i_niin i_sysin: Inhdr
 ?MAKE:	-pick add $@ %<

@@ -520,7 +520,7 @@ local_deinstall.man::		@@\
  */
 #define LinkFileList(step,list,dir,sub)	@!\
 step:: list							@@\
-	@case '${MFLAGS}' in *[i]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[i]*) set +e;; *) set -e;; esac; \	@@\
 	echo "	cd" dir; cd dir; for i in list; do (set -x; $(LN) sub/$$i .); done
 
 
@@ -1203,7 +1203,7 @@ local_realclean:: 								@@\
  */
 #define CommonSubdirsRule(dirs) @!\
 subdirs: 						@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \			@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \		@@\
 	for i in dirs ;\					@@\
 	do \								@@\
 		(cd $$i ; echo "$(VERB) in $(DIR)$$i..."; \		@@\
@@ -1217,7 +1217,7 @@ subdirs: 						@@\
  */
 #define NamedTargetSubdirsRule(dirs,name,verb,flags)	@!\
 name::									@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \		@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \		@@\
 	for i in dirs ;\					@@\
 	do \								@@\
 		(cd $$i ; echo verb "in $(DIR)$$i..."; \	@@\
@@ -1462,7 +1462,7 @@ MakeLintSubdirs(dirs,lintlib)
  */
 #define MakeMakeSubdirs(target)	@!\
 target::								@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \	@@\
 	for i in $(SUBDIRS);\				@@\
 	do \								@@\
 		echo "Making "target" in $(DIR)$$i..."; \	@@\
@@ -1481,7 +1481,7 @@ target::								@@\
  */
 #define MakeMakefilesSH()		@!\
 Makefiles.SH:: Makefile.SH				@@\
-	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \	@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; *) set -e;; esac; \	@@\
 	for i in $(SUBDIRS);\					@@\
 	do \								@@\
 		case "$(DIR)$$i/" in \								@@\

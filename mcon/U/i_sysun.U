@@ -13,7 +13,7 @@
 ?RCS: Baseline for dist 3.0 netwide release.
 ?RCS:
 ?X:
-?X: This unit looks wether <sys/un.h> is available or not
+?X: This unit looks whether <sys/un.h> is available or not
 ?X:
 ?MAKE:i_sysun: Inhdr
 ?MAKE:	-pick add $@ %<
