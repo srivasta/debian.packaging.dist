@@ -93,6 +93,8 @@ unlink 'Wanted' unless $opt_w;			# Wanted rebuilt if no -w
 unlink 'Obsolete' unless $opt_w;		# Obsolete file rebuilt if no -w
 &readpackage;							# Merely get the package's name
 &init;									# Various initializations
+my %excluded_symbol;
+read_exclusions($opt_X);				# Load -X or .package equivalent
 `mkdir .MT 2>&1` unless -d '.MT';		# For private temporary files
 
 &locate_units;				# Fill in @ARGV with a unit list

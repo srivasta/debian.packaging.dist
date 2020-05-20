@@ -23,7 +23,7 @@ $spitshell >metalint.$manext <<!GROK!THIS!
 .\" $Id$
 .\"
 .\"  Copyright (c) 1991-1997, 2004-2006, Raphael Manfredi
-.\"  
+.\"
 .\"  You may redistribute only under the terms of the Artistic Licence,
 .\"  as specified in the README file that comes with the distribution.
 .\"  You may reuse parts of this distribution only within the terms of
@@ -260,10 +260,19 @@ The file is listed more than once on the ?F: line, under the same name.
 This does not appear when declaring both a private UU file and a public
 file with the same name, for instance.
 .TP
-"(?F) UU file $uufile in non-special unit ignored."
+"(?F) UU file 'xxx' in non-special unit ignored."
 Private UU files (i.e. files like the \fImyread\fR script created for
 later perusal by \fIConfigure\fR) may only be created in special units.
 Exceptions allowed if the ?F: line is preceded by a proper ?LINT: hint.
+.TP
+"(?F) file 'xxx' already exported by yyy.U."
+The listed file 'xxx' is already reported exported (listed likewise) in
+the other unit yyy.U and is conflicting.  An exported file is a generated
+file above the UU directory.
+.TP
+"(?F) UU file 'xxx' already created by yyy.U."
+The listed file 'xxx' is already created in the UU directory by the other
+unit yyy.U.  A created file is listed as ./xxx on the ?F: line.
 .TP
 "(?T) temporary symbol '\$xxx' multiply declared."
 Self explanatory.

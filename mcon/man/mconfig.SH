@@ -32,7 +32,7 @@ $spitshell >metaconfig.$manext <<!GROK!THIS!
 .\"
 .\" $Log: mconfig.SH,v $
 .\" Revision 3.0.1.17  1997/02/28  16:29:31  ram
-.\" patch61: documents the running environment and the src.U unit
+.\" patch61: documents the runnning environment and the src.U unit
 .\" patch61: added warnings for $_a and $_o, as well as "startsh"
 .\"
 .\" Revision 3.0.1.16  1995/09/25  09:17:48  ram
@@ -1741,6 +1741,25 @@ eval \$prefixup
 before prompting via \fIgetfile\fR for instance. If the prefix does not
 make use of ~name expanstion, then the above will be a no-op on the \fI$dflt\fR
 variable, naturally.
+.TP
+Specific.U
+This unit is empty by default.  It is meant as a project-specific hook
+to have shell code executed by \fIConfigure\fR after \fIconfig.sh\fR was
+generated but before the extraction of .SH files.
+.sp
+Copy the unit to your project's \fIU/\fR directory and customize it.
+.sp
+Here is what the \fIdist\fR project uses it for (showing only the unit's code,
+not the full unit here):
+.Ex
+: project-specific code
+file=revision.h
+echo " "
+echo "Generating \$file..." >&4
+bin/svn-revision . \$file
+.Ef
+That shell code is executed when \fIConfigure\fR is back to the top directory
+of the source tree.
 .TP
 Typedef.U
 This unit produces the \fI\$typedef\fR shell variable, used internally by
