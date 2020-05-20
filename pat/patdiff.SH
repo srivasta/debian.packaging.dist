@@ -49,8 +49,6 @@ $startperl
 !GROK!THIS!
 cat >>patdiff <<'!NO!SUBS!'
 
-use File::Temp qw/ tempfile tempdir /;
-
 $RCSEXT = ',v' unless $RCSEXT;
 $TOPDIR = '';			# We are at top-level directory
 
@@ -161,11 +159,9 @@ foreach $file (@ARGV) {
 				close DIFF;
 				system 'rcs', "-Nlastpat:$new", @files;
 			} else {
-                                my $tmpo = File::Temp->new();
-                                my $tmpn = File::Temp->new();
-				&copyright'expand("co -p -rlastpat $file", "$tmpo");
-				&copyright'expand("co -p -r$new $file", "$tmpn");
-				open(DIFF, "$mydiff $tmpo $tmpn |") ||
+				&copyright'expand("co -p -rlastpat $file", "/tmp/pdo$$");
+				&copyright'expand("co -p -r$new $file", "/tmp/pdn$$");
+				open(DIFF, "$mydiff /tmp/pdo$$ /tmp/pdn$$ |") ||
 				die "Can't run $mydiff";
 				while (<DIFF>) {			# Contextual or unified diff
 					if ($. == 1) {
@@ -181,7 +177,7 @@ foreach $file (@ARGV) {
 				}
 				close DIFF;
 				system 'rcs', "-Nlastpat:$new", @files;
-				unlink "$tmpo", "$tmpn";
+				unlink "/tmp/pdn$$", "/tmp/pdo$$";
 			}
 		} else {
 			if ($mydiff eq '') {
@@ -195,11 +191,9 @@ foreach $file (@ARGV) {
 				}
 				close DIFF;
 			} else {
-                                my $tmpo = File::Temp->new();
-                                my $tmpn = File::Temp->new();
-				system "co -p -rlastpat $files >$tmpo";
-				system "cp $file $tmpn";
-				open(DIFF, "$mydiff $tmpo $tmpn |") ||
+				system "co -p -rlastpat $files >/tmp/pdo$$";
+				system "cp $file /tmp/pdn$$";
+				open(DIFF, "$mydiff /tmp/pdo$$ /tmp/pdn$$ |") ||
 				die "$progname: can't fork $mydiff: $!\n";
 				while (<DIFF>) {
 					# Contextual or unified diff
@@ -215,7 +209,7 @@ foreach $file (@ARGV) {
 					print PATCH;
 				}
 				close DIFF;
-				unlink "$tmpo", "$tmpn";
+				unlink "/tmp/pdn$$", "/tmp/pdo$$";
 			}
 		}
 	}

@@ -1,7 +1,9 @@
 .config/
+.package
 *.bak
 *.1
 Makefile
+Wanted
 bin/manicheck
 bin/manilist
 bin/packinit
@@ -39,3 +41,4 @@ pat/patnotify
 pat/patpost
 pat/patsend
 pat/patsnap
+revision.h

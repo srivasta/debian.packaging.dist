@@ -8,6 +8,7 @@ MANIFEST                   This list of files
 Makefile.SH                A makefile to run subsidiary makefiles
 README                     Basic instructions
 Wishlist                   Features I would like to add
+U/Specific.U               Specific code for dist before .SH extraction
 bin/                       Some binary tools
 bin/Jmakefile              Generic makefile description for bin
 bin/Makefile.SH            Jmake-generated configured makefile
@@ -127,6 +128,7 @@ mcon/U/Rcs.U               Some stupid redefinitions to keep RCS happy
 mcon/U/Sendfile64.U        Is sendfile() working with the largefile flags?
 mcon/U/Setvar.U            Set a variable with some sanity checks
 mcon/U/Signal.U            Utilities for sig_name.U
+mcon/U/Specific.U          Hook for project-specific code before .SH extraction
 mcon/U/Tr.U                Builds a tr script to handle lower and upper classes
 mcon/U/Trylink.U           Compiles and links a test program
 mcon/U/Typedef.U           Defines a typedef lookup function
@@ -170,6 +172,7 @@ mcon/U/d_backtrace.U       Do we have backtrace()?
 mcon/U/d_bcmp.U            Do we have bcmp() or memcmp()?
 mcon/U/d_bcopy.U           Do we have bcopy() or memcpy()?
 mcon/U/d_bfd_lib.U         Is the BFD library available?
+mcon/U/d_bfd_section.U     Do bfd_section_xxx() accessors exist with 1 argument?
 mcon/U/d_bindtxtcode.U     Do we have bind_textdomain_codeset()?
 mcon/U/d_brokstat.U        Check whether stat() macros are broken
 mcon/U/d_bsdjmp.U          Do we have BSD _setjmp() and _longjmp()?
@@ -221,7 +224,6 @@ mcon/U/d_eofpipe.U         Will EOF be seen on closed pipes?
 mcon/U/d_epoll.U           Can we use epoll_xxx() routines?
 mcon/U/d_etext_symbol.U    Whether linker defines the "etext" symbol
 mcon/U/d_euc2jis.U         Do we have euc2jis()?
-mcon/U/d_fast_assert.U     Can we use fast assertions?
 mcon/U/d_fchdir.U          Do we have fchdir()?
 mcon/U/d_fchmod.U          Do we have fchmod()?
 mcon/U/d_fchown.U          Do we have fchown()?
@@ -309,6 +311,7 @@ mcon/U/d_memcmp.U          Do we have memcmp()?
 mcon/U/d_memcpy.U          Do we have memcpy()?
 mcon/U/d_memmove.U         Do we have memmove()?
 mcon/U/d_mempcpy.U         Do we have mempcpy()?
+mcon/U/d_memrchr.U         Do we have memrchr()?
 mcon/U/d_memset.U          Do we have memset()?
 mcon/U/d_mkdir.U           Do we have mkdir()?
 mcon/U/d_mkfifo.U          Do we have mkfifo()?
