@@ -23,8 +23,8 @@ PAT_EXEC       = patcil patdiff patbase patlog patmake patsend \
                  patnotify patpost patftp patname patsnap patcol \
                  patclean patindex
 
-DPKG_ARCH := dpkg-architecture
-export DEB_HOST_MULTIARCH  := $(shell $(DPKG_ARCH) $(ha) -qDEB_HOST_MULTIARCH)
+# For DEB_HOST_MULTIARCH
+include /usr/share/dpkg/architecture.mk
 
 %:
 	dh $@
@@ -35,15 +35,19 @@ override_dh_auto_configure:
 	    touch .config/nomail                        && \
               sh ./Configure                               \
                 -de                                        \
-                -D prefix=$(PREFIX)                        \
+                -D prefix=/usr                             \
                 -D orgname=/etc/news/organization          \
                 -D myhostname=localhost                    \
                 -D mydomain=localdomain                    \
                 -D defeditor=/usr/ae                       \
-	        -D privlib=/usr/share/$(package)           \
+                -D privlib=/usr/share/$(package)           \
                 -D pager=/bin/more                         \
                 -D mansrc=/usr/share/man/                  \
                 -D cf_email='$(email)'                     \
+                -D grep=/bin/grep                          \
+                -D sed=/bin/sed                            \
+                -D cat=/bin/cat                            \
+                -D zcat=/bin/zcat                          \
                 -D d_berknames='define'
 
 
@@ -57,6 +61,9 @@ override_dh_auto_build:
 override_dh_install:
 	test -d $(MAN1DIR) || $(make_directory) $(MAN1DIR)
 	$(MAKE) install
+	for script in $(TMPTOP)/usr/bin/*; do    \
+        test `head -1 $$script` = '#!/usr/bin/perl' && perl -c $$script ;\
+    done
 	$(MAKE) install.man
 	$(make_directory) $(MAN7DIR)
 	(cd $(MAN1DIR); for file in $(PAT_EXEC) ; do \

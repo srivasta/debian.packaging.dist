@@ -70,6 +70,8 @@ chop($date = `date`);
 use Getopt::Std;
 &usage unless getopts("dhkmostvwGMVL:X:");
 
+my %excluded_symbol;
+read_exclusions($opt_X);
 $MC = $opt_L if $opt_L;			# May override public library path
 $MC = &tilda_expand($MC);		# ~name expansion
 chop($WD = `pwd`);				# Working directory

@@ -288,7 +288,7 @@ EOH
 
 set_org_perms () {
     chown root /etc/news/organization
-    if grep news /etc/group 2>&1 >/dev/null ; then
+    if grep news /etc/group > /dev/null 2>&1 ; then
 	chgrp news /etc/news/organization
     else
 	chgrp root /etc/news/organization
@@ -397,7 +397,7 @@ case "$1" in
 	if test ! -d /etc/news ; then
 	    mkdir /etc/news
 	    chown root /etc/news
-	    if grep news /etc/group 2>&1 >/dev/null ; then
+	    if grep news /etc/group > /dev/null 2>&1 ; then
 		chgrp news /etc/news
 	    else
 		echo "darn, you do not have news in /etc/group"
